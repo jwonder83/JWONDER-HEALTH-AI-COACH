@@ -1,7 +1,6 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
-import { SupabaseEnvMissingBanner } from "@/components/auth/SupabaseEnvMissingBanner";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
@@ -39,7 +38,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
     err === "auth"
       ? "인증에 실패했습니다. 다시 시도해 주세요."
       : err === "config"
-        ? "앱 레이아웃에서 Supabase를 초기화하지 못했습니다. 아래를 확인하세요."
+        ? "서버에서 Supabase를 초기화하지 못했습니다."
         : err === "no_code"
           ? "인증 코드가 없습니다."
           : null;
@@ -88,12 +87,22 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
       <p className="mt-3 text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-apple-subtle">{site.copy.loginCard.subtitle}</p>
 
       {showEnvBanner ? (
-        <div className="mt-6 space-y-3">
-          <SupabaseEnvMissingBanner />
-          {errorHint && err === "config" ? (
-            <p className="rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] leading-snug text-rose-800 shadow-sm">{errorHint}</p>
-          ) : null}
-        </div>
+        <p className="mt-6 rounded-lg border border-amber-200/90 bg-amber-50/90 px-3.5 py-2.5 text-[13px] leading-snug text-amber-950">
+          {err === "config" && supabaseEnvReady ? (
+            <>
+              {errorHint} Vercel 로그와 Supabase 연결을 확인해 주세요.
+            </>
+          ) : (
+            <>
+              Vercel <span className="font-medium">Settings → Environment Variables</span>에{" "}
+              <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_URL</code>,{" "}
+              <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>
+              (또는 <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>)를
+              Supabase API 화면과 동일하게 넣은 뒤 <strong>Redeploy</strong>하세요. Auth Redirect URLs에는{" "}
+              <code className="rounded bg-white/70 px-1 font-mono text-[11px]">/auth/callback</code> 전체 URL을 추가하세요.
+            </>
+          )}
+        </p>
       ) : null}
 
       {!showEnvBanner && (msg || errorHint) ? (

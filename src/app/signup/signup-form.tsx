@@ -1,7 +1,6 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
-import { SupabaseEnvMissingBanner } from "@/components/auth/SupabaseEnvMissingBanner";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
@@ -61,9 +60,13 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       <p className="mt-3 text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-apple-subtle">{site.copy.signupCard.subtitle}</p>
 
       {!supabaseEnvReady ? (
-        <div className="mt-6">
-          <SupabaseEnvMissingBanner />
-        </div>
+        <p className="mt-6 rounded-lg border border-amber-200/90 bg-amber-50/90 px-3.5 py-2.5 text-[13px] leading-snug text-amber-950">
+          Vercel <span className="font-medium">Settings → Environment Variables</span>에{" "}
+          <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_URL</code>,{" "}
+          <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>
+          (또는 <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>)를
+          넣은 뒤 <strong>Redeploy</strong>하세요.
+        </p>
       ) : null}
 
       {msg && (
