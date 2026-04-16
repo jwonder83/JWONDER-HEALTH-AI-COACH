@@ -1,0 +1,27 @@
+import { AppShell } from "@/components/layout/AppShell";
+import { isSiteSettingsHeaderVisible } from "@/lib/site-settings/admin-check";
+import { getSiteSettings } from "@/lib/site-settings/load-server";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+
+export default async function AppLayout({ children }: { children: ReactNode }) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      redirect("/login");
+    }
+    const site = await getSiteSettings();
+    const showAdminLink = isSiteSettingsHeaderVisible(user.email);
+    return (
+      <AppShell email={user.email ?? ""} showAdminLink={showAdminLink} site={site}>
+        {children}
+      </AppShell>
+    );
+  } catch {
+    redirect("/login?error=config");
+  }
+}
