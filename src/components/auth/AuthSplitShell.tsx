@@ -66,17 +66,6 @@ export function AuthSplitShell({ panelImage, eyebrow, panelTitle, panelDescripti
             <div className="rounded-[2rem] border border-orange-100/90 bg-white/90 p-8 shadow-[0_24px_56px_-28px_rgba(233,75,60,0.18)] ring-1 ring-orange-50/60 backdrop-blur-xl sm:p-10">
               {children}
             </div>
-            <p className="mt-8 text-center text-[11px] text-apple-subtle">
-              Images from{" "}
-              <a
-                href="https://unsplash.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-apple-muted underline decoration-black/15 underline-offset-[3px] transition hover:text-apple"
-              >
-                Unsplash
-              </a>
-            </p>
           </div>
         </div>
       </div>

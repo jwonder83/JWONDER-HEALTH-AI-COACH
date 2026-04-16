@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
+import { SupabaseEnvMissingBanner } from "@/components/auth/SupabaseEnvMissingBanner";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
@@ -20,9 +21,11 @@ type Props = {
   postLoginRedirect?: string | null;
   /** /login?error=… 쿼리(서버에서 전달) */
   urlError?: string;
+  /** 서버에서 NEXT_PUBLIC Supabase 쌍 검사 결과 */
+  supabaseEnvReady: boolean;
 };
 
-export function LoginForm({ site, postLoginRedirect, urlError }: Props) {
+export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady }: Props) {
   const err = urlError;
 
   const [email, setEmail] = useState("");
@@ -30,11 +33,13 @@ export function LoginForm({ site, postLoginRedirect, urlError }: Props) {
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const showEnvBanner = !supabaseEnvReady || err === "config";
+
   const errorHint =
     err === "auth"
       ? "인증에 실패했습니다. 다시 시도해 주세요."
       : err === "config"
-        ? "Supabase 환경 변수를 확인해 주세요."
+        ? "앱 레이아웃에서 Supabase를 초기화하지 못했습니다. 아래를 확인하세요."
         : err === "no_code"
           ? "인증 코드가 없습니다."
           : null;
@@ -82,11 +87,24 @@ export function LoginForm({ site, postLoginRedirect, urlError }: Props) {
       <h1 className="font-display mt-3 text-[1.75rem] font-bold tracking-[-0.03em] text-apple-ink sm:text-[1.875rem]">{site.copy.loginCard.title}</h1>
       <p className="mt-3 text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-apple-subtle">{site.copy.loginCard.subtitle}</p>
 
-      {(errorHint || msg) && (
+      {showEnvBanner ? (
+        <div className="mt-6 space-y-3">
+          <SupabaseEnvMissingBanner />
+          {errorHint && err === "config" ? (
+            <p className="rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] leading-snug text-rose-800 shadow-sm">{errorHint}</p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!showEnvBanner && (msg || errorHint) ? (
         <p className="mt-6 rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] leading-snug text-rose-800 shadow-sm">
           {msg ?? errorHint}
         </p>
-      )}
+      ) : null}
+
+      {showEnvBanner && msg ? (
+        <p className="mt-4 rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] leading-snug text-rose-800 shadow-sm">{msg}</p>
+      ) : null}
 
       <form className="mt-8 space-y-5" onSubmit={onSubmit}>
         <label className="block text-[13px] font-medium text-apple-subtle">

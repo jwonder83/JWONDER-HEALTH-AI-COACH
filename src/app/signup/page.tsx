@@ -1,5 +1,6 @@
 import { SignupForm } from "@/app/signup/signup-form";
 import { getSiteSettings } from "@/lib/site-settings/load-server";
+import { isSupabasePublicEnvConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -17,6 +18,7 @@ export default async function SignupPage() {
   }
 
   const site = await getSiteSettings();
+  const supabaseEnvReady = isSupabasePublicEnvConfigured();
 
-  return <SignupForm site={site} />;
+  return <SignupForm site={site} supabaseEnvReady={supabaseEnvReady} />;
 }

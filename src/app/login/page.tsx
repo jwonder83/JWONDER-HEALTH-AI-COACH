@@ -1,5 +1,6 @@
 import { LoginForm } from "@/app/login/login-form";
 import { getSiteSettings } from "@/lib/site-settings/load-server";
+import { isSupabasePublicEnvConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -38,6 +39,9 @@ export default async function LoginPage({
   }
 
   const site = await getSiteSettings();
+  const supabaseEnvReady = isSupabasePublicEnvConfigured();
 
-  return <LoginForm site={site} postLoginRedirect={redirectAfter} urlError={urlError} />;
+  return (
+    <LoginForm site={site} postLoginRedirect={redirectAfter} urlError={urlError} supabaseEnvReady={supabaseEnvReady} />
+  );
 }

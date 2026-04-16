@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
+import { SupabaseEnvMissingBanner } from "@/components/auth/SupabaseEnvMissingBanner";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
@@ -10,9 +11,9 @@ import { useState } from "react";
 const fieldClass =
   "mt-2 w-full rounded-2xl border border-orange-100/90 bg-white px-3.5 py-3.5 text-[17px] tracking-tight text-apple-ink shadow-sm transition placeholder:text-apple-subtle hover:border-apple/20 focus:border-apple/45 focus:outline-none focus:ring-4 focus:ring-apple/15";
 
-type Props = { site: SiteSettingsMerged };
+type Props = { site: SiteSettingsMerged; supabaseEnvReady: boolean };
 
-export function SignupForm({ site }: Props) {
+export function SignupForm({ site, supabaseEnvReady }: Props) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,6 +59,12 @@ export function SignupForm({ site }: Props) {
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple">{site.copy.signupCard.eyebrow}</p>
       <h1 className="font-display mt-3 text-[1.75rem] font-bold tracking-[-0.03em] text-apple-ink sm:text-[1.875rem]">{site.copy.signupCard.title}</h1>
       <p className="mt-3 text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-apple-subtle">{site.copy.signupCard.subtitle}</p>
+
+      {!supabaseEnvReady ? (
+        <div className="mt-6">
+          <SupabaseEnvMissingBanner />
+        </div>
+      ) : null}
 
       {msg && (
         <p className="mt-6 rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] text-rose-800 shadow-sm">{msg}</p>
