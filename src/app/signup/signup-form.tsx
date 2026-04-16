@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
+import { SUPABASE_VERCEL_DEPLOY_HINT } from "@/lib/supabase/deploy-hint";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
@@ -61,11 +62,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
 
       {!supabaseEnvReady ? (
         <p className="mt-6 rounded-lg border border-amber-200/90 bg-amber-50/90 px-3.5 py-2.5 text-[13px] leading-snug text-amber-950">
-          Vercel <span className="font-medium">Settings → Environment Variables</span>에{" "}
-          <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_URL</code>,{" "}
-          <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>
-          (또는 <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>)를
-          넣은 뒤 <strong>Redeploy</strong>하세요.
+          {SUPABASE_VERCEL_DEPLOY_HINT}
         </p>
       ) : null}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
+import { SUPABASE_VERCEL_DEPLOY_HINT } from "@/lib/supabase/deploy-hint";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
@@ -93,14 +94,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
               {errorHint} Vercel 로그와 Supabase 연결을 확인해 주세요.
             </>
           ) : (
-            <>
-              Vercel <span className="font-medium">Settings → Environment Variables</span>에{" "}
-              <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_URL</code>,{" "}
-              <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>
-              (또는 <code className="rounded bg-white/70 px-1 font-mono text-[11px]">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>)를
-              Supabase API 화면과 동일하게 넣은 뒤 <strong>Redeploy</strong>하세요. Auth Redirect URLs에는{" "}
-              <code className="rounded bg-white/70 px-1 font-mono text-[11px]">/auth/callback</code> 전체 URL을 추가하세요.
-            </>
+            SUPABASE_VERCEL_DEPLOY_HINT
           )}
         </p>
       ) : null}
