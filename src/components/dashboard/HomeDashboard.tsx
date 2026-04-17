@@ -99,14 +99,6 @@ export function HomeDashboard({ userId, site }: Props) {
     [workouts, weekBounds.mon, weekBounds.sun],
   );
 
-  const todayLabel = useMemo(() => {
-    return new Intl.DateTimeFormat("ko-KR", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    }).format(new Date());
-  }, []);
-
   const refresh = useCallback(async () => {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -192,7 +184,6 @@ export function HomeDashboard({ userId, site }: Props) {
             />
             <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-12">
               <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-white/70">{site.copy.mainHero.eyebrow}</p>
-              <p className="mt-2 text-[12px] font-medium text-white/55 sm:text-[13px]">{todayLabel}</p>
               <h1 className="font-display mt-3 max-w-2xl text-[1.875rem] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-[2.5rem] sm:leading-[1.06]">
                 {site.copy.mainHero.titleLine1}
                 <span className="mt-2 block font-semibold text-white/90">{site.copy.mainHero.titleLine2}</span>
@@ -208,16 +199,16 @@ export function HomeDashboard({ userId, site }: Props) {
                   바로 기록하기
                 </a>
                 <Link
-                  href="/records"
-                  className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
-                >
-                  통계·보내기
-                </Link>
-                <Link
                   href="/program"
                   className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
                 >
                   {site.program.navLabel}
+                </Link>
+                <Link
+                  href="/records"
+                  className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
+                >
+                  통계·보내기
                 </Link>
               </div>
             </div>
@@ -299,18 +290,6 @@ export function HomeDashboard({ userId, site }: Props) {
               </span>
             </Link>
             <Link
-              href="/records"
-              className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
-            >
-              <span className="flex size-11 shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-apple-ink">
-                <IconChart className="size-5" />
-              </span>
-              <span className="min-w-0">
-                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">통계·보내기</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">기간별 요약과 CSV보내기</span>
-              </span>
-            </Link>
-            <Link
               href="/program"
               className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
             >
@@ -320,6 +299,18 @@ export function HomeDashboard({ userId, site }: Props) {
               <span className="min-w-0">
                 <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">{site.program.navLabel}</span>
                 <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">{site.program.promoLinkLabel}</span>
+              </span>
+            </Link>
+            <Link
+              href="/records"
+              className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
+            >
+              <span className="flex size-11 shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-apple-ink">
+                <IconChart className="size-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">통계·보내기</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">기간별 요약과 CSV보내기</span>
               </span>
             </Link>
             <Link

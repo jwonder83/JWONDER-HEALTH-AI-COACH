@@ -76,11 +76,11 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
               <Link href="/" className={navLink}>
                 홈
               </Link>
-              <Link href="/records" className={navLink}>
-                통계·보내기
-              </Link>
               <Link href="/program" className={navLink}>
                 {site.program.navLabel}
+              </Link>
+              <Link href="/records" className={navLink}>
+                통계·보내기
               </Link>
               <Link href="/help" className={navLink}>
                 도움말
