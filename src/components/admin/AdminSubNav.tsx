@@ -23,7 +23,7 @@ export function AdminSubNav() {
           </Link>
         </nav>
         <Link href="/" className={`${linkClass} ml-auto border-stone-200/90 hover:bg-stone-50`}>
-          앱 홈
+          홈
         </Link>
       </div>
     </header>
