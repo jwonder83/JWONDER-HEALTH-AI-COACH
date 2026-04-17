@@ -37,3 +37,6 @@ next-env.d.ts
 
 # supabase CLI local cache
 /supabase/.temp/
+
+# local Android SDK cache (machine-specific)
+.android-sdk/

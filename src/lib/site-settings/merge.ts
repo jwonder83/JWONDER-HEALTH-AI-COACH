@@ -8,6 +8,7 @@ import type {
   ProgramSectionTitles,
   ProgramTocItem,
   ProgramYoutubeSlot,
+  LoginFormCopyConfig,
   SiteCopyConfig,
   SiteFooterConfig,
   SiteFooterLink,
@@ -164,6 +165,19 @@ function mergeLegalPages(base: SiteLegalPages, patch: unknown): SiteLegalPages {
   };
 }
 
+function mergeLoginForm(base: LoginFormCopyConfig, patch: unknown): LoginFormCopyConfig {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  return {
+    emailLabel: mergeString(base.emailLabel, p.emailLabel),
+    passwordLabel: mergeString(base.passwordLabel, p.passwordLabel),
+    submitLabel: mergeString(base.submitLabel, p.submitLabel),
+    submittingLabel: mergeString(base.submittingLabel, p.submittingLabel),
+    noAccountPrompt: mergeString(base.noAccountPrompt, p.noAccountPrompt),
+    signupLinkLabel: mergeString(base.signupLinkLabel, p.signupLinkLabel),
+  };
+}
+
 function mergeWorkoutForm(base: WorkoutFormCopyConfig, patch: unknown): WorkoutFormCopyConfig {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
@@ -312,6 +326,7 @@ function mergeCopy(base: SiteCopyConfig, patch: unknown): SiteCopyConfig {
     appDescription: mergeString(base.appDescription, p.appDescription),
     loginPanel: mergePanel(base.loginPanel, p.loginPanel),
     loginCard: mergeCard(base.loginCard, p.loginCard),
+    loginForm: mergeLoginForm(base.loginForm, p.loginForm),
     signupPanel: mergePanel(base.signupPanel, p.signupPanel),
     signupCard: mergeCard(base.signupCard, p.signupCard),
     mainHero: mergeMainHero(base.mainHero, p.mainHero),

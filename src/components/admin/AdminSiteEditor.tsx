@@ -21,7 +21,7 @@ const imageLabels: Record<keyof SiteImagesConfig, string> = {
   listEmpty: "목록 비었을 때",
 };
 
-function ImageFields({
+export function ImageFields({
   slot,
   label,
   value,
@@ -117,7 +117,7 @@ function ImageFields({
   );
 }
 
-function PanelFields({
+export function PanelFields({
   title,
   value,
   onChange,
@@ -158,7 +158,7 @@ function PanelFields({
   );
 }
 
-function CardFields({
+export function CardFields({
   title,
   value,
   onChange,
@@ -247,8 +247,8 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         <div>
           <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink">사이트 문구·이미지</h1>
           <p className="mt-2 text-[14px] leading-relaxed text-apple-subtle">
-            이미지는 파일로 Supabase Storage에 올리거나 URL을 직접 입력할 수 있습니다. 상단 관리자 메뉴의 「프로그램」에서 운동 가이드 문구를 따로 수정할
-            수 있습니다.
+            이미지는 파일로 Supabase Storage에 올리거나 URL을 직접 입력할 수 있습니다. 로그인 화면 문구는 「로그인」 메뉴에서, 프로그램 안내는 「프로그램」에서
+            수정할 수 있습니다.
           </p>
         </div>
         <Link
@@ -434,9 +434,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         </section>
 
         <section className="mb-10 grid gap-4 sm:grid-cols-2">
-          <PanelFields title="로그인 좌측 패널" value={settings.copy.loginPanel} onChange={(v) => setCopy({ loginPanel: v })} />
           <PanelFields title="회원가입 좌측 패널" value={settings.copy.signupPanel} onChange={(v) => setCopy({ signupPanel: v })} />
-          <CardFields title="로그인 카드" value={settings.copy.loginCard} onChange={(v) => setCopy({ loginCard: v })} />
           <CardFields title="회원가입 카드" value={settings.copy.signupCard} onChange={(v) => setCopy({ signupCard: v })} />
         </section>
 

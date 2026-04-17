@@ -15,6 +15,9 @@ export function AdminSubNav() {
           <Link href="/admin/site" className={linkClass}>
             사이트
           </Link>
+          <Link href="/admin/login" className={linkClass}>
+            로그인
+          </Link>
           <Link href="/admin/program" className={linkClass}>
             프로그램
           </Link>

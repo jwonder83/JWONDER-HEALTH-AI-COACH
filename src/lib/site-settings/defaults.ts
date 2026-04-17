@@ -63,6 +63,14 @@ export const DEFAULT_SITE_SETTINGS = {
       title: "로그인",
       subtitle: "이메일과 비밀번호로 계속하세요.",
     },
+    loginForm: {
+      emailLabel: "이메일",
+      passwordLabel: "비밀번호",
+      submitLabel: "로그인",
+      submittingLabel: "처리 중…",
+      noAccountPrompt: "계정이 없나요?",
+      signupLinkLabel: "회원가입",
+    },
     signupPanel: {
       eyebrow: "JWS · Workout",
       title: "오늘부터 기록을 시작해 보세요",

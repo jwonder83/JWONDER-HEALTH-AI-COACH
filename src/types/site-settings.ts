@@ -42,6 +42,17 @@ export type SiteFooterConfig = {
   copyrightLine: string;
 };
 
+/** /login 폼 라벨·버튼 — 어드민에서 편집 */
+export type LoginFormCopyConfig = {
+  emailLabel: string;
+  passwordLabel: string;
+  submitLabel: string;
+  submittingLabel: string;
+  /** "계정이 없나요?" 등 안내 한 줄 */
+  noAccountPrompt: string;
+  signupLinkLabel: string;
+};
+
 /** 메인 대시보드 운동 입력 카드 문구 */
 export type WorkoutFormCopyConfig = {
   eyebrow: string;
@@ -78,6 +89,7 @@ export type SiteCopyConfig = {
   appDescription: string;
   loginPanel: { eyebrow: string; title: string; description: string };
   loginCard: { eyebrow: string; title: string; subtitle: string };
+  loginForm: LoginFormCopyConfig;
   signupPanel: { eyebrow: string; title: string; description: string };
   signupCard: { eyebrow: string; title: string; subtitle: string };
   mainHero: {

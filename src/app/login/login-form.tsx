@@ -26,6 +26,7 @@ type Props = {
 };
 
 export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady }: Props) {
+  const formCopy = site.copy.loginForm;
   const err = urlError;
   const fid = useId();
   const idEmail = `${fid}-email`;
@@ -122,7 +123,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
 
       <form className="mt-8 space-y-5" onSubmit={onSubmit}>
         <label htmlFor={idEmail} className="block text-[13px] font-medium text-apple-subtle">
-          이메일
+          {formCopy.emailLabel}
           <input
             id={idEmail}
             name="email"
@@ -135,7 +136,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
           />
         </label>
         <label htmlFor={idPassword} className="block text-[13px] font-medium text-apple-subtle">
-          비밀번호
+          {formCopy.passwordLabel}
           <input
             id={idPassword}
             name="password"
@@ -152,17 +153,17 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
           disabled={loading}
           className="w-full border border-black bg-black py-3.5 text-[12px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.99] disabled:opacity-45"
         >
-          {loading ? "처리 중…" : "로그인"}
+          {loading ? formCopy.submittingLabel : formCopy.submitLabel}
         </button>
       </form>
 
       <p className="mt-8 text-center text-[14px] text-apple-subtle">
-        계정이 없나요?{" "}
+        {formCopy.noAccountPrompt}{" "}
         <Link
           href="/signup"
           className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60"
         >
-          회원가입
+          {formCopy.signupLinkLabel}
         </Link>
       </p>
     </AuthSplitShell>
