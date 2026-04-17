@@ -1,8 +1,15 @@
 "use client";
 
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
+import {
+  endOfMonth,
+  endOfWeekSunday,
+  rollupPeriod,
+  startOfMonth,
+  startOfWeekMonday,
+} from "@/lib/workouts/period-stats";
 import type { WorkoutRow } from "@/types/workout";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 type Props = {
   initialRows: WorkoutRow[];
@@ -23,6 +30,11 @@ function startOfDay(d: Date) {
 }
 
 export function RecordsClient({ initialRows }: Props) {
+  const fid = useId();
+  const idQ = `${fid}-q`;
+  const idFrom = `${fid}-from`;
+  const idTo = `${fid}-to`;
+
   const [q, setQ] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -47,6 +59,22 @@ export function RecordsClient({ initialRows }: Props) {
     }
     return { count: filtered.length, volume };
   }, [filtered]);
+
+  const weekLine = useMemo(() => {
+    const mon = startOfWeekMonday();
+    const sun = endOfWeekSunday(mon);
+    const r = rollupPeriod(initialRows, mon, sun);
+    const top = r.topExercise ? ` · 가장 많이 한 종목 ${r.topExercise}` : "";
+    return `이번 주 총 볼륨 ${Math.round(r.volume * 10) / 10} · 기록 ${r.rowCount}건${top}`;
+  }, [initialRows]);
+
+  const monthLine = useMemo(() => {
+    const s = startOfMonth();
+    const e = endOfMonth();
+    const r = rollupPeriod(initialRows, s, e);
+    const top = r.topExercise ? ` · 가장 많이 한 종목 ${r.topExercise}` : "";
+    return `이번 달 총 볼륨 ${Math.round(r.volume * 10) / 10} · 기록 ${r.rowCount}건${top}`;
+  }, [initialRows]);
 
   function downloadCsv() {
     const header = ["created_at", "exercise_name", "weight_kg", "reps", "sets", "success"];
@@ -86,29 +114,46 @@ export function RecordsClient({ initialRows }: Props) {
         }
       />
 
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-[1.25rem] border border-orange-100/90 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-orange-50/60">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple">주간 한 줄</p>
+          <p className="mt-1.5 text-[13px] font-medium leading-snug text-apple-ink">{weekLine}</p>
+        </div>
+        <div className="rounded-[1.25rem] border border-orange-100/90 bg-u-lavender/25 px-4 py-3 shadow-sm ring-1 ring-orange-50/60">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple">월간 한 줄</p>
+          <p className="mt-1.5 text-[13px] font-medium leading-snug text-apple-ink">{monthLine}</p>
+        </div>
+      </div>
+
       <div className="mt-2 rounded-[1.75rem] border border-orange-100/90 bg-white/95 p-5 shadow-[0_16px_48px_-20px_rgba(233,75,60,0.14)] sm:p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="block text-[12px] font-semibold text-apple-subtle">
+          <label htmlFor={idQ} className="block text-[12px] font-semibold text-apple-subtle">
             운동명 포함
             <input
+              id={idQ}
+              name="q"
               className="mt-1.5 w-full rounded-xl border border-orange-100/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-apple/40 focus:outline-none focus:ring-2 focus:ring-apple/20"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="예: 스쿼트"
             />
           </label>
-          <label className="block text-[12px] font-semibold text-apple-subtle">
+          <label htmlFor={idFrom} className="block text-[12px] font-semibold text-apple-subtle">
             시작일
             <input
+              id={idFrom}
+              name="from"
               type="date"
               className="mt-1.5 w-full rounded-xl border border-orange-100/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-apple/40 focus:outline-none focus:ring-2 focus:ring-apple/20"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
             />
           </label>
-          <label className="block text-[12px] font-semibold text-apple-subtle">
+          <label htmlFor={idTo} className="block text-[12px] font-semibold text-apple-subtle">
             종료일
             <input
+              id={idTo}
+              name="to"
               type="date"
               className="mt-1.5 w-full rounded-xl border border-orange-100/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-apple/40 focus:outline-none focus:ring-2 focus:ring-apple/20"
               value={to}

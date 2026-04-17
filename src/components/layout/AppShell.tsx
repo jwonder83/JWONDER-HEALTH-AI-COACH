@@ -3,11 +3,20 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { SignOutButton } from "./SignOutButton";
 
+export type AppFooterMeta = {
+  /** 장애·상태 안내 페이지 (팀 내부용 등) */
+  statusUrl?: string;
+  statusLabel?: string;
+  feedbackMailto?: string;
+  feedbackFormUrl?: string;
+};
+
 type Props = {
   email: string;
   showAdminLink: boolean;
   site: SiteSettingsMerged;
   children: ReactNode;
+  footerMeta?: AppFooterMeta;
 };
 
 function initialFromEmail(e: string) {
@@ -39,7 +48,7 @@ function FooterNavLink({ href, className, children }: { href: string; className:
 const navBtn =
   "rounded-full border border-orange-100/90 bg-white/90 px-3.5 py-2 text-[12px] font-semibold tracking-tight text-apple-ink shadow-sm transition hover:border-apple/30 hover:bg-apple/10 hover:text-apple sm:px-4";
 
-export function AppShell({ email, showAdminLink, site, children }: Props) {
+export function AppShell({ email, showAdminLink, site, children, footerMeta }: Props) {
   return (
     <div className="flex min-h-screen flex-col text-apple-ink">
       <header className="sticky top-0 z-30 px-3 pt-3 sm:px-5 sm:pt-4">
@@ -83,7 +92,9 @@ export function AppShell({ email, showAdminLink, site, children }: Props) {
         </div>
       </header>
 
-      <div className="flex-1">{children}</div>
+      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+        {children}
+      </main>
 
       <footer className="mt-auto px-4 pb-8 pt-12 sm:px-6">
         <div className="mx-auto max-w-6xl rounded-[1.5rem] border border-orange-100/80 bg-white/80 px-6 py-8 text-center shadow-[0_12px_40px_-16px_rgba(233,75,60,0.12)] backdrop-blur-md">
@@ -108,6 +119,46 @@ export function AppShell({ email, showAdminLink, site, children }: Props) {
               </span>
             ))}
           </div>
+          {footerMeta?.statusUrl || footerMeta?.feedbackMailto || footerMeta?.feedbackFormUrl ? (
+            <p className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[11px] leading-relaxed text-apple-subtle">
+              {footerMeta.statusUrl ? (
+                <>
+                  <FooterNavLink
+                    href={footerMeta.statusUrl}
+                    className="underline decoration-apple/20 underline-offset-4 transition hover:text-apple"
+                  >
+                    {footerMeta.statusLabel?.trim() || "장애 시 상태 확인"}
+                  </FooterNavLink>
+                  {footerMeta.feedbackMailto || footerMeta.feedbackFormUrl ? (
+                    <span className="text-orange-200/80" aria-hidden>
+                      ·
+                    </span>
+                  ) : null}
+                </>
+              ) : null}
+              {footerMeta.feedbackMailto ? (
+                <a
+                  href={footerMeta.feedbackMailto}
+                  className="underline decoration-apple/20 underline-offset-4 transition hover:text-apple"
+                >
+                  문의(메일)
+                </a>
+              ) : null}
+              {footerMeta.feedbackMailto && footerMeta.feedbackFormUrl ? (
+                <span className="text-orange-200/80" aria-hidden>
+                  ·
+                </span>
+              ) : null}
+              {footerMeta.feedbackFormUrl ? (
+                <FooterNavLink
+                  href={footerMeta.feedbackFormUrl}
+                  className="underline decoration-apple/20 underline-offset-4 transition hover:text-apple"
+                >
+                  문의(폼)
+                </FooterNavLink>
+              ) : null}
+            </p>
+          ) : null}
           <p className="mt-6 whitespace-pre-line text-[12px] text-apple-subtle">{footerCopyrightLine(site.copy.footer.copyrightLine)}</p>
         </div>
       </footer>

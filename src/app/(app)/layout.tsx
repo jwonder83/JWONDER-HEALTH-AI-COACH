@@ -22,8 +22,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   try {
     const site = await getSiteSettings();
     const showAdminLink = isUserAdmin(user.email);
+    const footerMeta = {
+      statusUrl: process.env.NEXT_PUBLIC_STATUS_URL?.trim() || undefined,
+      statusLabel: process.env.NEXT_PUBLIC_STATUS_LABEL?.trim() || undefined,
+      feedbackMailto: process.env.NEXT_PUBLIC_FEEDBACK_EMAIL?.trim()
+        ? `mailto:${process.env.NEXT_PUBLIC_FEEDBACK_EMAIL.trim()}`
+        : undefined,
+      feedbackFormUrl: process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL?.trim() || undefined,
+    };
     return (
-      <AppShell email={user.email ?? ""} showAdminLink={showAdminLink} site={site}>
+      <AppShell email={user.email ?? ""} showAdminLink={showAdminLink} site={site} footerMeta={footerMeta}>
         {children}
       </AppShell>
     );

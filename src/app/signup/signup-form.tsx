@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 const fieldClass =
   "mt-2 w-full rounded-2xl border border-orange-100/90 bg-white px-3.5 py-3.5 text-[17px] tracking-tight text-apple-ink shadow-sm transition placeholder:text-apple-subtle hover:border-apple/20 focus:border-apple/45 focus:outline-none focus:ring-4 focus:ring-apple/15";
@@ -15,6 +15,9 @@ type Props = { site: SiteSettingsMerged; supabaseEnvReady: boolean };
 
 export function SignupForm({ site, supabaseEnvReady }: Props) {
   const router = useRouter();
+  const fid = useId();
+  const idEmail = `${fid}-email`;
+  const idPassword = `${fid}-password`;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
@@ -50,6 +53,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
   }
 
   return (
+    <main id="main-content" tabIndex={-1} className="outline-none">
     <AuthSplitShell
       panelImage={site.images.authPanel}
       eyebrow={site.copy.signupPanel.eyebrow}
@@ -80,9 +84,11 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       )}
 
       <form className="mt-8 space-y-5" onSubmit={onSubmit}>
-        <label className="block text-[13px] font-medium text-apple-subtle">
+        <label htmlFor={idEmail} className="block text-[13px] font-medium text-apple-subtle">
           이메일
           <input
+            id={idEmail}
+            name="email"
             className={fieldClass}
             type="email"
             autoComplete="email"
@@ -91,9 +97,11 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
             required
           />
         </label>
-        <label className="block text-[13px] font-medium text-apple-subtle">
+        <label htmlFor={idPassword} className="block text-[13px] font-medium text-apple-subtle">
           비밀번호 (6자 이상 권장)
           <input
+            id={idPassword}
+            name="password"
             className={fieldClass}
             type="password"
             autoComplete="new-password"
@@ -122,5 +130,6 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
         </Link>
       </p>
     </AuthSplitShell>
+    </main>
   );
 }

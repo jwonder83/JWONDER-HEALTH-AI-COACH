@@ -5,7 +5,7 @@ import { SUPABASE_VERCEL_DEPLOY_HINT } from "@/lib/supabase/deploy-hint";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 const fieldClass =
   "mt-2 w-full rounded-2xl border border-orange-100/90 bg-white px-3.5 py-3.5 text-[17px] tracking-tight text-apple-ink shadow-sm transition placeholder:text-apple-subtle hover:border-apple/20 focus:border-apple/45 focus:outline-none focus:ring-4 focus:ring-apple/15";
@@ -27,6 +27,9 @@ type Props = {
 
 export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady }: Props) {
   const err = urlError;
+  const fid = useId();
+  const idEmail = `${fid}-email`;
+  const idPassword = `${fid}-password`;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -84,6 +87,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
       >
         ADMIN
       </Link>
+      <main id="main-content" tabIndex={-1} className="outline-none">
     <AuthSplitShell
       panelImage={site.images.authPanel}
       eyebrow={site.copy.loginPanel.eyebrow}
@@ -117,9 +121,11 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
       ) : null}
 
       <form className="mt-8 space-y-5" onSubmit={onSubmit}>
-        <label className="block text-[13px] font-medium text-apple-subtle">
+        <label htmlFor={idEmail} className="block text-[13px] font-medium text-apple-subtle">
           이메일
           <input
+            id={idEmail}
+            name="email"
             className={fieldClass}
             type="email"
             autoComplete="email"
@@ -128,9 +134,11 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
             required
           />
         </label>
-        <label className="block text-[13px] font-medium text-apple-subtle">
+        <label htmlFor={idPassword} className="block text-[13px] font-medium text-apple-subtle">
           비밀번호
           <input
+            id={idPassword}
+            name="password"
             className={fieldClass}
             type="password"
             autoComplete="current-password"
@@ -158,6 +166,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
         </Link>
       </p>
     </AuthSplitShell>
+      </main>
     </>
   );
 }

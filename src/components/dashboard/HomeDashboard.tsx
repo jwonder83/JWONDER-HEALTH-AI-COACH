@@ -3,6 +3,7 @@
 import { WebCoachingSection } from "@/components/coaching/WebCoachingSection";
 import { SiteFillImage } from "@/components/site/SiteFillImage";
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
+import { DashboardGoalsCard } from "@/components/dashboard/DashboardGoalsCard";
 import { WorkoutForm } from "@/components/workouts/WorkoutForm";
 import { WorkoutList } from "@/components/workouts/WorkoutList";
 import { createClient } from "@/lib/supabase/client";
@@ -189,6 +190,8 @@ export function HomeDashboard({ userId, site }: Props) {
             전체 삭제
           </button>
         </div>
+
+        <DashboardGoalsCard workouts={workouts} />
       </div>
 
       <main className="mx-auto max-w-4xl space-y-14 px-5 py-14 sm:space-y-20 sm:px-8 sm:py-20">
