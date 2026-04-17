@@ -22,7 +22,7 @@ export function ProgramGuideView({ program }: Props) {
       ) : null}
 
       {program.showBuiltInSections ? (
-        <ProgramGuideBuiltIn />
+        <ProgramGuideBuiltIn program={program} />
       ) : (
         <div className="mt-8 rounded-2xl border border-amber-200/90 bg-amber-50/70 px-4 py-3 text-[14px] text-amber-950">
           내장 프로그램 본문이 꺼져 있습니다. 어드민에서 「내장 가이드 표시」를 켜거나, 위·아래 마크다운 영역에 내용을 채워 주세요.

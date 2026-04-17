@@ -103,6 +103,66 @@ export type SiteCopyConfig = {
   footer: SiteFooterConfig;
 };
 
+export type ProgramYoutubeSlot = {
+  /** YouTube 동영상 ID (watch?v= 뒤 값) */
+  videoId: string;
+  /** 임베드·접근성용 제목 */
+  title: string;
+};
+
+/** 볼륨 섹션 등 — 새 탭으로 열리는 외부 영상·강의 링크 */
+export type ProgramExternalVideoLink = {
+  /** 링크 앞 짧은 안내 문구 */
+  lead: string;
+  /** 앵커에 보이는 제목 */
+  anchorLabel: string;
+  /** `https://` 또는 사이트 내부 경로(`/…`) */
+  href: string;
+};
+
+/** 내장 가이드 본문에서 쓰는 이미지(각각 URL·alt) */
+export type ProgramBuiltinImages = {
+  hero: ImageSlot;
+  barbell: ImageSlot;
+  plates: ImageSlot;
+  calm: ImageSlot;
+  athlete: ImageSlot;
+  stretch: ImageSlot;
+  kettle: ImageSlot;
+  rack: ImageSlot;
+};
+
+export type ProgramBuiltinVideos = {
+  framework: ProgramYoutubeSlot;
+  split: ProgramYoutubeSlot;
+  volumeMain: ProgramYoutubeSlot;
+  deload: ProgramYoutubeSlot;
+  warmupMain: ProgramYoutubeSlot;
+  cooldown: ProgramYoutubeSlot;
+  rpe: ProgramYoutubeSlot;
+  squat: ProgramYoutubeSlot;
+  deadlift: ProgramYoutubeSlot;
+  bench: ProgramYoutubeSlot;
+};
+
+export type ProgramSectionTitles = {
+  framework: string;
+  split: string;
+  volume: string;
+  deload: string;
+  order: string;
+  warmup: string;
+  rpe: string;
+  alternatives: string;
+  checklist: string;
+  micro: string;
+  stats: string;
+  safety: string;
+};
+
+/** 목차 항목 — `id`는 섹션 `id` 및 앵커 `#${id}` 와 동일해야 합니다. */
+export type ProgramTocItem = { id: string; label: string };
+
 /** /program — 어드민에서 편집(내장 가이드 + 마크다운 전후) */
 export type ProgramGuideSettings = {
   /** 헤더 주요 메뉴에 표시되는 짧은 레이블 */
@@ -119,6 +179,14 @@ export type ProgramGuideSettings = {
   prefixMarkdown: string;
   /** 내장 본문 아래에 붙는 마크다운(GFM) */
   appendixMarkdown: string;
+  /** 내장 본문 목차(순서·개수는 기본과 동일하게 유지, 라벨만 바꾸는 용도 권장) */
+  toc: ProgramTocItem[];
+  builtinImages: ProgramBuiltinImages;
+  builtinVideos: ProgramBuiltinVideos;
+  /** 볼륨 랜드마크 블록 아래 심화 영상(외부 링크) — URL 비우면 해당 줄 숨김 */
+  volumeExternalLink: ProgramExternalVideoLink;
+  /** 각 섹션 H2 제목 */
+  sectionTitles: ProgramSectionTitles;
 };
 
 export type SiteSettingsMerged = {

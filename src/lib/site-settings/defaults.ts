@@ -1,4 +1,5 @@
 import type { SiteSettingsMerged } from "@/types/site-settings";
+import { defaultProgramGuideBase } from "@/lib/site-settings/program-defaults";
 
 const DEFAULT_PROGRAM: SiteSettingsMerged["program"] = {
   navLabel: "프로그램",
@@ -10,6 +11,7 @@ const DEFAULT_PROGRAM: SiteSettingsMerged["program"] = {
   showBuiltInSections: true,
   prefixMarkdown: "",
   appendixMarkdown: "",
+  ...defaultProgramGuideBase(),
 };
 
 export const DEFAULT_SITE_SETTINGS = {

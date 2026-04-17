@@ -1,7 +1,13 @@
 import type {
   HelpFaqItem,
   ImageSlot,
+  ProgramBuiltinImages,
+  ProgramBuiltinVideos,
+  ProgramExternalVideoLink,
   ProgramGuideSettings,
+  ProgramSectionTitles,
+  ProgramTocItem,
+  ProgramYoutubeSlot,
   SiteCopyConfig,
   SiteFooterConfig,
   SiteFooterLink,
@@ -210,6 +216,73 @@ function mergeBool(base: boolean, v: unknown): boolean {
   return typeof v === "boolean" ? v : base;
 }
 
+function mergeYoutubeSlot(base: ProgramYoutubeSlot, patch: unknown): ProgramYoutubeSlot {
+  if (!patch || typeof patch !== "object") return base;
+  const o = patch as Record<string, unknown>;
+  const videoId = typeof o.videoId === "string" && o.videoId.trim() ? o.videoId.trim() : base.videoId;
+  const title = typeof o.title === "string" ? o.title : base.title;
+  return { videoId, title };
+}
+
+function mergeProgramExternalVideoLink(base: ProgramExternalVideoLink, patch: unknown): ProgramExternalVideoLink {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  const lead = typeof p.lead === "string" ? p.lead : base.lead;
+  const anchorLabel = typeof p.anchorLabel === "string" ? p.anchorLabel : base.anchorLabel;
+  let href = base.href;
+  if (typeof p.href === "string") {
+    const t = p.href.trim();
+    if (t === "") href = "";
+    else if (isSafeFooterHref(t)) href = t;
+  }
+  return { lead, anchorLabel, href };
+}
+
+function mergeProgramBuiltinImages(base: ProgramBuiltinImages, patch: unknown): ProgramBuiltinImages {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  const keys = Object.keys(base) as (keyof ProgramBuiltinImages)[];
+  const out = { ...base };
+  for (const k of keys) {
+    out[k] = mergeImageSlot(base[k], p[k]);
+  }
+  return out;
+}
+
+function mergeProgramBuiltinVideos(base: ProgramBuiltinVideos, patch: unknown): ProgramBuiltinVideos {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  const keys = Object.keys(base) as (keyof ProgramBuiltinVideos)[];
+  const out = { ...base };
+  for (const k of keys) {
+    out[k] = mergeYoutubeSlot(base[k], p[k]);
+  }
+  return out;
+}
+
+function mergeSectionTitles(base: ProgramSectionTitles, patch: unknown): ProgramSectionTitles {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  const keys = Object.keys(base) as (keyof ProgramSectionTitles)[];
+  const out = { ...base };
+  for (const k of keys) {
+    out[k] = mergeString(base[k], p[k]);
+  }
+  return out;
+}
+
+function mergeProgramToc(base: ProgramTocItem[], patch: unknown): ProgramTocItem[] {
+  if (!Array.isArray(patch) || patch.length !== base.length) return base;
+  return base.map((b, i) => {
+    const item = patch[i];
+    if (!item || typeof item !== "object") return b;
+    const o = item as Record<string, unknown>;
+    const id = typeof o.id === "string" && o.id.trim() ? o.id.trim() : b.id;
+    const label = typeof o.label === "string" ? o.label : b.label;
+    return { id, label };
+  });
+}
+
 function mergeProgram(base: ProgramGuideSettings, patch: unknown): ProgramGuideSettings {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
@@ -222,6 +295,11 @@ function mergeProgram(base: ProgramGuideSettings, patch: unknown): ProgramGuideS
     showBuiltInSections: mergeBool(base.showBuiltInSections, p.showBuiltInSections),
     prefixMarkdown: mergeString(base.prefixMarkdown, p.prefixMarkdown),
     appendixMarkdown: mergeString(base.appendixMarkdown, p.appendixMarkdown),
+    toc: mergeProgramToc(base.toc, p.toc),
+    builtinImages: mergeProgramBuiltinImages(base.builtinImages, p.builtinImages),
+    builtinVideos: mergeProgramBuiltinVideos(base.builtinVideos, p.builtinVideos),
+    volumeExternalLink: mergeProgramExternalVideoLink(base.volumeExternalLink, p.volumeExternalLink),
+    sectionTitles: mergeSectionTitles(base.sectionTitles, p.sectionTitles),
   };
 }
 
