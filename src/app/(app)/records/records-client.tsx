@@ -136,7 +136,7 @@ export function RecordsClient({ initialRows }: Props) {
       <SectionTitleBlock
         step="02"
         eyebrow="RECORDS"
-        title="통계·보내기"
+        title="운동 기록"
         description="종목·기간으로 좁혀 보고, CSV로 내려받을 수 있습니다."
         right={
           <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px]">

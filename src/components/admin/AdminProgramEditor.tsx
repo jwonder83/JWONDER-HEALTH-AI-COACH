@@ -142,7 +142,7 @@ const PROGRAM_SECTION_TITLE_SLOTS: { key: keyof ProgramSectionTitles; label: str
   { key: "alternatives", label: "대체 종목" },
   { key: "checklist", label: "종목별 큐·영상" },
   { key: "micro", label: "마이크로 목표" },
-  { key: "stats", label: "통계" },
+  { key: "stats", label: "운동 기록" },
   { key: "safety", label: "안전" },
 ];
 

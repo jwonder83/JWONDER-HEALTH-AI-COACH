@@ -19,7 +19,7 @@ export const DEFAULT_PROGRAM_TOC: ProgramTocItem[] = [
   { id: "alternatives", label: "대체 종목" },
   { id: "checklist", label: "종목별 큐" },
   { id: "micro", label: "마이크로 목표" },
-  { id: "stats", label: "통계" },
+  { id: "stats", label: "운동 기록" },
   { id: "safety", label: "안전" },
 ];
 
@@ -88,7 +88,7 @@ export const DEFAULT_PROGRAM_SECTION_TITLES: ProgramSectionTitles = {
   alternatives: "대체 종목·도구 선택",
   checklist: "종목별 코칭 큐와 참고 영상",
   micro: "마이크로 목표와 주간 운영",
-  stats: "데이터로 주기를 점검하기",
+  stats: "운동 기록으로 주기 점검하기",
   safety: "안전·의학적 경고",
 };
 

@@ -208,7 +208,7 @@ export function HomeDashboard({ userId, site }: Props) {
                   href="/records"
                   className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
                 >
-                  통계·보내기
+                  운동 기록
                 </Link>
               </div>
             </div>
@@ -309,8 +309,8 @@ export function HomeDashboard({ userId, site }: Props) {
                 <IconChart className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">통계·보내기</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">기간별 요약과 CSV보내기</span>
+                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">운동 기록</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">기간별 요약·CSV 내려받기</span>
               </span>
             </Link>
             <Link
@@ -332,7 +332,7 @@ export function HomeDashboard({ userId, site }: Props) {
           <div className="mt-8 flex flex-col gap-3 border border-dashed border-neutral-300 bg-neutral-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
             <div>
               <p className="font-display text-[15px] font-semibold text-apple-ink">아직 저장된 기록이 없어요</p>
-              <p className="mt-1 text-[13px] leading-relaxed text-apple-subtle">첫 세트를 남기면 여기와 통계에 바로 쌓입니다.</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-apple-subtle">첫 세트를 남기면 여기와 운동 기록에 바로 반영됩니다.</p>
             </div>
             <a
               href="#section-input"

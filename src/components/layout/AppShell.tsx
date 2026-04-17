@@ -80,7 +80,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                 {site.program.navLabel}
               </Link>
               <Link href="/records" className={navLink}>
-                통계·보내기
+                운동 기록
               </Link>
               <Link href="/help" className={navLink}>
                 도움말
