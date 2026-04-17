@@ -21,10 +21,11 @@ const h2 = "font-display text-[1.2rem] font-bold tracking-[-0.02em] text-apple-i
 const lead = "text-[15px] font-medium leading-relaxed text-apple-ink sm:text-[16px]";
 const body = "text-[14px] leading-relaxed text-apple-subtle sm:text-[15px]";
 
+/* Unsplash 사진 ID는 CDN에서 내려갈 수 있음 — 깨지면 HEAD로 확인 후 교체 */
 const IMG = {
   gym: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=82",
   barbell: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=82",
-  athlete: "https://images.unsplash.com/photo-1574680096141-d05b474e2155?auto=format&fit=crop&w=1200&q=82",
+  athlete: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=82",
   stretch: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=82",
   rack: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1200&q=82",
   plates: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=82",
