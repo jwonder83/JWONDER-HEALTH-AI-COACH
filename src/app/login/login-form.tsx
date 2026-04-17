@@ -33,16 +33,23 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const showEnvBanner = !supabaseEnvReady || err === "config";
+  /** 긴 Vercel·Supabase 설정 안내: 공개 env가 서버에 없을 때만 */
+  const showDeployHint = !supabaseEnvReady;
+  /** env는 있는데 앱 레이아웃에서 다른 오류가 난 경우 */
+  const showServerError = err === "server";
+  /** 예전 링크(?error=config)만 있고 env는 이미 맞춰진 경우 등 */
+  const showConfigOther = err === "config" && supabaseEnvReady;
 
   const errorHint =
     err === "auth"
       ? "인증에 실패했습니다. 다시 시도해 주세요."
       : err === "config"
-        ? "서버에서 Supabase를 초기화하지 못했습니다."
-        : err === "no_code"
-          ? "인증 코드가 없습니다."
-          : null;
+        ? "이전에 설정 오류로 이동된 링크일 수 있습니다. 주소의 ?error=… 를 지우고 다시 시도해 보세요."
+        : err === "server"
+          ? "앱을 불러오는 중 오류가 났습니다. 잠시 후 다시 시도하거나 Vercel·Supabase 상태를 확인해 주세요."
+          : err === "no_code"
+            ? "인증 코드가 없습니다."
+            : null;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -87,25 +94,25 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
       <h1 className="font-display mt-3 text-[1.75rem] font-bold tracking-[-0.03em] text-apple-ink sm:text-[1.875rem]">{site.copy.loginCard.title}</h1>
       <p className="mt-3 text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-apple-subtle">{site.copy.loginCard.subtitle}</p>
 
-      {showEnvBanner ? (
+      {showDeployHint ? (
         <p className="mt-6 rounded-lg border border-amber-200/90 bg-amber-50/90 px-3.5 py-2.5 text-[13px] leading-snug text-amber-950">
-          {err === "config" && supabaseEnvReady ? (
-            <>
-              {errorHint} Vercel 로그와 Supabase 연결을 확인해 주세요.
-            </>
-          ) : (
-            SUPABASE_VERCEL_DEPLOY_HINT
-          )}
+          {SUPABASE_VERCEL_DEPLOY_HINT}
         </p>
       ) : null}
 
-      {!showEnvBanner && (msg || errorHint) ? (
+      {!showDeployHint && (showServerError || showConfigOther) && errorHint ? (
+        <p className="mt-6 rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] leading-snug text-rose-800 shadow-sm">
+          {errorHint}
+        </p>
+      ) : null}
+
+      {!showDeployHint && !showServerError && !showConfigOther && (msg || (errorHint && err !== "config")) ? (
         <p className="mt-6 rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] leading-snug text-rose-800 shadow-sm">
           {msg ?? errorHint}
         </p>
       ) : null}
 
-      {showEnvBanner && msg ? (
+      {showDeployHint && msg ? (
         <p className="mt-4 rounded-xl border border-rose-200/90 bg-rose-50/95 px-4 py-3 text-[14px] leading-snug text-rose-800 shadow-sm">{msg}</p>
       ) : null}
 

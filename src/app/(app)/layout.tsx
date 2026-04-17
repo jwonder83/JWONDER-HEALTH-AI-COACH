@@ -1,11 +1,15 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { isSiteSettingsHeaderVisible } from "@/lib/site-settings/admin-check";
 import { getSiteSettings } from "@/lib/site-settings/load-server";
+import { isSupabasePublicEnvConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
+  if (!isSupabasePublicEnvConfigured()) {
+    redirect("/login?error=config");
+  }
   try {
     const supabase = await createClient();
     const {
@@ -22,6 +26,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       </AppShell>
     );
   } catch {
-    redirect("/login?error=config");
+    redirect("/login?error=server");
   }
 }
