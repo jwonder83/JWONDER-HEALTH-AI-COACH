@@ -21,20 +21,104 @@ function formatWorkoutsTable(rows: WorkoutRow[]): string {
   return [header, sep, ...lines].join("\n");
 }
 
-const SYSTEM_PROMPT = `당신은 한국어로 답하는 헬스·스rength 트레이닝 코치입니다.
+const SYSTEM_PROMPT = `당신은 한국어로 답하는 헬스·strength 트레이닝 코치입니다.
 사용자의 운동 기록을 바탕으로 격려와 구체적인 개선 제안을 해 주세요.
 의학적 진단·부상 판정은 하지 말고, 통증·이상이 있으면 전문가 상담을 권하는 문장을 포함하세요.
 마크다운(##, ###, 목록)을 사용해 가독성 있게 작성하세요.`;
 
-/** OpenAI Chat Completions로 AI 코칭 텍스트 생성 */
-export async function buildAiCoaching(rows: WorkoutRow[]): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!apiKey) {
-    throw new Error(
-      "OPENAI_API_KEY 가 설정되지 않았습니다. .env.local 에 OpenAI API 키를 추가하세요.",
-    );
+function isAllowedCoachingUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:") return false;
+    const h = u.hostname.toLowerCase();
+    if (h === "localhost" || h === "127.0.0.1" || h.endsWith(".local")) return false;
+    if (h.startsWith("169.254.")) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function htmlToPlainText(html: string): string {
+  const t = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<\/(p|div|br|h[1-6]|li|tr|section|article)>/gi, "\n")
+    .replace(/<[^>]+>/g, " ");
+  return t
+    .replace(/\s+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+async function fetchCoachingWebSource(url: string): Promise<string> {
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), 12_000);
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.8",
+        "User-Agent": "JWONDER-HEALTH-AI-COACH/1.0 (+https://vercel.com)",
+      },
+      redirect: "follow",
+      signal: ac.signal,
+    });
+    if (!res.ok) {
+      throw new Error(`참고 페이지 응답 ${res.status}`);
+    }
+    const maxBytes = 120_000;
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength > maxBytes) {
+      throw new Error("참고 페이지 본문이 너무 큽니다.");
+    }
+    const raw = new TextDecoder("utf-8", { fatal: false }).decode(buf);
+    const ct = res.headers.get("content-type") ?? "";
+    if (ct.includes("text/html") || raw.trimStart().startsWith("<")) {
+      return htmlToPlainText(raw).slice(0, 10_000);
+    }
+    return raw.trim().slice(0, 10_000);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** OpenAI 없이: 기록 요약 + (선택) 웹 참고 문단을 코칭처럼 묶어 반환 */
+async function buildWebOrLocalCoaching(rows: WorkoutRow[]): Promise<string> {
+  const local = buildLocalCoachingText(rows);
+  const url = process.env.COACHING_CONTENT_URL?.trim();
+
+  if (url && isAllowedCoachingUrl(url)) {
+    try {
+      const web = await fetchCoachingWebSource(url);
+      if (web.length > 0) {
+        return (
+          "## 오늘의 코칭 메모\n\n" +
+          "최근 기록을 바탕으로 아래에 **요약**과, 참고용으로 가져온 **웹 자료**를 함께 정리했어요.\n\n" +
+          "### 기록 기반 요약\n\n" +
+          local +
+          "\n\n### 참고 자료 (웹)\n\n" +
+          web +
+          "\n\n---\n\n" +
+          "_실시간 AI 모델 호출 없이, 저장 기록과 공개 웹 문서를 조합한 참고 코멘트예요. 부상·통증이 있으면 전문가 상담을 권해 드려요._"
+        );
+      }
+    } catch {
+      /* URL 실패 시 로컬만 */
+    }
   }
 
+  return (
+    "## 코칭 인사이트\n\n" +
+    "_실시간 AI 연동 없이, 저장된 기록만으로 자동 정리한 코멘트예요._\n\n" +
+    local +
+    "\n\n---\n\n" +
+    "*의학적 진단이 아닙니다. 무리한 중량·통증이 있으면 전문의 상담을 권장드려요.*"
+  );
+}
+
+async function buildOpenAiCoaching(rows: WorkoutRow[], apiKey: string): Promise<string> {
   const model = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
   const localSummary = buildLocalCoachingText(rows);
   const table = formatWorkoutsTable(rows);
@@ -88,4 +172,20 @@ ${localSummary}
   }
 
   return text;
+}
+
+/**
+ * 기본: OpenAI 호출 없음 → 기록 요약 + (선택) COACHING_CONTENT_URL 웹 본문.
+ * OpenAI 사용: COACHING_USE_OPENAI=true 이고 OPENAI_API_KEY 가 있을 때만.
+ */
+export async function buildAiCoaching(rows: WorkoutRow[]): Promise<string> {
+  const useOpenAi =
+    process.env.COACHING_USE_OPENAI === "1" || process.env.COACHING_USE_OPENAI === "true";
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+
+  if (useOpenAi && apiKey) {
+    return buildOpenAiCoaching(rows, apiKey);
+  }
+
+  return buildWebOrLocalCoaching(rows);
 }

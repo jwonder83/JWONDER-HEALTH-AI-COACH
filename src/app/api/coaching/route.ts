@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ coaching });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "코칭 생성 중 오류";
-    const status = msg.includes("OPENAI_API_KEY") ? 503 : 502;
+    const status = msg.includes("OPENAI_API_KEY") || msg.includes("OpenAI") ? 503 : 502;
     return NextResponse.json({ error: msg }, { status });
   }
 }

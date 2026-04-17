@@ -65,7 +65,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettingsMerged = {
     webCoachingEyebrow: "AI Coach",
     webCoachingTitle: "AI 코칭",
     webCoachingHint:
-      "OpenAI를 사용해 기록을 읽고 한국어 코칭을 생성합니다. 서버에 OPENAI_API_KEY가 필요합니다.",
+      "저장된 기록을 요약해 코칭 형태로 보여 줍니다. (기본은 외부 LLM 호출 없음) Vercel에 COACHING_CONTENT_URL을 넣으면 해당 https 페이지 본문을 참고 자료로 함께 붙입니다. 실제 OpenAI를 쓰려면 COACHING_USE_OPENAI=true와 OPENAI_API_KEY가 필요합니다.",
     webCoachingButtonLabel: "AI 코칭 받기",
     listEmptyTitle: "아직 기록이 없어요",
     listEmptySubtitle: "위에서 첫 세트를 저장해 보세요.",
