@@ -40,7 +40,7 @@ export function SettingsForm({ email }: Props) {
         description="로그인된 이메일과 비밀번호 재설정을 관리합니다."
       />
 
-      <div className="mt-2 rounded-[1.75rem] border border-orange-100/90 bg-white/95 p-6 shadow-[0_16px_48px_-20px_rgba(233,75,60,0.14)]">
+      <div className="mt-2 border border-neutral-200 bg-white p-6 shadow-sm">
         <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-apple-subtle">이메일</p>
         <p className="mt-2 break-all text-[16px] font-semibold text-apple-ink">{email || "—"}</p>
         <p className="mt-6 text-[13px] leading-relaxed text-apple-subtle">
@@ -51,7 +51,7 @@ export function SettingsForm({ email }: Props) {
           type="button"
           disabled={loading || !email}
           onClick={() => void sendReset()}
-          className="mt-6 w-full rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] py-3 text-[12px] font-bold uppercase tracking-[0.12em] text-white shadow-lg transition hover:brightness-105 disabled:opacity-45"
+          className="mt-6 w-full border border-black bg-black py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black disabled:opacity-45"
         >
           {loading ? "발송 중…" : "비밀번호 재설정 이메일 보내기"}
         </button>

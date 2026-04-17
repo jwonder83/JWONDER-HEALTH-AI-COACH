@@ -15,13 +15,13 @@ export default function OpengraphImage() {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "flex-end",
-          background: "linear-gradient(125deg, #2c1810 0%, #3d2419 42%, #c73d32 72%, #e94b3c 100%)",
+          background: "linear-gradient(160deg, #0a0a0a 0%, #1a1a1a 45%, #f5f5f3 100%)",
           padding: 64,
         }}
       >
-        <div style={{ fontSize: 56, fontWeight: 800, color: "#ffffff", letterSpacing: -3, lineHeight: 1.05 }}>JWONDER</div>
-        <div style={{ marginTop: 16, fontSize: 30, fontWeight: 600, color: "rgba(255,255,255,0.92)" }}>헬스 기록 · 웹 코칭</div>
-        <div style={{ marginTop: 20, fontSize: 20, color: "rgba(255,255,255,0.78)" }}>기록을 남기고, 한 주를 정리해 보세요.</div>
+        <div style={{ fontSize: 52, fontWeight: 600, color: "#ffffff", letterSpacing: 8, lineHeight: 1.05, textTransform: "uppercase" }}>JWONDER</div>
+        <div style={{ marginTop: 20, fontSize: 26, fontWeight: 500, color: "rgba(255,255,255,0.88)" }}>헬스 기록 · 웹 코칭</div>
+        <div style={{ marginTop: 16, fontSize: 18, fontWeight: 400, color: "rgba(255,255,255,0.7)" }}>기록을 남기고, 한 주를 정리해 보세요.</div>
       </div>
     ),
     { width: 1200, height: 630 },

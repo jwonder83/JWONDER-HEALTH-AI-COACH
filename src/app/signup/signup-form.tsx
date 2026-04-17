@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 
 const fieldClass =
-  "mt-2 w-full rounded-2xl border border-orange-100/90 bg-white px-3.5 py-3.5 text-[17px] tracking-tight text-apple-ink shadow-sm transition placeholder:text-apple-subtle hover:border-apple/20 focus:border-apple/45 focus:outline-none focus:ring-4 focus:ring-apple/15";
+  "mt-2 w-full border border-neutral-200 bg-white px-3.5 py-3.5 text-[17px] tracking-tight text-apple-ink shadow-sm transition placeholder:text-apple-subtle hover:border-neutral-400 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15";
 
 type Props = { site: SiteSettingsMerged; supabaseEnvReady: boolean };
 
@@ -60,7 +60,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       panelTitle={site.copy.signupPanel.title}
       panelDescription={site.copy.signupPanel.description}
     >
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple">{site.copy.signupCard.eyebrow}</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-apple-subtle">{site.copy.signupCard.eyebrow}</p>
       <h1 className="font-display mt-3 text-[1.75rem] font-bold tracking-[-0.03em] text-apple-ink sm:text-[1.875rem]">{site.copy.signupCard.title}</h1>
       <p className="mt-3 text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-apple-subtle">{site.copy.signupCard.subtitle}</p>
 
@@ -114,7 +114,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
         <button
           type="submit"
           disabled={loading || ok}
-          className="w-full rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] py-3.5 text-[15px] font-bold text-white shadow-[0_2px_0_rgba(255,255,255,0.35)_inset,0_12px_32px_-8px_rgba(233,75,60,0.4)] transition hover:brightness-105 active:scale-[0.99] disabled:opacity-45"
+          className="w-full border border-black bg-black py-3.5 text-[12px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.99] disabled:opacity-45"
         >
           {loading ? "처리 중…" : "가입하기"}
         </button>
@@ -124,7 +124,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
         이미 계정이 있나요?{" "}
         <Link
           href="/login"
-          className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] hover:text-apple"
+          className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60"
         >
           로그인
         </Link>

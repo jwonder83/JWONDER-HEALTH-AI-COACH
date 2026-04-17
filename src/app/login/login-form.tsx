@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useId, useState } from "react";
 
 const fieldClass =
-  "mt-2 w-full rounded-2xl border border-orange-100/90 bg-white px-3.5 py-3.5 text-[17px] tracking-tight text-apple-ink shadow-sm transition placeholder:text-apple-subtle hover:border-apple/20 focus:border-apple/45 focus:outline-none focus:ring-4 focus:ring-apple/15";
+  "mt-2 w-full border border-neutral-200 bg-white px-3.5 py-3.5 text-[17px] tracking-tight text-apple-ink shadow-sm transition placeholder:text-apple-subtle hover:border-neutral-400 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15";
 
 function isSafeInternalPath(path: string | null | undefined): path is string {
   if (!path || typeof path !== "string") return false;
@@ -83,7 +83,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
         href="/admin"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed right-4 top-4 z-50 rounded-full border border-orange-100 bg-white/95 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-apple shadow-md backdrop-blur-md transition hover:bg-apple/10 sm:right-6 sm:top-5"
+        className="fixed right-4 top-4 z-50 border border-neutral-200 bg-white/95 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.18em] text-apple-ink shadow-sm backdrop-blur-md transition hover:border-black sm:right-6 sm:top-5"
       >
         ADMIN
       </Link>
@@ -94,7 +94,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
       panelTitle={site.copy.loginPanel.title}
       panelDescription={site.copy.loginPanel.description}
     >
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple">{site.copy.loginCard.eyebrow}</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-apple-subtle">{site.copy.loginCard.eyebrow}</p>
       <h1 className="font-display mt-3 text-[1.75rem] font-bold tracking-[-0.03em] text-apple-ink sm:text-[1.875rem]">{site.copy.loginCard.title}</h1>
       <p className="mt-3 text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-apple-subtle">{site.copy.loginCard.subtitle}</p>
 
@@ -150,7 +150,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] py-3.5 text-[15px] font-bold text-white shadow-[0_2px_0_rgba(255,255,255,0.35)_inset,0_12px_32px_-8px_rgba(233,75,60,0.4)] transition hover:brightness-105 active:scale-[0.99] disabled:opacity-45"
+          className="w-full border border-black bg-black py-3.5 text-[12px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.99] disabled:opacity-45"
         >
           {loading ? "처리 중…" : "로그인"}
         </button>
@@ -160,7 +160,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
         계정이 없나요?{" "}
         <Link
           href="/signup"
-          className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] hover:text-apple"
+          className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60"
         >
           회원가입
         </Link>

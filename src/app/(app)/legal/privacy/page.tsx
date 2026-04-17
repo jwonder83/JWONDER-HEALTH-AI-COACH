@@ -8,7 +8,7 @@ export default async function PrivacyPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8 sm:py-14">
       <SectionTitleBlock step="P" eyebrow="LEGAL" title={privacyTitle} />
-      <article className="mt-2 space-y-4 rounded-[1.75rem] border border-orange-100/90 bg-white/95 p-6 text-[15px] leading-relaxed text-apple-ink shadow-[0_16px_48px_-20px_rgba(233,75,60,0.12)]">
+      <article className="mt-2 space-y-4 border border-neutral-200 bg-white p-6 text-[15px] leading-relaxed text-apple-ink shadow-sm">
         {paragraphs.map((p, i) => (
           <p key={i} className="whitespace-pre-wrap">
             {p}

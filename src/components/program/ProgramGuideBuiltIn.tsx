@@ -2,7 +2,7 @@ import Link from "next/link";
 import { GuideFigure, YouTubeEmbed } from "@/components/program/ProgramGuideMedia";
 import type { ProgramGuideSettings } from "@/types/site-settings";
 
-const card = "rounded-2xl border border-orange-100/90 bg-white/90 p-4 shadow-sm sm:p-5";
+const card = "rounded-sm border border-neutral-200 bg-white p-4 shadow-sm sm:p-5";
 const h2 = "font-display text-[1.2rem] font-bold tracking-[-0.02em] text-apple-ink sm:text-[1.35rem]";
 const body = "text-[14px] leading-relaxed text-apple-subtle sm:text-[15px]";
 
@@ -19,12 +19,12 @@ export function ProgramGuideBuiltIn({ program }: Props) {
     <>
       <GuideFigure src={bi.hero.src} alt={bi.hero.alt} priority className="mt-8" />
 
-      <nav aria-label="이 페이지 목차" className="mt-10 flex flex-wrap gap-2 border-y border-orange-100/80 py-5">
+      <nav aria-label="이 페이지 목차" className="mt-10 flex flex-wrap gap-2 border-y border-neutral-200 py-5">
         {program.toc.map((item) => (
           <a
             key={item.id}
             href={`#${item.id}`}
-            className="rounded-full border border-orange-100/90 bg-u-lavender/25 px-3 py-1.5 text-[11px] font-semibold text-apple-ink transition hover:border-apple/30 hover:bg-u-lavender/45"
+            className="rounded-sm border border-neutral-200 bg-white px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-apple-ink transition hover:border-black hover:bg-neutral-50"
           >
             {item.label}
           </a>
@@ -64,7 +64,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
         <YouTubeEmbed id={bv.split.videoId} title={bv.split.title} />
         <div className="grid gap-4 lg:grid-cols-2">
           <div className={card}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple">초급 · 주 3일 (전신 또는 상하)</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-subtle">초급 · 주 3일 (전신 또는 상하)</p>
             <ul className="mt-3 space-y-2 text-[14px] leading-snug text-apple-ink">
               <li>
                 <span className="font-semibold">A일</span> — 하체 복합(스쿼트/레그프레스) + 보조 1~2 + 코어
@@ -81,7 +81,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
             </p>
           </div>
           <div className={card}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple">중급 · 주 4~5일</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-subtle">중급 · 주 4~5일</p>
             <ul className="mt-3 space-y-2 text-[14px] leading-snug text-apple-ink">
               <li>
                 <span className="font-semibold">4분할</span> 하체 / 가슉·전면어깨 / 등·후면어깨 / 팔·보조
@@ -105,16 +105,16 @@ export function ProgramGuideBuiltIn({ program }: Props) {
           르네상스 퍼리오다이제이션 등에서 널리 쓰는 프레임으로, <strong className="text-apple-ink">근육당 주간 세트</strong>를 설계할 때 참고합니다. 수치는
           population 가이드이며, 개인은 기록과 회복 신호로 보정해야 합니다.
         </p>
-        <div className="overflow-x-auto rounded-2xl border border-orange-100/90 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-[13px] text-apple-ink sm:text-[14px]">
-            <thead className="border-b border-orange-100/90 bg-u-lavender/25 text-[10px] font-bold uppercase tracking-[0.12em] text-apple sm:text-[11px]">
+            <thead className="border-b border-neutral-200 bg-neutral-100 text-[10px] font-bold uppercase tracking-[0.12em] text-apple-subtle sm:text-[11px]">
               <tr>
                 <th className="px-3 py-2.5 sm:px-4">용어</th>
                 <th className="px-3 py-2.5 sm:px-4">의미</th>
                 <th className="px-3 py-2.5 sm:px-4">실무 적용</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-orange-100/80 text-apple-subtle">
+            <tbody className="divide-y divide-neutral-200 text-apple-subtle">
               <tr>
                 <td className="px-3 py-2.5 font-semibold text-apple-ink sm:px-4">MV</td>
                 <td className="px-3 py-2.5 sm:px-4">유지 볼륨</td>
@@ -145,7 +145,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
         <GuideFigure src={bi.plates.src} alt={bi.plates.alt} />
         <YouTubeEmbed id={bv.volumeMain.videoId} title={bv.volumeMain.title} />
         {volLink.href.trim() ? (
-          <p className={`${body} rounded-xl border border-orange-100/80 bg-u-mint/25 px-3 py-2.5 text-[13px] sm:text-[14px]`}>
+          <p className={`${body} rounded-xl border border-neutral-200 bg-neutral-100 px-3 py-2.5 text-[13px] sm:text-[14px]`}>
             {volLink.lead.trim() ? (
               <>
                 {volLink.lead}
@@ -154,7 +154,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
             ) : null}
             <a
               href={volLink.href}
-              className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-4 hover:text-apple"
+              className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-4 hover:opacity-60"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -230,16 +230,16 @@ export function ProgramGuideBuiltIn({ program }: Props) {
           <strong className="text-apple-ink">RPE(Rate of Perceived Exertion)</strong>는 주관적 체력감, <strong>RIR(Reps in Reserve)</strong>는 실패 직전까지
           남겨둔 반복 추정치입니다. 초보는 RIR 2~4에서 기술을 고정하고, 중급 이후 점진적으로 RIR 0~2 구간을 일부 세트에 도입하는 식으로 확장합니다.
         </p>
-        <div className="overflow-x-auto rounded-2xl border border-orange-100/90 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-[12px] text-apple-ink sm:text-[13px]">
-            <thead className="border-b border-orange-100/90 bg-u-mango/30 text-[10px] font-bold uppercase tracking-[0.1em] text-apple">
+            <thead className="border-b border-neutral-200 bg-neutral-100 text-[10px] font-medium uppercase tracking-[0.1em] text-apple-subtle">
               <tr>
                 <th className="px-3 py-2 sm:px-4">RPE(10점)</th>
                 <th className="px-3 py-2 sm:px-4">대략적 RIR</th>
                 <th className="px-3 py-2 sm:px-4">세트 느낌</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-orange-100/80 text-apple-subtle">
+            <tbody className="divide-y divide-neutral-200 text-apple-subtle">
               <tr>
                 <td className="px-3 py-2 font-semibold text-apple-ink sm:px-4">10</td>
                 <td className="px-3 py-2 sm:px-4">0 (실패 또는 직전)</td>
@@ -280,16 +280,16 @@ export function ProgramGuideBuiltIn({ program }: Props) {
           때는 무게를 줄이는 것보다 <strong className="text-apple-ink">각도·ROM·도구</strong>를 먼저 바꾸는 편이 안전한 경우가 많습니다.
         </p>
         <GuideFigure src={bi.rack.src} alt={bi.rack.alt} />
-        <div className="overflow-x-auto rounded-2xl border border-orange-100/90 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-[13px] text-apple-ink sm:text-[14px]">
-            <thead className="border-b border-orange-100/90 bg-u-lavender/20 text-[10px] font-bold uppercase tracking-[0.12em] text-apple sm:text-[11px]">
+            <thead className="border-b border-neutral-200 bg-neutral-100 text-[10px] font-bold uppercase tracking-[0.12em] text-apple-subtle sm:text-[11px]">
               <tr>
                 <th className="px-3 py-2.5 sm:px-4">본 동작</th>
                 <th className="px-3 py-2.5 sm:px-4">대안(유사 패턴)</th>
                 <th className="px-3 py-2.5 sm:px-4">메모</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-orange-100/80">
+            <tbody className="divide-y divide-neutral-200">
               <tr>
                 <td className="px-3 py-2.5 font-medium sm:px-4">바벨 백스쿼트</td>
                 <td className="px-3 py-2.5 text-apple-subtle sm:px-4">세이프티바 스쿼트, SSB, 고블릿, 레그프레스</td>
@@ -334,7 +334,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
 
         <div className="grid items-start gap-6 lg:grid-cols-2">
           <div className={card}>
-            <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-apple">스쿼트</p>
+            <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">스쿼트</p>
             <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
               <li>발 스크류(외측 전방으로 회전력)로 아치 유지</li>
               <li>무릎 트랙은 발가락 2~5지 방향과 일치</li>
@@ -347,7 +347,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
 
         <div className="grid items-start gap-6 lg:grid-cols-2">
           <div className={card}>
-            <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-apple">데드리프트·힙힌지</p>
+            <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">데드리프트·힙힌지</p>
             <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
               <li>견갑은 바로 “당기는” 것이 아니라 중립 견고화</li>
               <li>바는 항상 중족부에 수직으로 걸리게</li>
@@ -360,7 +360,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
 
         <div className="grid items-start gap-6 lg:grid-cols-2">
           <div className={card}>
-            <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-apple">벤치 프레스</p>
+            <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">벤치 프레스</p>
             <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
               <li>견갑 하후·내측 고정, 흉추 약간 아치</li>
               <li>팔꿈치 45° 전후(정면에서 보면 몸통과 각도)</li>
@@ -372,7 +372,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
         </div>
 
         <div className={card}>
-          <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-apple">로우·수평당김</p>
+          <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">로우·수평당김</p>
           <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
             <li>견갑 후인·하행 후 견고해진 뒤 전완으로 당김</li>
             <li>과도한 요추 과신전 대신 흉추 중립~소확장</li>
@@ -395,7 +395,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
         <h2 className={h2}>{st.stats}</h2>
         <p className={body}>
           주간·월간 볼륨, 종목 비중, 연속 기록은 앱의{" "}
-          <Link href="/records" className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] hover:text-apple">
+          <Link href="/records" className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60">
             통계·보내기
           </Link>
           와 대시보드 카드에서 확인할 수 있습니다. CSV로 내려받아 엑셀·시트에서 <strong className="text-apple-ink">4주 이동 평균</strong>을 그리면 MRV 접근
@@ -406,7 +406,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       {/* 안전 */}
       <section id="safety" className="mt-16 scroll-mt-28 space-y-3">
         <h2 className={h2}>{st.safety}</h2>
-        <p className="rounded-2xl border border-rose-100/90 bg-rose-50/70 px-4 py-3 text-[14px] leading-relaxed text-rose-950">
+        <p className="rounded-sm border border-neutral-300 bg-neutral-50 px-4 py-3 text-[14px] leading-relaxed text-apple-ink">
           흉통, 실신 전조, 날카로운 관절통, 호흡곤란이 있으면 즉시 중단하고 응급·의료기관을 이용하세요. 본 문서는 일반적인 힘 트레이닝 정보이며 개인별
           진단·처방을 대체하지 않습니다.
         </p>

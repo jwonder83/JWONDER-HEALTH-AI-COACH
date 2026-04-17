@@ -66,11 +66,11 @@ function ImageFields({
   }
 
   return (
-    <fieldset className="rounded-2xl border border-orange-100/90 bg-white/90 p-4 shadow-[0_8px_28px_-12px_rgba(233,75,60,0.1)]">
+    <fieldset className="rounded-2xl border border-neutral-200 bg-white/90 p-4 shadow-sm">
       <legend className="px-1 text-[13px] font-semibold text-apple-ink">{label}</legend>
 
       <div className="mt-3">
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-orange-200/80 bg-gradient-to-r from-apple/12 to-u-lavender/30 px-3 py-2 text-[13px] font-semibold text-apple-muted transition hover:from-apple/18 hover:to-u-lavender/40 disabled:cursor-not-allowed disabled:opacity-50">
+        <label className="inline-flex cursor-pointer items-center gap-2 border border-neutral-200 bg-neutral-50 px-3 py-2 text-[12px] font-medium uppercase tracking-[0.1em] text-apple-ink transition hover:border-black disabled:cursor-not-allowed disabled:opacity-50">
           <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" disabled={uploading} onChange={(e) => void onPickFile(e)} />
           {uploading ? "업로드 중…" : "파일에서 이미지 선택"}
         </label>
@@ -252,7 +252,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         </div>
         <Link
           href="/admin"
-          className="shrink-0 rounded-full border border-orange-100/90 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-apple/25 hover:text-apple-ink"
+          className="shrink-0 rounded-full border border-neutral-200 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-black hover:text-apple-ink"
         >
           관리자 개요
         </Link>
@@ -642,8 +642,8 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         <section className="mb-10 space-y-4">
           <h2 className="text-[15px] font-semibold text-apple-ink">하단 푸터</h2>
           <p className="text-[13px] leading-relaxed text-apple-subtle">
-            로그인 후 레이아웃 하단 카드에 표시됩니다. 링크는 <code className="rounded bg-orange-100/50 px-1">/경로</code> 또는{" "}
-            <code className="rounded bg-orange-100/50 px-1">https://…</code> 만 허용됩니다.
+            로그인 후 레이아웃 하단 카드에 표시됩니다. 링크는 <code className="rounded bg-neutral-100 px-1">/경로</code> 또는{" "}
+            <code className="rounded bg-neutral-100 px-1">https://…</code> 만 허용됩니다.
           </p>
           <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
             <label className="block text-[12px] font-medium text-apple-subtle">
@@ -663,7 +663,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
               />
             </label>
             <label className="block text-[12px] font-medium text-apple-subtle">
-              저작권·하단 문구 (<code className="rounded bg-orange-100/50 px-1">{"{year}"}</code> → 현재 연도)
+              저작권·하단 문구 (<code className="rounded bg-neutral-100 px-1">{"{year}"}</code> → 현재 연도)
               <input
                 className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
                 value={settings.copy.footer.copyrightLine}
@@ -701,7 +701,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
                   <button
                     type="button"
                     disabled={settings.copy.footer.links.length <= 1}
-                    className="rounded-lg border border-orange-100 px-3 py-2 text-[12px] font-semibold text-apple-subtle transition hover:bg-rose-50 hover:text-rose-800 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-lg border border-neutral-200 px-3 py-2 text-[12px] font-medium text-apple-subtle transition hover:border-black hover:text-apple-ink disabled:cursor-not-allowed disabled:opacity-40"
                     onClick={() => {
                       const ft = settings.copy.footer;
                       if (ft.links.length <= 1) return;
@@ -716,7 +716,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
             <button
               type="button"
               disabled={settings.copy.footer.links.length >= 12}
-              className="rounded-lg border border-orange-200/80 bg-u-mint/30 px-3 py-2 text-[12px] font-semibold text-apple-ink transition hover:bg-u-mint/50 disabled:opacity-40"
+              className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-[12px] font-medium text-apple-ink transition hover:border-black disabled:opacity-40"
               onClick={() => {
                 const ft = settings.copy.footer;
                 setCopy({ footer: { ...ft, links: [...ft.links, { label: "새 링크", href: "/" }] } });
@@ -731,7 +731,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
           type="button"
           disabled={saving}
           onClick={() => void onSave()}
-          className="w-full rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] py-3.5 text-[15px] font-bold text-white shadow-lg transition hover:brightness-105 disabled:opacity-45"
+          className="w-full border border-black bg-black py-3.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white hover:text-black disabled:opacity-45"
         >
           {saving ? "수정 중…" : "수정"}
         </button>

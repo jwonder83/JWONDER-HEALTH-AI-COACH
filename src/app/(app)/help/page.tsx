@@ -16,21 +16,21 @@ export default async function HelpPage() {
       <p className="mt-2 whitespace-pre-wrap text-[16px] leading-relaxed text-apple-subtle">{h.intro}</p>
       <p className="mt-5 text-[15px] leading-relaxed text-apple-subtle">
         주간 스플릿·델로드·워밍업·RPE·대체 종목 등은{" "}
-        <Link href="/program" className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] hover:text-apple">
+        <Link href="/program" className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60">
           {site.program.promoLinkLabel}
         </Link>
         에 모아 두었습니다.
       </p>
-      <p className="mt-6 border-l-4 border-apple bg-apple/5 px-4 py-3 text-[15px] font-medium text-apple-ink">{h.contactLine}</p>
+      <p className="mt-6 border-l-2 border-black bg-neutral-50 px-4 py-3 text-[15px] font-medium text-apple-ink">{h.contactLine}</p>
 
       {hasExtraLinks ? (
-        <div className="mt-8 rounded-2xl border border-orange-100/90 bg-white/90 px-4 py-4 shadow-sm sm:px-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-apple">추가 안내</p>
+        <div className="mt-8 rounded-2xl border border-neutral-200 bg-white/90 px-4 py-4 shadow-sm sm:px-5">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-apple-subtle">추가 안내</p>
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-apple-subtle">
             {statusUrl ? (
               <a
                 href={statusUrl}
-                className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] transition hover:text-apple"
+                className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] transition hover:opacity-60"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -40,7 +40,7 @@ export default async function HelpPage() {
             {feedbackEmail ? (
               <a
                 href={`mailto:${feedbackEmail}`}
-                className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] transition hover:text-apple"
+                className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] transition hover:opacity-60"
               >
                 피드백·문의(메일)
               </a>
@@ -48,7 +48,7 @@ export default async function HelpPage() {
             {feedbackFormUrl ? (
               <a
                 href={feedbackFormUrl}
-                className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] transition hover:text-apple"
+                className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] transition hover:opacity-60"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -59,15 +59,15 @@ export default async function HelpPage() {
         </div>
       ) : null}
 
-      <h2 className="mt-12 text-[13px] font-bold uppercase tracking-[0.18em] text-apple">{h.faqSectionTitle}</h2>
+      <h2 className="mt-12 text-[13px] font-medium uppercase tracking-[0.22em] text-apple-subtle">{h.faqSectionTitle}</h2>
       <ul className="mt-4 space-y-3">
         {h.faqItems.map((item, i) => (
-          <li key={i} className="overflow-hidden rounded-2xl border border-orange-100/90 bg-white shadow-sm">
+          <li key={i} className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
             <details className="group">
               <summary className="cursor-pointer list-none px-4 py-3 text-[15px] font-bold marker:content-none [&::-webkit-details-marker]:hidden">
-                <span className="text-apple">Q.</span> {item.question}
+                <span className="text-apple-subtle">Q.</span> {item.question}
               </summary>
-              <div className="border-t border-orange-100/80 bg-u-lavender/20 px-4 py-3 text-[15px] leading-relaxed text-apple-ink">{item.answer}</div>
+              <div className="border-t border-neutral-200 bg-neutral-50 px-4 py-3 text-[15px] leading-relaxed text-apple-ink">{item.answer}</div>
             </details>
           </li>
         ))}

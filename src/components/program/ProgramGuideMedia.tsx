@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const figureRing =
-  "overflow-hidden rounded-2xl border border-orange-100/85 bg-white shadow-[0_16px_48px_-20px_rgba(233,75,60,0.18)] ring-1 ring-orange-50/70";
+  "overflow-hidden rounded-sm border border-neutral-200 bg-white shadow-[0_12px_40px_-16px_rgba(0,0,0,0.08)] ring-1 ring-neutral-100";
 
 type FigureProps = {
   src: string;

@@ -1,19 +1,23 @@
 @import "tailwindcss";
 
-/* Ujjo-inspired: warm cream, coral CTA, lavender accents — ref. https://godly.website/website/ujjo-568 */
+/* Luxury editorial: Chanel.kr inspired — black / warm white / subtle gray, serif display */
 @theme {
   --font-sans:
-    var(--font-dm-sans), "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", "Noto Sans KR", ui-sans-serif,
-    system-ui, sans-serif;
-  --color-apple: #e94b3c;
-  --color-apple-hover: #ff6a5a;
-  --color-apple-muted: #c73d32;
-  --color-apple-surface: #fff8f4;
-  --color-apple-ink: #2c1810;
-  --color-apple-subtle: #7d6a62;
-  --color-u-lavender: #e4d9ff;
-  --color-u-mango: #ffe066;
-  --color-u-mint: #c8f5e0;
+    var(--font-dm-sans), "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", "Noto Sans KR", ui-sans-serif, system-ui,
+    sans-serif;
+  --color-apple: #000000;
+  --color-apple-hover: #1a1a1a;
+  --color-apple-muted: #404040;
+  --color-apple-surface: #f5f5f3;
+  --color-apple-ink: #000000;
+  --color-apple-subtle: #6b6b6b;
+  --color-u-lavender: #ebebeb;
+  --color-u-mango: #e5e5e5;
+  --color-u-mint: #e8e8e8;
+  /* 기존 `orange-*` 유틸을 보더·배경용 뉴트럴로 재매핑 */
+  --color-orange-50: #fafaf9;
+  --color-orange-100: #e5e5e5;
+  --color-orange-200: #d4d4d4;
 }
 
 html {
@@ -23,21 +27,20 @@ html {
 body {
   @apply min-h-screen font-sans antialiased;
   font-feature-settings: "kern" 1, "liga" 1;
+  letter-spacing: -0.01em;
   color: var(--color-apple-ink);
   background-color: var(--color-apple-surface);
-  background-image:
-    radial-gradient(ellipse 100% 80% at 10% -10%, rgba(228, 217, 255, 0.65), transparent 42%),
-    radial-gradient(ellipse 80% 60% at 95% 5%, rgba(255, 224, 102, 0.45), transparent 38%),
-    radial-gradient(ellipse 70% 55% at 50% 100%, rgba(255, 200, 185, 0.35), transparent 45%),
-    radial-gradient(ellipse 60% 40% at 0% 80%, rgba(200, 245, 224, 0.35), transparent 40%);
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5f5f3 38%, #f0f0ed 100%);
 }
 
 .font-display {
-  font-family: var(--font-syne), var(--font-dm-sans), "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-family: var(--font-cormorant), "Times New Roman", Times, Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 input:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  @apply outline-none ring-2 ring-apple/40 ring-offset-2 ring-offset-apple-surface;
+  @apply outline-none ring-2 ring-black/25 ring-offset-2 ring-offset-white;
 }

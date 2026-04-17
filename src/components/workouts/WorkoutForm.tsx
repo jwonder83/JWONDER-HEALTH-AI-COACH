@@ -24,10 +24,10 @@ const LS_PRESETS = "jws_workout_presets_v1";
 const MAX_PRESETS = 8;
 
 const fieldClass =
-  "mt-2 w-full rounded-2xl border border-orange-100/90 bg-white px-3.5 py-3 text-[17px] tracking-tight text-apple-ink shadow-sm transition-[border-color,box-shadow] duration-200 placeholder:text-apple-subtle hover:border-apple/25 focus:border-apple/50 focus:outline-none focus:ring-4 focus:ring-apple/15";
+  "mt-2 w-full border border-neutral-200 bg-white px-3.5 py-3 text-[17px] tracking-tight text-apple-ink shadow-sm transition-[border-color,box-shadow] duration-200 placeholder:text-apple-subtle hover:border-neutral-400 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15";
 
 const panel =
-  "rounded-[2rem] border border-orange-100/80 bg-white/90 p-8 shadow-[0_16px_48px_-20px_rgba(233,75,60,0.15),0_2px_0_rgba(255,255,255,0.95)_inset] ring-1 ring-orange-50/80 backdrop-blur-md sm:rounded-[2.25rem] sm:p-10";
+  "border border-neutral-200 bg-white p-8 shadow-sm sm:p-10";
 
 function presetKey(p: WorkoutInput): string {
   return `${p.exercise_name.trim()}|${p.weight_kg}|${p.reps}|${p.sets}|${p.success}`;
@@ -145,20 +145,20 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
   return (
     <section className={panel}>
       {omitCardHeader ? (
-        <div className="mb-8 border-b border-orange-100/80 pb-6">
+        <div className="mb-8 border-b border-neutral-200/80 pb-6">
           <p className="text-[14px] font-medium leading-relaxed text-apple-subtle sm:text-[15px]">{copy.subtitle}</p>
         </div>
       ) : (
-        <div className="mb-9 border-b border-orange-100/90 pb-9">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple">{copy.eyebrow}</p>
+        <div className="mb-9 border-b border-neutral-200/90 pb-9">
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-apple-subtle">{copy.eyebrow}</p>
           <h2 className="font-display mt-3 text-[1.5rem] font-bold tracking-[-0.02em] text-apple-ink sm:text-[1.75rem]">{copy.title}</h2>
           <p className="mt-3 max-w-md text-[17px] font-normal leading-[1.47] tracking-[-0.012em] text-apple-subtle">{copy.subtitle}</p>
         </div>
       )}
 
       {presets.length > 0 ? (
-        <div className="mb-6 rounded-2xl border border-orange-100/80 bg-u-lavender/20 px-4 py-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple">프리셋</p>
+        <div className="mb-6 rounded-2xl border border-neutral-200/80 bg-neutral-50 px-4 py-3">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-apple-subtle">프리셋</p>
           <p className="mt-1 text-[12px] text-apple-subtle">자주 쓰는 종목·중량을 한 번에 불러옵니다. (이 기기에만 저장)</p>
           <ul className="mt-3 flex flex-wrap gap-2" aria-label="운동 프리셋 목록">
             {presets.map((p) => (
@@ -169,7 +169,7 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
                     setForm({ ...p, exercise_name: p.exercise_name.trim() });
                     setStatus(null);
                   }}
-                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-orange-100/90 bg-white px-3 py-1.5 text-left text-[12px] font-semibold text-apple-ink shadow-sm transition hover:border-apple/35 hover:bg-apple/5"
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-neutral-200/90 bg-white px-3 py-1.5 text-left text-[12px] font-semibold text-apple-ink shadow-sm transition hover:border-black hover:bg-neutral-50"
                 >
                   <span className="truncate">{p.exercise_name.trim()}</span>
                   <span className="shrink-0 tabular-nums text-apple-subtle">
@@ -251,7 +251,7 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
               role="radiogroup"
               aria-label={copy.outcomeAriaLabel}
               onKeyDown={handleOutcomeKeyDown}
-              className="mt-2 inline-flex w-full max-w-xs rounded-2xl border border-orange-100 bg-u-lavender/25 p-1 sm:max-w-sm"
+              className="mt-2 inline-flex w-full max-w-xs rounded-2xl border border-neutral-200 bg-neutral-100 p-1 sm:max-w-sm"
             >
               <button
                 type="button"
@@ -261,7 +261,7 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
                 onClick={() => setForm((f) => ({ ...f, success: true }))}
                 className={
                   form.success
-                    ? "flex-1 rounded-xl bg-white py-2.5 text-[15px] font-semibold text-apple-ink shadow-sm ring-1 ring-orange-100/80 transition-all duration-200 active:scale-[0.99]"
+                    ? "flex-1 rounded-xl bg-white py-2.5 text-[15px] font-semibold text-apple-ink shadow-sm ring-1 ring-neutral-200 transition-all duration-200 active:scale-[0.99]"
                     : "flex-1 rounded-xl py-2.5 text-[15px] font-medium text-apple-subtle transition-colors duration-200 hover:text-apple-ink"
                 }
               >
@@ -275,7 +275,7 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
                 onClick={() => setForm((f) => ({ ...f, success: false }))}
                 className={
                   !form.success
-                    ? "flex-1 rounded-xl bg-white py-2.5 text-[15px] font-semibold text-apple-ink shadow-sm ring-1 ring-orange-100/80 transition-all duration-200 active:scale-[0.99]"
+                    ? "flex-1 rounded-xl bg-white py-2.5 text-[15px] font-semibold text-apple-ink shadow-sm ring-1 ring-neutral-200 transition-all duration-200 active:scale-[0.99]"
                     : "flex-1 rounded-xl py-2.5 text-[15px] font-medium text-apple-subtle transition-colors duration-200 hover:text-apple-ink"
                 }
               >
@@ -288,14 +288,14 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
           <button
             type="submit"
             disabled={loading}
-            className="rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] px-9 py-2.5 text-[15px] font-bold text-white shadow-[0_2px_0_rgba(255,255,255,0.35)_inset,0_12px_32px_-8px_rgba(233,75,60,0.45)] transition-all duration-200 hover:brightness-105 active:scale-[0.98] disabled:opacity-45"
+            className="border border-black bg-black px-9 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] disabled:opacity-45"
           >
             {loading ? copy.savingButtonLabel : copy.saveButtonLabel}
           </button>
           <button
             type="button"
             onClick={addCurrentAsPreset}
-            className="rounded-full border border-orange-100 bg-white px-4 py-2.5 text-[13px] font-semibold text-apple-ink shadow-sm transition hover:border-apple/30 hover:bg-u-lavender/30"
+            className="border border-neutral-300 bg-white px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-apple-ink shadow-sm transition hover:border-black hover:bg-neutral-50"
           >
             프리셋에 저장
           </button>

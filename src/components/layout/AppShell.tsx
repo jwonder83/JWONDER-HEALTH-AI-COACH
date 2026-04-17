@@ -45,52 +45,50 @@ function FooterNavLink({ href, className, children }: { href: string; className:
   );
 }
 
-const navBtn =
-  "rounded-full border border-orange-100/90 bg-white/90 px-3.5 py-2 text-[12px] font-semibold tracking-tight text-apple-ink shadow-sm transition hover:border-apple/30 hover:bg-apple/10 hover:text-apple sm:px-4";
+const navLink =
+  "px-2 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-apple-ink transition-opacity hover:opacity-50 sm:px-3 sm:text-[12px]";
 
 export function AppShell({ email, showAdminLink, site, children, footerMeta }: Props) {
   return (
     <div className="flex min-h-screen flex-col text-apple-ink">
-      <header className="sticky top-0 z-30 px-3 pt-3 sm:px-5 sm:pt-4">
-        <div className="mx-auto max-w-6xl rounded-[1.75rem] border border-orange-100/80 bg-white/85 px-4 py-3 shadow-[0_8px_32px_-12px_rgba(233,75,60,0.18),0_2px_0_rgba(255,255,255,0.9)_inset] backdrop-blur-xl sm:px-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-              <Link
-                href="/"
-                className="font-display flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-apple to-[#ff8a7a] text-lg font-bold text-white shadow-md shadow-apple/25"
-                aria-label="홈"
-              >
-                {initialFromEmail(email)}
+      <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+          <div className="flex min-w-0 flex-wrap items-center gap-4 sm:gap-8">
+            <Link
+              href="/"
+              className="font-display flex size-10 shrink-0 items-center justify-center border border-apple-ink bg-apple-ink text-[15px] font-semibold text-white transition hover:bg-white hover:text-apple-ink"
+              aria-label="홈"
+            >
+              {initialFromEmail(email)}
+            </Link>
+            <nav aria-label="주요 메뉴" className="flex flex-wrap items-center gap-x-1 gap-y-1 sm:gap-x-2">
+              <Link href="/" className={navLink}>
+                홈
               </Link>
-              <nav aria-label="주요 메뉴" className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <Link href="/" className={navBtn}>
-                  홈
-                </Link>
-                <Link href="/records" className={navBtn}>
-                  통계·보내기
-                </Link>
-                <Link href="/program" className={navBtn}>
-                  {site.program.navLabel}
-                </Link>
-                <Link href="/help" className={navBtn}>
-                  도움말
-                </Link>
-                <Link href="/settings" className={navBtn}>
-                  계정
-                </Link>
-              </nav>
-            </div>
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
-              <span className="hidden max-w-[200px] truncate text-[12px] text-apple-subtle sm:inline">{email}</span>
-              {showAdminLink ? (
-                <Link href="/admin" className={navBtn}>
-                  사이트 설정
-                </Link>
-              ) : null}
-              <SignOutButton
-                className={`${navBtn} border-stone-200/90 hover:border-stone-300 hover:bg-stone-50 hover:text-apple-ink`}
-              />
-            </div>
+              <Link href="/records" className={navLink}>
+                통계·보내기
+              </Link>
+              <Link href="/program" className={navLink}>
+                {site.program.navLabel}
+              </Link>
+              <Link href="/help" className={navLink}>
+                도움말
+              </Link>
+              <Link href="/settings" className={navLink}>
+                계정
+              </Link>
+            </nav>
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-3">
+            <span className="hidden max-w-[200px] truncate text-[11px] uppercase tracking-[0.12em] text-apple-subtle sm:inline">{email}</span>
+            {showAdminLink ? (
+              <Link href="/admin" className={navLink}>
+                사이트 설정
+              </Link>
+            ) : null}
+            <SignOutButton
+              className={`${navLink} border border-transparent hover:border-neutral-300 hover:opacity-100`}
+            />
           </div>
         </div>
       </header>
@@ -99,23 +97,23 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
         {children}
       </main>
 
-      <footer className="mt-auto px-4 pb-8 pt-12 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[1.5rem] border border-orange-100/80 bg-white/80 px-6 py-8 text-center shadow-[0_12px_40px_-16px_rgba(233,75,60,0.12)] backdrop-blur-md">
-          <p className="font-display text-[12px] font-bold uppercase tracking-[0.18em] text-apple">{site.copy.footer.primaryLine}</p>
+      <footer className="mt-auto border-t border-neutral-200 bg-white px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-6xl text-center">
+          <p className="font-display text-[11px] font-medium uppercase tracking-[0.28em] text-apple-ink">{site.copy.footer.primaryLine}</p>
           {site.copy.footer.secondaryLine.trim() ? (
-            <p className="mt-2 text-[13px] leading-relaxed text-apple-subtle">{site.copy.footer.secondaryLine}</p>
+            <p className="mt-3 text-[13px] leading-relaxed text-apple-subtle">{site.copy.footer.secondaryLine}</p>
           ) : null}
-          <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[14px] font-medium">
+          <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-normal">
             {site.copy.footer.links.map((item, i) => (
               <span key={`${item.href}-${i}`} className="contents">
                 {i > 0 ? (
-                  <span className="text-orange-200" aria-hidden>
-                    ✦
+                  <span className="text-neutral-300" aria-hidden>
+                    |
                   </span>
                 ) : null}
                 <FooterNavLink
                   href={item.href}
-                  className="text-apple-muted underline decoration-apple/25 underline-offset-[6px] transition hover:text-apple"
+                  className="text-apple-ink underline decoration-neutral-300 underline-offset-[6px] transition hover:opacity-60"
                 >
                   {item.label}
                 </FooterNavLink>
@@ -123,18 +121,18 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
             ))}
           </div>
           {footerMeta?.statusUrl || footerMeta?.feedbackMailto || footerMeta?.feedbackFormUrl ? (
-            <p className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[11px] leading-relaxed text-apple-subtle">
+            <p className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[11px] uppercase tracking-[0.14em] text-apple-subtle">
               {footerMeta.statusUrl ? (
                 <>
                   <FooterNavLink
                     href={footerMeta.statusUrl}
-                    className="underline decoration-apple/20 underline-offset-4 transition hover:text-apple"
+                    className="underline decoration-neutral-300 underline-offset-4 transition hover:text-apple-ink"
                   >
                     {footerMeta.statusLabel?.trim() || "장애 시 상태 확인"}
                   </FooterNavLink>
                   {footerMeta.feedbackMailto || footerMeta.feedbackFormUrl ? (
-                    <span className="text-orange-200/80" aria-hidden>
-                      ·
+                    <span className="text-neutral-300" aria-hidden>
+                      |
                     </span>
                   ) : null}
                 </>
@@ -142,27 +140,29 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
               {footerMeta.feedbackMailto ? (
                 <a
                   href={footerMeta.feedbackMailto}
-                  className="underline decoration-apple/20 underline-offset-4 transition hover:text-apple"
+                  className="underline decoration-neutral-300 underline-offset-4 transition hover:text-apple-ink"
                 >
                   문의(메일)
                 </a>
               ) : null}
               {footerMeta.feedbackMailto && footerMeta.feedbackFormUrl ? (
-                <span className="text-orange-200/80" aria-hidden>
-                  ·
+                <span className="text-neutral-300" aria-hidden>
+                  |
                 </span>
               ) : null}
               {footerMeta.feedbackFormUrl ? (
                 <FooterNavLink
                   href={footerMeta.feedbackFormUrl}
-                  className="underline decoration-apple/20 underline-offset-4 transition hover:text-apple"
+                  className="underline decoration-neutral-300 underline-offset-4 transition hover:text-apple-ink"
                 >
                   문의(폼)
                 </FooterNavLink>
               ) : null}
             </p>
           ) : null}
-          <p className="mt-6 whitespace-pre-line text-[12px] text-apple-subtle">{footerCopyrightLine(site.copy.footer.copyrightLine)}</p>
+          <p className="mt-8 whitespace-pre-line text-[11px] uppercase tracking-[0.16em] text-apple-subtle">
+            {footerCopyrightLine(site.copy.footer.copyrightLine)}
+          </p>
         </div>
       </footer>
     </div>

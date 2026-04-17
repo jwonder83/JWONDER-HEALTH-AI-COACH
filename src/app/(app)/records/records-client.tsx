@@ -139,38 +139,38 @@ export function RecordsClient({ initialRows }: Props) {
         title="통계·보내기"
         description="종목·기간으로 좁혀 보고, CSV로 내려받을 수 있습니다."
         right={
-          <span className="rounded-full border border-orange-100 bg-u-mint/45 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px]">
+          <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px]">
             {stats.count}건
           </span>
         }
       />
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-[1.25rem] border border-orange-100/90 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-orange-50/60">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple">주간 한 줄</p>
+        <div className="rounded-[1.25rem] border border-neutral-200/90 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-neutral-100">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">주간 한 줄</p>
           <p className="mt-1.5 text-[13px] font-medium leading-snug text-apple-ink">{weekLine}</p>
         </div>
-        <div className="rounded-[1.25rem] border border-orange-100/90 bg-u-lavender/25 px-4 py-3 shadow-sm ring-1 ring-orange-50/60">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple">월간 한 줄</p>
+        <div className="rounded-[1.25rem] border border-neutral-200/90 bg-neutral-50 px-4 py-3 shadow-sm ring-1 ring-neutral-100">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">월간 한 줄</p>
           <p className="mt-1.5 text-[13px] font-medium leading-snug text-apple-ink">{monthLine}</p>
         </div>
       </div>
 
       {monthInsight ? (
-        <div className="mt-3 rounded-[1.25rem] border border-orange-100/80 bg-u-mint/30 px-4 py-3 text-[13px] leading-snug text-apple-ink ring-1 ring-orange-50/50 sm:text-[14px]">
-          <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-apple">월간 인사이트</span>
+        <div className="mt-3 rounded-[1.25rem] border border-neutral-200/80 bg-neutral-50 px-4 py-3 text-[13px] leading-snug text-apple-ink ring-1 ring-neutral-100 sm:text-[14px]">
+          <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-apple-subtle">월간 인사이트</span>
           <p className="mt-1.5 font-medium">{monthInsight}</p>
         </div>
       ) : null}
 
-      <div className="mt-2 rounded-[1.75rem] border border-orange-100/90 bg-white/95 p-5 shadow-[0_16px_48px_-20px_rgba(233,75,60,0.14)] sm:p-6">
+      <div className="mt-2 rounded-[1.75rem] border border-neutral-200/90 bg-white/95 p-5 shadow-sm sm:p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label htmlFor={idQ} className="block text-[12px] font-semibold text-apple-subtle">
             운동명 포함
             <input
               id={idQ}
               name="q"
-              className="mt-1.5 w-full rounded-xl border border-orange-100/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-apple/40 focus:outline-none focus:ring-2 focus:ring-apple/20"
+              className="mt-1.5 w-full rounded-xl border border-neutral-200/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="예: 스쿼트"
@@ -182,7 +182,7 @@ export function RecordsClient({ initialRows }: Props) {
               id={idFrom}
               name="from"
               type="date"
-              className="mt-1.5 w-full rounded-xl border border-orange-100/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-apple/40 focus:outline-none focus:ring-2 focus:ring-apple/20"
+              className="mt-1.5 w-full rounded-xl border border-neutral-200/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
             />
@@ -193,7 +193,7 @@ export function RecordsClient({ initialRows }: Props) {
               id={idTo}
               name="to"
               type="date"
-              className="mt-1.5 w-full rounded-xl border border-orange-100/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-apple/40 focus:outline-none focus:ring-2 focus:ring-apple/20"
+              className="mt-1.5 w-full rounded-xl border border-neutral-200/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15"
               value={to}
               onChange={(e) => setTo(e.target.value)}
             />
@@ -206,20 +206,20 @@ export function RecordsClient({ initialRows }: Props) {
                 setFrom("");
                 setTo("");
               }}
-              className="w-full rounded-full border border-orange-100 bg-u-lavender/30 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-apple-ink transition hover:bg-u-lavender/50"
+              className="w-full rounded-full border border-neutral-200 bg-neutral-100 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-apple-ink transition hover:bg-neutral-200"
             >
               필터 초기화
             </button>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 border-t border-orange-100/90 pt-6 sm:grid-cols-3">
-          <div className="rounded-2xl border border-orange-100/90 bg-u-mint/50 px-4 py-3 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple">건수</p>
+        <div className="mt-6 grid gap-3 border-t border-neutral-200/90 pt-6 sm:grid-cols-3">
+          <div className="rounded-2xl border border-neutral-200/90 bg-neutral-50 px-4 py-3 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">건수</p>
             <p className="font-display mt-1 text-2xl font-bold tabular-nums">{stats.count}</p>
           </div>
-          <div className="rounded-2xl border border-orange-100/90 bg-u-mango/35 px-4 py-3 text-center sm:col-span-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple">추정 볼륨 (kg×회×세트 합)</p>
+          <div className="rounded-2xl border border-neutral-200/90 bg-neutral-100 px-4 py-3 text-center sm:col-span-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">추정 볼륨 (kg×회×세트 합)</p>
             <p className="font-display mt-1 text-2xl font-bold tabular-nums">{Math.round(stats.volume * 10) / 10}</p>
           </div>
         </div>
@@ -228,15 +228,15 @@ export function RecordsClient({ initialRows }: Props) {
           type="button"
           onClick={downloadCsv}
           disabled={filtered.length === 0}
-          className="mt-6 w-full rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] py-3 text-[12px] font-bold uppercase tracking-[0.14em] text-white shadow-lg transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-40"
+          className="mt-6 w-full border border-black bg-black py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
         >
           CSV 내려받기 ({filtered.length}건)
         </button>
       </div>
 
-      <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-orange-100/90 bg-white shadow-[0_12px_40px_-16px_rgba(233,75,60,0.12)]">
-        <div className="bg-gradient-to-r from-apple to-[#ff8a7a] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white">미리보기</div>
-        <ul className="max-h-[min(480px,50vh)] divide-y divide-orange-100/80 overflow-y-auto">
+      <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-neutral-200/90 bg-white shadow-sm">
+        <div className="border-b border-neutral-200 bg-black px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.2em] text-white">미리보기</div>
+        <ul className="max-h-[min(480px,50vh)] divide-y divide-neutral-200 overflow-y-auto">
           {filtered.length === 0 ? (
             <li className="px-4 py-8 text-center text-[14px] text-apple-subtle">조건에 맞는 기록이 없습니다.</li>
           ) : (

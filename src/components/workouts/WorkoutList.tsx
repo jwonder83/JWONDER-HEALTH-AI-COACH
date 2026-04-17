@@ -12,7 +12,7 @@ type Props = {
 };
 
 const listShell =
-  "overflow-hidden rounded-[2rem] border border-orange-100/90 bg-white/90 shadow-[0_16px_48px_-20px_rgba(233,75,60,0.12)] ring-1 ring-orange-50/80 backdrop-blur-md sm:rounded-[2.25rem]";
+  "overflow-hidden border border-neutral-200 bg-white shadow-sm backdrop-blur-md";
 
 function formatDate(iso: string) {
   try {
@@ -29,7 +29,7 @@ function Skeleton() {
   return (
     <div className={`${listShell} p-5`}>
       {[0, 1, 2].map((i) => (
-        <div key={i} className={`flex animate-pulse gap-4 py-4 ${i > 0 ? "border-t border-orange-100/80" : ""}`}>
+        <div key={i} className={`flex animate-pulse gap-4 py-4 ${i > 0 ? "border-t border-neutral-200" : ""}`}>
           <div className="size-12 shrink-0 rounded-2xl bg-gradient-to-b from-zinc-100 to-zinc-200/90" />
           <div className="flex-1 space-y-2 py-1">
             <div className="h-4 w-2/5 max-w-[10rem] rounded-lg bg-zinc-200/80" />
@@ -49,7 +49,7 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
   if (items.length === 0) {
     return (
       <div
-        className={`relative overflow-hidden rounded-[2rem] border border-orange-100/90 bg-white shadow-[0_16px_48px_-20px_rgba(233,75,60,0.12)] ring-1 ring-orange-50/80 sm:rounded-[2.25rem]`}
+        className="relative overflow-hidden border border-neutral-200 bg-white shadow-sm"
       >
         <div className="relative aspect-[5/3] max-h-[220px] w-full sm:aspect-[2.3/1] sm:max-h-[240px]">
           <SiteFillImage
@@ -70,8 +70,8 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
   return (
     <ul className={listShell}>
       {items.map((w, i) => (
-        <li key={w.id} className={`relative ${i > 0 ? "border-t border-orange-100/80" : ""}`}>
-          <div className="group flex flex-col gap-3 border-l-[3px] border-transparent px-5 py-4 transition-[background-color,border-color] duration-200 hover:border-apple/45 hover:bg-gradient-to-r hover:from-u-mango/12 hover:to-transparent sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-5">
+        <li key={w.id} className={`relative ${i > 0 ? "border-t border-neutral-200" : ""}`}>
+          <div className="group flex flex-col gap-3 border-l-2 border-transparent px-5 py-4 transition-[background-color,border-color] duration-200 hover:border-black hover:bg-neutral-50 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-5">
             <div className="flex min-w-0 flex-1 items-center gap-4">
               <div
                 className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-b from-zinc-100 to-zinc-200/95 text-[15px] font-semibold tracking-[-0.02em] text-zinc-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] ring-1 ring-black/[0.06] transition-transform duration-200 group-hover:scale-[1.02]"
@@ -92,8 +92,8 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
               <span
                 className={
                   w.success
-                    ? "rounded-full border border-emerald-200/60 bg-emerald-50/90 px-3 py-1 text-[12px] font-semibold text-emerald-800 shadow-sm"
-                    : "rounded-full border border-rose-200/60 bg-rose-50/90 px-3 py-1 text-[12px] font-semibold text-rose-800 shadow-sm"
+                    ? "border border-neutral-300 bg-neutral-100 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-apple-ink"
+                    : "border border-neutral-400 bg-neutral-200 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-apple-ink"
                 }
               >
                 {w.success ? "성공" : "실패"}
@@ -103,7 +103,7 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
                 <button
                   type="button"
                   onClick={() => onDeleteItem(w.id)}
-                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-[11px] font-semibold text-apple-ink shadow-sm transition hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+                  className="border border-neutral-300 bg-white px-3 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-apple-subtle transition hover:border-black hover:text-apple-ink"
                 >
                   삭제
                 </button>

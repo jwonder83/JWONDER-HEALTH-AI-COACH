@@ -63,10 +63,10 @@ function ProgramBuiltinImageRow({
   }
 
   return (
-    <div className="rounded-xl border border-orange-100/80 bg-u-lavender/10 p-3">
+    <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3">
       <p className="text-[11px] font-semibold text-apple-ink">{label}</p>
       <div className="mt-2">
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-orange-200/80 bg-gradient-to-r from-apple/12 to-u-lavender/30 px-3 py-2 text-[13px] font-semibold text-apple-muted transition hover:from-apple/18 hover:to-u-lavender/40 disabled:cursor-not-allowed disabled:opacity-50">
+        <label className="inline-flex cursor-pointer items-center gap-2 border border-neutral-200 bg-neutral-50 px-3 py-2 text-[12px] font-medium uppercase tracking-[0.1em] text-apple-ink transition hover:border-black disabled:cursor-not-allowed disabled:opacity-50">
           <input
             type="file"
             accept={PROGRAM_IMAGE_ACCEPT}
@@ -195,7 +195,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         </div>
         <Link
           href="/admin"
-          className="shrink-0 rounded-full border border-orange-100/90 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-apple/25 hover:text-apple-ink"
+          className="shrink-0 rounded-full border border-neutral-200 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-black hover:text-apple-ink"
         >
           관리자 개요
         </Link>
@@ -213,7 +213,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         </p>
       ) : null}
 
-      <div className="space-y-6 rounded-2xl border border-orange-100/90 bg-white/90 p-5 shadow-sm sm:p-6">
+      <div className="space-y-6 rounded-2xl border border-neutral-200 bg-white/90 p-5 shadow-sm sm:p-6">
         <label className="block text-[12px] font-medium text-apple-subtle">
           헤더 메뉴 레이블 (짧게)
           <input
@@ -256,10 +256,10 @@ export function AdminProgramEditor({ initialSettings }: Props) {
           />
         </label>
 
-        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-orange-100/80 bg-u-lavender/15 px-3 py-3">
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3">
           <input
             type="checkbox"
-            className="mt-1 size-4 rounded border-orange-200 text-apple focus:ring-apple/30"
+            className="mt-1 size-4 rounded border-neutral-300 text-apple-ink focus:ring-black/20"
             checked={p.showBuiltInSections}
             onChange={(e) => setProgram({ showBuiltInSections: e.target.checked })}
           />
@@ -272,7 +272,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         </label>
       </div>
 
-      <div className="mt-6 space-y-8 rounded-2xl border border-orange-100/90 bg-white/90 p-5 shadow-sm sm:p-6">
+      <div className="mt-6 space-y-8 rounded-2xl border border-neutral-200 bg-white/90 p-5 shadow-sm sm:p-6">
         <div>
           <h2 className="font-display text-[1.1rem] font-bold text-apple-ink">내장 가이드 — 목차·제목·이미지·동영상</h2>
           <p className="mt-1 text-[12px] leading-relaxed text-apple-subtle">
@@ -367,7 +367,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
           </p>
           <div className="mt-3 space-y-4">
             {PROGRAM_VIDEO_SLOTS.map(({ key, label }) => (
-              <div key={key} className="rounded-xl border border-orange-100/80 bg-u-mango/15 p-3">
+              <div key={key} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3">
                 <p className="text-[11px] font-semibold text-apple-ink">{label}</p>
                 <label className="mt-2 block text-[11px] font-medium text-apple-subtle">
                   videoId
@@ -475,7 +475,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 space-y-6 rounded-2xl border border-orange-100/90 bg-white/90 p-5 shadow-sm sm:p-6">
+      <div className="mt-6 space-y-6 rounded-2xl border border-neutral-200 bg-white/90 p-5 shadow-sm sm:p-6">
         <label className="block text-[12px] font-medium text-apple-subtle">
           상단 마크다운 (내장 본문 위)
           <textarea
@@ -502,7 +502,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         type="button"
         disabled={saving}
         onClick={() => void onSave()}
-        className="mt-8 w-full rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] py-3.5 text-[15px] font-bold text-white shadow-lg transition hover:brightness-105 disabled:opacity-45"
+        className="mt-8 w-full border border-black bg-black py-3.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white hover:text-black disabled:opacity-45"
       >
         {saving ? "수정 중…" : "수정"}
       </button>

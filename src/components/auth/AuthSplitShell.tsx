@@ -14,7 +14,7 @@ type Props = {
 
 export function AuthSplitShell({ panelImage, eyebrow, panelTitle, panelDescription, children }: Props) {
   return (
-    <div className="relative min-h-screen bg-apple-surface">
+    <div className="relative min-h-screen bg-white">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         {/* 데스크톱: 좌측 풀블리드 이미지 */}
         <div className="relative hidden min-h-screen lg:block">
@@ -28,13 +28,9 @@ export function AuthSplitShell({ panelImage, eyebrow, panelTitle, panelDescripti
             className="absolute inset-0 bg-gradient-to-t from-black via-zinc-950/70 to-zinc-950/15"
             aria-hidden
           />
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_65%_at_0%_100%,rgba(233,75,60,0.45),transparent_58%)]"
-            aria-hidden
-          />
           <div className="absolute inset-0 flex flex-col justify-end p-10 xl:p-14">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-u-mango/90">{eyebrow}</p>
-            <h2 className="font-display mt-3 max-w-md text-[2rem] font-bold leading-[1.08] tracking-[-0.03em] text-white xl:text-[2.25rem]">
+            <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-white/65">{eyebrow}</p>
+            <h2 className="font-display mt-3 max-w-md text-[2rem] font-semibold leading-[1.08] tracking-[-0.03em] text-white xl:text-[2.25rem]">
               {panelTitle}
             </h2>
             <p className="mt-4 max-w-sm text-[17px] font-normal leading-[1.45] tracking-[-0.012em] text-white/72">{panelDescription}</p>
@@ -59,11 +55,11 @@ export function AuthSplitShell({ panelImage, eyebrow, panelTitle, panelDescripti
         {/* 폼 영역 */}
         <div className="relative flex flex-col justify-center px-5 py-12 sm:px-8 lg:px-12 lg:py-16 xl:px-16">
           <div
-            className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_55%_at_50%_0%,rgba(255,255,255,0.85),transparent_52%)] lg:bg-apple-surface"
+            className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_55%_at_50%_0%,rgba(255,255,255,0.9),transparent_52%)] lg:bg-neutral-50"
             aria-hidden
           />
           <div className="mx-auto w-full max-w-[440px]">
-            <div className="rounded-[2rem] border border-orange-100/90 bg-white/90 p-8 shadow-[0_24px_56px_-28px_rgba(233,75,60,0.18)] ring-1 ring-orange-50/60 backdrop-blur-xl sm:p-10">
+            <div className="border border-neutral-200 bg-white p-8 shadow-sm sm:p-10">
               {children}
             </div>
           </div>
