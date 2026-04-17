@@ -69,6 +69,9 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                 <Link href="/records" className={navBtn}>
                   통계·보내기
                 </Link>
+                <Link href="/program" className={navBtn}>
+                  프로그램
+                </Link>
                 <Link href="/help" className={navBtn}>
                   도움말
                 </Link>

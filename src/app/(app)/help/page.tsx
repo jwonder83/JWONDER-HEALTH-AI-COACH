@@ -1,5 +1,6 @@
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
 import { getSiteSettings } from "@/lib/site-settings/load-server";
+import Link from "next/link";
 
 export default async function HelpPage() {
   const site = await getSiteSettings();
@@ -13,6 +14,13 @@ export default async function HelpPage() {
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8 sm:py-14">
       <SectionTitleBlock step="?" eyebrow="HELP" title={h.pageTitle} />
       <p className="mt-2 whitespace-pre-wrap text-[16px] leading-relaxed text-apple-subtle">{h.intro}</p>
+      <p className="mt-5 text-[15px] leading-relaxed text-apple-subtle">
+        주간 스플릿·델로드·워밍업·RPE·대체 종목 등은{" "}
+        <Link href="/program" className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] hover:text-apple">
+          운동 프로그램 가이드
+        </Link>
+        에 모아 두었습니다.
+      </p>
       <p className="mt-6 border-l-4 border-apple bg-apple/5 px-4 py-3 text-[15px] font-medium text-apple-ink">{h.contactLine}</p>
 
       {hasExtraLinks ? (

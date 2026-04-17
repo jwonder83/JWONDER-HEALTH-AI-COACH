@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import type { WorkoutInput, WorkoutRow } from "@/types/workout";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 const cardRing = "ring-1 ring-orange-100/90 shadow-[0_20px_50px_-24px_rgba(233,75,60,0.2)]";
@@ -200,7 +201,18 @@ export function HomeDashboard({ userId, site }: Props) {
             step="01"
             eyebrow="INPUT"
             title={site.copy.mainNavSectionLabels[0]}
-            description={SECTION_HINT_INPUT}
+            description={
+              <>
+                {SECTION_HINT_INPUT}{" "}
+                <Link
+                  href="/program"
+                  className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[4px] hover:text-apple"
+                >
+                  운동 프로그램 가이드
+                </Link>
+                에서 루틴·워밍업·RPE 팁을 볼 수 있어요.
+              </>
+            }
           />
           <WorkoutForm
             onSaved={() => void refresh()}

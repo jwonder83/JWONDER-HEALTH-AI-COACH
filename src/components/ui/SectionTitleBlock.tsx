@@ -4,7 +4,7 @@ type Props = {
   step: string;
   eyebrow: string;
   title: string;
-  description?: string;
+  description?: ReactNode;
   right?: ReactNode;
   /** 상단 장식 바 (그라데이션) */
   showAccent?: boolean;
@@ -42,7 +42,7 @@ export function SectionTitleBlock({
               {title}
             </h2>
             {description ? (
-              <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-apple-subtle sm:text-[15px]">{description}</p>
+              <div className="mt-2 max-w-2xl text-[14px] leading-relaxed text-apple-subtle sm:text-[15px]">{description}</div>
             ) : null}
           </div>
         </div>

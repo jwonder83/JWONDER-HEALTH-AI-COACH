@@ -1,5 +1,6 @@
 "use client";
 
+import { computeLoggingStreak } from "@/lib/workouts/streak";
 import {
   endOfMonth,
   endOfWeekSunday,
@@ -68,6 +69,8 @@ export function DashboardGoalsCard({ workouts }: Props) {
       ? Math.min(100, Math.round((week.rowCount / goals.weeklySessionTarget) * 100))
       : null;
 
+  const streak = useMemo(() => computeLoggingStreak(workouts), [workouts]);
+
   return (
     <div className="mt-6 rounded-[1.5rem] border border-orange-100/90 bg-white/90 p-4 shadow-inner ring-1 ring-orange-50/70 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -84,6 +87,18 @@ export function DashboardGoalsCard({ workouts }: Props) {
           ) : (
             <p className="mt-1 text-[13px] text-apple-subtle">이번 주에는 아직 기록이 없어요.</p>
           )}
+          {streak > 0 ? (
+            <p className="mt-2 text-[12px] font-medium text-apple-subtle">
+              연속 기록{" "}
+              <span className="font-display text-[15px] font-bold tabular-nums text-apple">{streak}</span>일 · 오늘
+              또는 어제부터 집계
+            </p>
+          ) : workouts.length > 0 ? (
+            <p className="mt-2 text-[12px] text-apple-subtle">
+              연속 기록을 이어가려면 <span className="font-semibold text-apple-ink">오늘 또는 어제</span>에 기록을
+              남겨 보세요.
+            </p>
+          ) : null}
         </div>
         <button
           type="button"

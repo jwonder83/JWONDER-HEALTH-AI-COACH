@@ -76,6 +76,37 @@ export function RecordsClient({ initialRows }: Props) {
     return `이번 달 총 볼륨 ${Math.round(r.volume * 10) / 10} · 기록 ${r.rowCount}건${top}`;
   }, [initialRows]);
 
+  const monthInsight = useMemo(() => {
+    const s = startOfMonth();
+    const e = endOfMonth();
+    const sTs = s.getTime();
+    const eTs = e.getTime();
+    const inRange = initialRows.filter((w) => {
+      const t = new Date(w.created_at).getTime();
+      return t >= sTs && t <= eTs;
+    });
+    if (inRange.length === 0) return null;
+    const counts = new Map<string, number>();
+    for (const w of inRange) {
+      const name = w.exercise_name.trim() || "기타";
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+    let top: string | null = null;
+    let max = 0;
+    for (const [k, v] of counts) {
+      if (v > max) {
+        max = v;
+        top = k;
+      }
+    }
+    if (!top || max === 0) return null;
+    const pct = Math.round((max / inRange.length) * 100);
+    if (pct >= 38) {
+      return `이번 달 기록의 약 ${pct}%가 「${top}」예요. 반대쪽 부위·운동도 골고루 넣었는지 한 번 점검해 보세요.`;
+    }
+    return "이번 달은 종목이 비교적 고르게 섞여 있어요. 한 줄 요약과 함께 보면 좋아요.";
+  }, [initialRows]);
+
   function downloadCsv() {
     const header = ["created_at", "exercise_name", "weight_kg", "reps", "sets", "success"];
     const lines = [header.join(",")];
@@ -124,6 +155,13 @@ export function RecordsClient({ initialRows }: Props) {
           <p className="mt-1.5 text-[13px] font-medium leading-snug text-apple-ink">{monthLine}</p>
         </div>
       </div>
+
+      {monthInsight ? (
+        <div className="mt-3 rounded-[1.25rem] border border-orange-100/80 bg-u-mint/30 px-4 py-3 text-[13px] leading-snug text-apple-ink ring-1 ring-orange-50/50 sm:text-[14px]">
+          <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-apple">월간 인사이트</span>
+          <p className="mt-1.5 font-medium">{monthInsight}</p>
+        </div>
+      ) : null}
 
       <div className="mt-2 rounded-[1.75rem] border border-orange-100/90 bg-white/95 p-5 shadow-[0_16px_48px_-20px_rgba(233,75,60,0.14)] sm:p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
