@@ -29,7 +29,7 @@ export function OnboardingBanner() {
   return (
     <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 dark:border-amber-900/50 dark:bg-amber-950/40">
       <p className="text-[13px] font-medium leading-snug text-amber-950 dark:text-amber-100">
-        목표와 주당 횟수를 알려 주시면, <strong>루틴 초안</strong>(규칙 기반·AI 없음)을 바로 받을 수 있어요.
+        목표와 주당 횟수를 알려 주시면, <strong>루틴 초안</strong>을 바로 받을 수 있어요.
       </p>
       <div className="flex shrink-0 flex-wrap gap-2">
         <Link
