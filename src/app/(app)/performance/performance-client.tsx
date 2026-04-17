@@ -1,5 +1,7 @@
 "use client";
 
+import { BodyWeightPanel } from "@/components/bodyweight/BodyWeightPanel";
+import { computeOneLineInsight, last7DaysVolumeSeries } from "@/lib/dashboard/insights";
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
 import {
   endOfMonth,
@@ -29,7 +31,7 @@ function startOfDay(d: Date) {
   return x.getTime();
 }
 
-export function RecordsClient({ initialRows }: Props) {
+export function PerformanceClient({ initialRows }: Props) {
   const fid = useId();
   const idQ = `${fid}-q`;
   const idFrom = `${fid}-from`;
@@ -107,6 +109,10 @@ export function RecordsClient({ initialRows }: Props) {
     return "이번 달은 종목이 비교적 고르게 섞여 있어요. 한 줄 요약과 함께 보면 좋아요.";
   }, [initialRows]);
 
+  const series7 = useMemo(() => last7DaysVolumeSeries(initialRows), [initialRows]);
+  const maxVol = useMemo(() => Math.max(1, ...series7.map((s) => s.volume)), [series7]);
+  const coachLine = useMemo(() => computeOneLineInsight(initialRows), [initialRows]);
+
   function downloadCsv() {
     const header = ["created_at", "exercise_name", "weight_kg", "reps", "sets", "success"];
     const lines = [header.join(",")];
@@ -132,18 +138,46 @@ export function RecordsClient({ initialRows }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-8 sm:py-14">
+    <div className="mx-auto max-w-5xl px-4 py-10 text-apple-ink dark:text-zinc-100 sm:px-8 sm:py-14">
       <SectionTitleBlock
         step="02"
-        eyebrow="RECORDS"
-        title="운동 기록"
-        description="종목·기간으로 좁혀 보고, CSV로 내려받을 수 있습니다."
+        eyebrow="PERFORMANCE"
+        title="퍼포먼스"
+        description="주간·월간 볼륨과 최근 7일 추세를 보고, 필터·CSV로 보냅니다."
         right={
           <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px]">
             {stats.count}건
           </span>
         }
       />
+
+      <div className="mt-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">코치 인사이트</p>
+        <p className="mt-2 text-[14px] font-medium leading-relaxed text-apple-ink sm:text-[15px] dark:text-zinc-100">{coachLine}</p>
+        <p className="mt-2 text-[11px] text-apple-subtle dark:text-zinc-500">규칙 기반 문구이며 외부 AI를 호출하지 않습니다.</p>
+      </div>
+
+      <BodyWeightPanel />
+
+      <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 dark:border-zinc-800 dark:bg-zinc-950">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">최근 7일 볼륨</p>
+        <p className="mt-1 text-[12px] text-apple-subtle">일별 kg×회×세트 합산</p>
+        <div className="mt-4 flex h-40 items-end justify-between gap-1.5 sm:gap-2">
+          {series7.map((s) => {
+            const barH = Math.max(6, Math.round((s.volume / maxVol) * 128));
+            return (
+              <div key={s.key} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+                <div
+                  className="w-full max-w-[44px] rounded-t-md bg-black/85 sm:max-w-none"
+                  style={{ height: `${barH}px` }}
+                  title={`${s.label}: ${Math.round(s.volume * 10) / 10}`}
+                />
+                <span className="text-[10px] font-medium text-apple-subtle">{s.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <div className="rounded-[1.25rem] border border-neutral-200/90 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-neutral-100">

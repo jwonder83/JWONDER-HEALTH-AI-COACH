@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20 text-apple-ink">
+    <div className="min-h-screen bg-white pb-20 text-apple-ink dark:bg-zinc-950 dark:text-zinc-100">
       <AdminSubNav />
       {children}
     </div>

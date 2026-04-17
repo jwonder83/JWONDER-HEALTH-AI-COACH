@@ -1,24 +1,6 @@
-import { RecordsClient } from "./records-client";
-import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function RecordsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    redirect("/login");
-  }
-  const { data, error } = await supabase
-    .from("workouts")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
-  if (error) {
-    return <RecordsClient initialRows={[]} />;
-  }
-  const rows = (data ?? []).map((r) => mapWorkoutRow(r as Record<string, unknown>));
-  return <RecordsClient initialRows={rows} />;
+/** 예전 주소 호환: `/records` → `/performance` */
+export default function RecordsRedirectPage() {
+  redirect("/performance");
 }

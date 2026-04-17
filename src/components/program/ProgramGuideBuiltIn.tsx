@@ -395,8 +395,8 @@ export function ProgramGuideBuiltIn({ program }: Props) {
         <h2 className={h2}>{st.stats}</h2>
         <p className={body}>
           주간·월간 볼륨, 종목 비중, 연속 기록은 앱의{" "}
-          <Link href="/records" className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60">
-            운동 기록
+          <Link href="/performance" className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60">
+            퍼포먼스
           </Link>
           과 대시보드 카드에서 확인할 수 있습니다. CSV로 내려받아 엑셀·시트에서 <strong className="text-apple-ink">4주 이동 평균</strong>을 그리면 MRV 접근
           신호를 조기에 볼 수 있습니다.

@@ -1,15 +1,18 @@
 "use client";
 
 import type { WorkoutFormCopyConfig } from "@/types/site-settings";
-import type { WorkoutInput } from "@/types/workout";
-import { useEffect, useId, useState } from "react";
+import type { WorkoutInput, WorkoutRow } from "@/types/workout";
+import { getLastSameExercise, maxVolumeForExercise, rowVolume, volumeFromNumbers } from "@/lib/dashboard/insights";
+import { useEffect, useId, useMemo, useState } from "react";
 
 type Props = {
-  onSaved: () => void;
-  saveWorkout: (input: WorkoutInput) => Promise<{ error?: string }>;
+  onSaved?: (result?: { pr?: boolean }) => void;
+  saveWorkout: (input: WorkoutInput) => Promise<{ error?: string; pr?: boolean }>;
   copy: WorkoutFormCopyConfig;
   /** 상단 카드 제목 블록 숨김(페이지 섹션 헤더와 중복 방지) */
   omitCardHeader?: boolean;
+  /** 직전 기록·PR 힌트용 전체 기록 */
+  allWorkouts?: WorkoutRow[];
 };
 
 const empty: WorkoutInput = {
@@ -24,10 +27,10 @@ const LS_PRESETS = "jws_workout_presets_v1";
 const MAX_PRESETS = 8;
 
 const fieldClass =
-  "mt-2 w-full border border-neutral-200 bg-white px-3.5 py-3 text-[17px] tracking-tight text-apple-ink shadow-sm transition-[border-color,box-shadow] duration-200 placeholder:text-apple-subtle hover:border-neutral-400 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15";
+  "mt-2 w-full border border-neutral-200 bg-white px-3.5 py-3 text-[17px] tracking-tight text-apple-ink shadow-sm transition-[border-color,box-shadow] duration-200 placeholder:text-apple-subtle hover:border-neutral-400 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-300 dark:focus:ring-white/20";
 
 const panel =
-  "border border-neutral-200 bg-white p-8 shadow-sm sm:p-10";
+  "border border-neutral-200 bg-white p-8 shadow-sm sm:p-10 dark:border-zinc-800 dark:bg-zinc-950";
 
 function presetKey(p: WorkoutInput): string {
   return `${p.exercise_name.trim()}|${p.weight_kg}|${p.reps}|${p.sets}|${p.success}`;
@@ -48,7 +51,7 @@ function isValidPreset(p: unknown): p is WorkoutInput {
   );
 }
 
-export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false }: Props) {
+export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false, allWorkouts = [] }: Props) {
   const uid = useId();
   const idExercise = `${uid}-exercise`;
   const idWeight = `${uid}-weight`;
@@ -109,13 +112,14 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
     e.preventDefault();
     setStatus(null);
     setLoading(true);
-    const { error } = await saveWorkout({
+    const payload = {
       ...form,
       exercise_name: form.exercise_name.trim(),
       weight_kg: Number(form.weight_kg),
       reps: Math.round(Number(form.reps)),
       sets: Math.round(Number(form.sets)),
-    });
+    };
+    const { error, pr } = await saveWorkout(payload);
     setLoading(false);
     if (error) {
       setStatus(error);
@@ -123,7 +127,22 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
     }
     setForm({ ...empty, exercise_name: form.exercise_name });
     setStatus(copy.savedToast);
-    onSaved();
+    onSaved?.({ pr: Boolean(pr) });
+  }
+
+  const volumePreview = useMemo(
+    () => volumeFromNumbers(Number(form.weight_kg), form.reps, form.sets),
+    [form.weight_kg, form.reps, form.sets],
+  );
+
+  const prevSame = useMemo(() => getLastSameExercise(allWorkouts, form.exercise_name), [allWorkouts, form.exercise_name]);
+  const prevVol = prevSame ? rowVolume(prevSame) : 0;
+  const deltaPct =
+    prevVol > 0 && volumePreview > 0 ? Math.round(((volumePreview - prevVol) / prevVol) * 100) : prevSame ? null : null;
+  const bestVol = useMemo(() => maxVolumeForExercise(allWorkouts, form.exercise_name), [allWorkouts, form.exercise_name]);
+
+  function bumpWeight(delta: number) {
+    setForm((f) => ({ ...f, weight_kg: Math.max(0, Math.round((Number(f.weight_kg) + delta) * 2) / 2) }));
   }
 
   function handleOutcomeKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
@@ -203,6 +222,27 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
             onChange={(e) => setForm((f) => ({ ...f, exercise_name: e.target.value }))}
             required
           />
+          <button
+            type="button"
+            className="mt-2 text-[12px] font-semibold text-apple-ink underline underline-offset-4 hover:opacity-60"
+            onClick={() => {
+              const last = getLastSameExercise(allWorkouts, form.exercise_name);
+              if (!last) {
+                setStatus("저장된 기록에서 같은 종목을 찾지 못했어요.");
+                return;
+              }
+              setForm((f) => ({
+                ...f,
+                weight_kg: Number(last.weight_kg),
+                reps: last.reps,
+                sets: last.sets,
+                success: last.success,
+              }));
+              setStatus("직전 기록을 불러왔어요.");
+            }}
+          >
+            직전 기록 불러오기
+          </button>
         </label>
         <label htmlFor={idWeight} className="block text-[13px] font-medium text-apple-subtle">
           {copy.weightLabel}
@@ -217,6 +257,18 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
             onChange={(e) => setForm((f) => ({ ...f, weight_kg: Number(e.target.value) }))}
             required
           />
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {[-5, -2.5, 2.5, 5].map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => bumpWeight(d)}
+                className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-apple-ink hover:border-black"
+              >
+                {d > 0 ? `+${d}` : d}
+              </button>
+            ))}
+          </div>
         </label>
         <label htmlFor={idReps} className="block text-[13px] font-medium text-apple-subtle">
           {copy.repsLabel}
@@ -230,6 +282,18 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
             onChange={(e) => setForm((f) => ({ ...f, reps: Number(e.target.value) }))}
             required
           />
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {[-1, 1].map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, reps: Math.max(1, f.reps + d) }))}
+                className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-[11px] font-semibold text-apple-ink hover:border-black"
+              >
+                {d > 0 ? "+1" : "-1"}
+              </button>
+            ))}
+          </div>
         </label>
         <label htmlFor={idSets} className="block text-[13px] font-medium text-apple-subtle">
           {copy.setsLabel}
@@ -244,6 +308,19 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
             required
           />
         </label>
+        <div className="sm:col-span-2 rounded-xl border border-neutral-200/80 bg-neutral-50 px-3 py-2.5 text-[13px] text-apple-subtle">
+          <span className="font-semibold text-apple-ink">이번 세트 볼륨</span>{" "}
+          <span className="tabular-nums text-apple-ink">{Math.round(volumePreview * 10) / 10}</span>
+          {bestVol > 0 ? (
+            <span className="ml-2 text-[12px]">· 종목 최고 {Math.round(bestVol * 10) / 10}</span>
+          ) : null}
+          {deltaPct !== null ? (
+            <span className={`ml-2 text-[12px] font-medium ${deltaPct >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+              직전 대비 {deltaPct >= 0 ? "+" : ""}
+              {deltaPct}%
+            </span>
+          ) : null}
+        </div>
         <div className="sm:col-span-2">
           <fieldset className="min-w-0 border-0 p-0">
             <legend className="text-[13px] font-medium text-apple-subtle">{copy.outcomeGroupLabel}</legend>

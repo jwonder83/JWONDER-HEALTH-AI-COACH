@@ -1,13 +1,17 @@
 "use client";
 
 import { WebCoachingSection } from "@/components/coaching/WebCoachingSection";
+import { CoachHub } from "@/components/dashboard/CoachHub";
+import { OnboardingBanner } from "@/components/dashboard/OnboardingBanner";
+import { DashboardGoalsCard } from "@/components/dashboard/DashboardGoalsCard";
 import { SiteFillImage } from "@/components/site/SiteFillImage";
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
-import { DashboardGoalsCard } from "@/components/dashboard/DashboardGoalsCard";
+import { Toast } from "@/components/ui/Toast";
 import { WorkoutForm } from "@/components/workouts/WorkoutForm";
 import { WorkoutList } from "@/components/workouts/WorkoutList";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
+import { isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import type { WorkoutInput, WorkoutRow } from "@/types/workout";
@@ -52,10 +56,11 @@ function IconLifeBuoy({ className }: { className?: string }) {
   );
 }
 
-const cardRing = "border border-neutral-200 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.08)]";
+const cardRing =
+  "border border-neutral-200 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.08)] dark:border-zinc-800 dark:shadow-[0_20px_50px_-24px_rgba(0,0,0,0.4)]";
 
 const sectionShell =
-  "scroll-mt-36 border border-neutral-200 bg-white p-6 shadow-sm sm:scroll-mt-44 sm:p-9";
+  "scroll-mt-36 border border-neutral-200 bg-white p-6 shadow-sm sm:scroll-mt-44 sm:p-9 dark:border-zinc-800 dark:bg-zinc-950";
 
 const SECTION_HINT_INPUT = "필드를 채우고 저장하면 바로 아래 목록에 반영됩니다.";
 const SECTION_HINT_LIST = "날짜·종목 기준으로 기록을 확인하고 한 건씩 지울 수 있어요.";
@@ -68,6 +73,7 @@ type Props = {
 export function HomeDashboard({ userId, site }: Props) {
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const navItems = useMemo(
     () =>
@@ -121,7 +127,9 @@ export function HomeDashboard({ userId, site }: Props) {
     void refresh();
   }, [refresh]);
 
-  async function saveWorkout(input: WorkoutInput): Promise<{ error?: string }> {
+  async function saveWorkout(input: WorkoutInput): Promise<{ error?: string; pr?: boolean }> {
+    const vol = volumeFromNumbers(input.weight_kg, input.reps, input.sets);
+    const pr = isNewVolumePr(workouts, input.exercise_name.trim(), vol);
     const supabase = createClient();
     const { error } = await supabase.from("workouts").insert({
       user_id: userId,
@@ -135,7 +143,7 @@ export function HomeDashboard({ userId, site }: Props) {
       return { error: error.message };
     }
     await refresh();
-    return {};
+    return { pr };
   }
 
   async function handleClear() {
@@ -163,7 +171,7 @@ export function HomeDashboard({ userId, site }: Props) {
   }
 
   return (
-    <div className="relative pb-28 text-apple-ink">
+    <div className="relative pb-28 text-apple-ink dark:text-zinc-100">
       <div
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_100%_70%_at_50%_0%,rgba(0,0,0,0.04),transparent_50%)]"
         aria-hidden
@@ -205,15 +213,19 @@ export function HomeDashboard({ userId, site }: Props) {
                   {site.program.navLabel}
                 </Link>
                 <Link
-                  href="/records"
+                  href="/performance"
                   className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
                 >
-                  운동 기록
+                  퍼포먼스
                 </Link>
               </div>
             </div>
           </div>
         </div>
+
+        <CoachHub workouts={workouts} />
+
+        <OnboardingBanner />
 
         {/* Unsplash 타일 띠 */}
         <div className="mt-8 grid grid-cols-3 gap-2 sm:mt-10 sm:gap-3">
@@ -302,15 +314,15 @@ export function HomeDashboard({ userId, site }: Props) {
               </span>
             </Link>
             <Link
-              href="/records"
+              href="/performance"
               className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
             >
               <span className="flex size-11 shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-apple-ink">
                 <IconChart className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">운동 기록</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">기간별 요약·CSV 내려받기</span>
+                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">퍼포먼스</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">추세·필터·CSV 내려받기</span>
               </span>
             </Link>
             <Link
@@ -391,10 +403,14 @@ export function HomeDashboard({ userId, site }: Props) {
             }
           />
           <WorkoutForm
-            onSaved={() => void refresh()}
+            onSaved={(r) => {
+              void refresh();
+              if (r?.pr) setToast("새 PR이에요! 볼륨 최고 기록을 갱신했습니다.");
+            }}
             saveWorkout={saveWorkout}
             copy={site.copy.workoutForm}
             omitCardHeader
+            allWorkouts={workouts}
           />
         </section>
 
@@ -440,6 +456,8 @@ export function HomeDashboard({ userId, site }: Props) {
           />
         </section>
       </main>
+
+      <Toast message={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }
