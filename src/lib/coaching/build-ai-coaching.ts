@@ -111,7 +111,6 @@ async function buildWebOrLocalCoaching(rows: WorkoutRow[]): Promise<string> {
 
   return (
     "## 코칭 인사이트\n\n" +
-    "_실시간 AI 연동 없이, 저장된 기록만으로 자동 정리한 코멘트예요._\n\n" +
     local +
     "\n\n---\n\n" +
     "*의학적 진단이 아닙니다. 무리한 중량·통증이 있으면 전문의 상담을 권장드려요.*"
