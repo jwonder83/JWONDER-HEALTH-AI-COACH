@@ -8,10 +8,49 @@ import { WorkoutForm } from "@/components/workouts/WorkoutForm";
 import { WorkoutList } from "@/components/workouts/WorkoutList";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
+import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import type { WorkoutInput, WorkoutRow } from "@/types/workout";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+function IconPencil({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden>
+      <path
+        d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconChart({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden>
+      <path d="M4 19V5M4 19h16M8 17V9M12 17v-5M16 17v-8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconBook({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden>
+      <path d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconLifeBuoy({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="4" />
+      <path d="M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 const cardRing = "ring-1 ring-orange-100/90 shadow-[0_20px_50px_-24px_rgba(233,75,60,0.2)]";
 
@@ -49,6 +88,24 @@ export function HomeDashboard({ userId, site }: Props) {
       ] as const,
     [site.images, site.copy.mainDashTileCaptions],
   );
+
+  const weekBounds = useMemo(() => {
+    const mon = startOfWeekMonday();
+    return { mon, sun: endOfWeekSunday(mon) };
+  }, []);
+
+  const weekRollup = useMemo(
+    () => rollupPeriod(workouts, weekBounds.mon, weekBounds.sun),
+    [workouts, weekBounds.mon, weekBounds.sun],
+  );
+
+  const todayLabel = useMemo(() => {
+    return new Intl.DateTimeFormat("ko-KR", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    }).format(new Date());
+  }, []);
 
   const refresh = useCallback(async () => {
     const supabase = createClient();
@@ -114,11 +171,15 @@ export function HomeDashboard({ userId, site }: Props) {
   }
 
   return (
-    <div className="pb-28 text-apple-ink">
-      <div className="mx-auto max-w-4xl px-5 pt-6 sm:px-8 sm:pt-8">
+    <div className="relative pb-28 text-apple-ink">
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(233,75,60,0.12),transparent_50%),radial-gradient(ellipse_90%_60%_at_100%_40%,rgba(167,139,250,0.14),transparent_45%),radial-gradient(ellipse_80%_50%_at_0%_80%,rgba(253,186,116,0.1),transparent_40%)]"
+        aria-hidden
+      />
+      <div className="mx-auto max-w-5xl px-5 pt-6 sm:px-8 sm:pt-8">
         {/* 히어로 */}
         <div className={`relative overflow-hidden rounded-[2rem] sm:rounded-[2.25rem] ${cardRing}`}>
-          <div className="relative aspect-[16/10] min-h-[220px] w-full sm:aspect-[2.15/1] sm:min-h-[300px]">
+          <div className="relative aspect-[16/10] min-h-[240px] w-full sm:aspect-[2.15/1] sm:min-h-[320px]">
             <SiteFillImage
               src={site.images.hero.src}
               alt={site.images.hero.alt}
@@ -133,15 +194,36 @@ export function HomeDashboard({ userId, site }: Props) {
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_95%_75%_at_80%_100%,rgba(233,75,60,0.35),transparent_55%)]"
               aria-hidden
             />
-            <div className="absolute inset-0 flex flex-col justify-end p-8 sm:p-12">
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-12">
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-u-mango/90">{site.copy.mainHero.eyebrow}</p>
+              <p className="mt-2 text-[12px] font-medium text-white/55 sm:text-[13px]">{todayLabel}</p>
               <h1 className="font-display mt-3 max-w-2xl text-[1.875rem] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-[2.5rem] sm:leading-[1.06]">
                 {site.copy.mainHero.titleLine1}
                 <span className="mt-2 block font-semibold text-white/90">{site.copy.mainHero.titleLine2}</span>
               </h1>
-              <p className="mt-5 max-w-lg text-[17px] font-medium leading-relaxed tracking-[-0.01em] text-white/78">
+              <p className="mt-4 max-w-lg text-[16px] font-medium leading-relaxed tracking-[-0.01em] text-white/78 sm:mt-5 sm:text-[17px]">
                 {site.copy.mainHero.subtitle}
               </p>
+              <div className="pointer-events-auto mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
+                <a
+                  href="#section-input"
+                  className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2.5 text-[13px] font-bold text-apple shadow-lg shadow-black/20 transition hover:bg-u-mango/95 hover:text-apple-ink active:scale-[0.98] sm:px-5 sm:py-3 sm:text-[14px]"
+                >
+                  바로 기록하기
+                </a>
+                <Link
+                  href="/records"
+                  className="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/10 px-4 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 active:scale-[0.98] sm:px-5 sm:py-3 sm:text-[14px]"
+                >
+                  통계·보내기
+                </Link>
+                <Link
+                  href="/program"
+                  className="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/10 px-4 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 active:scale-[0.98] sm:px-5 sm:py-3 sm:text-[14px]"
+                >
+                  {site.program.navLabel}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -166,6 +248,115 @@ export function HomeDashboard({ userId, site }: Props) {
             </div>
           ))}
         </div>
+
+        {/* 한눈에 요약 */}
+        <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 sm:grid-cols-3 sm:gap-4">
+          {[
+            {
+              k: "total",
+              label: "누적 기록",
+              value: hydrated ? `${workouts.length}` : "—",
+              unit: "건",
+              sub: "저장된 세트 행",
+            },
+            {
+              k: "week",
+              label: "이번 주",
+              value: hydrated ? `${weekRollup.rowCount}` : "—",
+              unit: "건",
+              sub: "월~일 기준",
+            },
+            {
+              k: "vol",
+              label: "이번 주 볼륨",
+              value: hydrated ? `${Math.round(weekRollup.volume * 10) / 10}` : "—",
+              unit: "합",
+              sub: weekRollup.topExercise ? `많이 남긴 종목: ${weekRollup.topExercise}` : "종목별 kg×회×세트 합산",
+            },
+          ].map((s) => (
+            <div
+              key={s.k}
+              className="rounded-2xl border border-orange-100/90 bg-white/90 p-4 shadow-sm ring-1 ring-white/60 sm:p-5"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple">{s.label}</p>
+              <p className="font-display mt-2 text-[1.35rem] font-bold tabular-nums text-apple-ink sm:text-[1.5rem]">
+                {s.value}
+                <span className="ml-1 text-[13px] font-semibold text-apple-subtle sm:text-[14px]">{s.unit}</span>
+              </p>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-apple-subtle sm:text-[12px]">{s.sub}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* 빠른 이동 카드 */}
+        <div className="mt-8 sm:mt-10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple">바로 가기</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Link
+              href="#section-input"
+              className="group flex gap-3 rounded-2xl border border-orange-100/90 bg-gradient-to-br from-white to-u-lavender/20 p-4 shadow-sm ring-1 ring-white/80 transition hover:border-apple/25 hover:shadow-md sm:p-5"
+            >
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-apple/15 to-u-mango/25 text-apple">
+                <IconPencil className="size-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="font-display text-[15px] font-bold text-apple-ink group-hover:text-apple">운동 기록</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">세트를 남기고 목록에서 바로 확인</span>
+              </span>
+            </Link>
+            <Link
+              href="/records"
+              className="group flex gap-3 rounded-2xl border border-orange-100/90 bg-gradient-to-br from-white to-u-mint/25 p-4 shadow-sm ring-1 ring-white/80 transition hover:border-apple/25 hover:shadow-md sm:p-5"
+            >
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-u-mint/40 text-apple-ink">
+                <IconChart className="size-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="font-display text-[15px] font-bold text-apple-ink group-hover:text-apple">통계·보내기</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">기간별 요약과 CSV보내기</span>
+              </span>
+            </Link>
+            <Link
+              href="/program"
+              className="group flex gap-3 rounded-2xl border border-orange-100/90 bg-gradient-to-br from-white to-u-mango/20 p-4 shadow-sm ring-1 ring-white/80 transition hover:border-apple/25 hover:shadow-md sm:p-5"
+            >
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-u-mango/35 text-apple-ink">
+                <IconBook className="size-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="font-display text-[15px] font-bold text-apple-ink group-hover:text-apple">{site.program.navLabel}</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">{site.program.promoLinkLabel}</span>
+              </span>
+            </Link>
+            <Link
+              href="/help"
+              className="group flex gap-3 rounded-2xl border border-orange-100/90 bg-gradient-to-br from-white to-orange-50/80 p-4 shadow-sm ring-1 ring-white/80 transition hover:border-apple/25 hover:shadow-md sm:p-5"
+            >
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-orange-100/60 text-apple-ink">
+                <IconLifeBuoy className="size-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="font-display text-[15px] font-bold text-apple-ink group-hover:text-apple">도움말</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">FAQ와 문의 안내</span>
+              </span>
+            </Link>
+          </div>
+        </div>
+
+        {hydrated && workouts.length === 0 ? (
+          <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-dashed border-apple/30 bg-gradient-to-r from-apple/[0.07] via-white to-u-lavender/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+            <div>
+              <p className="font-display text-[15px] font-bold text-apple-ink">아직 저장된 기록이 없어요</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-apple-subtle">첫 세트를 남기면 여기와 통계에 바로 쌓입니다.</p>
+            </div>
+            <a
+              href="#section-input"
+              className="inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-apple to-[#ff8a7a] px-5 py-2.5 text-[13px] font-bold text-white shadow-md transition hover:brightness-105 active:scale-[0.98]"
+            >
+              기록 입력으로 이동
+            </a>
+          </div>
+        ) : null}
 
         {/* 스티키 내비 — 가독성 우선(큰 글씨·굵게·대비) */}
         <div className="sticky top-4 z-20 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center sm:justify-between">
@@ -195,7 +386,7 @@ export function HomeDashboard({ userId, site }: Props) {
         <DashboardGoalsCard workouts={workouts} />
       </div>
 
-      <main className="mx-auto max-w-4xl space-y-14 px-5 py-14 sm:space-y-20 sm:px-8 sm:py-20">
+      <main className="mx-auto max-w-5xl space-y-14 px-5 py-14 sm:space-y-20 sm:px-8 sm:py-20">
         <section id="section-input" className={sectionShell}>
           <SectionTitleBlock
             step="01"
