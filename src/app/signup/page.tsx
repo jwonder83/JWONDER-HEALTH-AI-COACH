@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export default async function SignupPage() {
-  try {
+  if (isSupabasePublicEnvConfigured()) {
     const supabase = await createClient();
     const {
       data: { user },
@@ -13,8 +13,6 @@ export default async function SignupPage() {
     if (user) {
       redirect("/");
     }
-  } catch {
-    /* env 미설정 */
   }
 
   const site = await getSiteSettings();

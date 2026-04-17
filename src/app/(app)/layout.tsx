@@ -10,14 +10,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   if (!isSupabasePublicEnvConfigured()) {
     redirect("/login?error=config");
   }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect("/login");
+  }
+
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      redirect("/login");
-    }
     const site = await getSiteSettings();
     const showAdminLink = isSiteSettingsHeaderVisible(user.email);
     return (

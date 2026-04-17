@@ -26,7 +26,8 @@ export default async function LoginPage({
   const redirectAfter = safeInternalPath(sp.redirect);
   const urlError = firstString(sp.error);
 
-  try {
+  /* redirect()는 예외로 동작하므로 try/catch로 감싸면 안 됨 */
+  if (isSupabasePublicEnvConfigured()) {
     const supabase = await createClient();
     const {
       data: { user },
@@ -34,8 +35,6 @@ export default async function LoginPage({
     if (user) {
       redirect(redirectAfter ?? "/");
     }
-  } catch {
-    /* env 미설정 시 로그인 폼에서 안내 */
   }
 
   const site = await getSiteSettings();
