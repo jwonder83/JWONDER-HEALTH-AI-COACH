@@ -208,7 +208,7 @@ export function HomeDashboard({ userId, site }: Props) {
                   href="/program"
                   className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[4px] hover:text-apple"
                 >
-                  운동 프로그램 가이드
+                  {site.program.promoLinkLabel}
                 </Link>
                 에서 루틴·워밍업·RPE 팁을 볼 수 있어요.
               </>

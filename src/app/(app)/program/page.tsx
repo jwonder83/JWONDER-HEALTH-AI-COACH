@@ -1,5 +1,7 @@
-import { ProgramGuide } from "@/components/program/ProgramGuide";
+import { ProgramGuideView } from "@/components/program/ProgramGuideView";
+import { getSiteSettings } from "@/lib/site-settings/load-server";
 
-export default function ProgramPage() {
-  return <ProgramGuide />;
+export default async function ProgramPage() {
+  const site = await getSiteSettings();
+  return <ProgramGuideView program={site.program} />;
 }

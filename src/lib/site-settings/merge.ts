@@ -1,6 +1,7 @@
 import type {
   HelpFaqItem,
   ImageSlot,
+  ProgramGuideSettings,
   SiteCopyConfig,
   SiteFooterConfig,
   SiteFooterLink,
@@ -205,6 +206,25 @@ function mergeMainNavSectionLabels(
   return out;
 }
 
+function mergeBool(base: boolean, v: unknown): boolean {
+  return typeof v === "boolean" ? v : base;
+}
+
+function mergeProgram(base: ProgramGuideSettings, patch: unknown): ProgramGuideSettings {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  return {
+    navLabel: mergeString(base.navLabel, p.navLabel),
+    promoLinkLabel: mergeString(base.promoLinkLabel, p.promoLinkLabel),
+    pageEyebrow: mergeString(base.pageEyebrow, p.pageEyebrow),
+    pageTitle: mergeString(base.pageTitle, p.pageTitle),
+    pageLead: mergeString(base.pageLead, p.pageLead),
+    showBuiltInSections: mergeBool(base.showBuiltInSections, p.showBuiltInSections),
+    prefixMarkdown: mergeString(base.prefixMarkdown, p.prefixMarkdown),
+    appendixMarkdown: mergeString(base.appendixMarkdown, p.appendixMarkdown),
+  };
+}
+
 function mergeCopy(base: SiteCopyConfig, patch: unknown): SiteCopyConfig {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
@@ -241,5 +261,6 @@ export function mergeSiteSettingsFromDb(dbJson: unknown): SiteSettingsMerged {
   return {
     images: mergeImages(DEFAULT_SITE_SETTINGS.images, root.images),
     copy: mergeCopy(DEFAULT_SITE_SETTINGS.copy, root.copy),
+    program: mergeProgram(DEFAULT_SITE_SETTINGS.program, root.program),
   };
 }

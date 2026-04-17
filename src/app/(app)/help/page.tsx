@@ -17,7 +17,7 @@ export default async function HelpPage() {
       <p className="mt-5 text-[15px] leading-relaxed text-apple-subtle">
         주간 스플릿·델로드·워밍업·RPE·대체 종목 등은{" "}
         <Link href="/program" className="font-semibold text-apple-muted underline decoration-apple/25 underline-offset-[5px] hover:text-apple">
-          운동 프로그램 가이드
+          {site.program.promoLinkLabel}
         </Link>
         에 모아 두었습니다.
       </p>

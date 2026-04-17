@@ -241,23 +241,22 @@ export function AdminSiteEditor({ initialSettings }: Props) {
   const navLabs = settings.copy.mainNavSectionLabels;
 
   return (
-    <div className="min-h-screen bg-apple-surface pb-20 text-apple-ink">
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-        <header className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple">Admin</p>
-            <h1 className="font-display mt-1 text-[1.75rem] font-bold tracking-[-0.02em]">사이트 문구·이미지</h1>
-            <p className="mt-2 text-[14px] leading-relaxed text-apple-subtle">
-              이미지는 파일로 Supabase Storage에 올리거나 URL을 직접 입력할 수 있습니다. 문구를 바꾼 뒤 하단의 수정을 눌러 반영하세요.
-            </p>
-          </div>
-          <Link
-            href="/"
-            className="rounded-full border border-orange-100/90 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-apple/25 hover:text-apple-ink"
-          >
-            홈으로
-          </Link>
-        </header>
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink">사이트 문구·이미지</h1>
+          <p className="mt-2 text-[14px] leading-relaxed text-apple-subtle">
+            이미지는 파일로 Supabase Storage에 올리거나 URL을 직접 입력할 수 있습니다. 상단 관리자 메뉴의 「프로그램」에서 운동 가이드 문구를 따로 수정할
+            수 있습니다.
+          </p>
+        </div>
+        <Link
+          href="/admin"
+          className="shrink-0 rounded-full border border-orange-100/90 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-apple/25 hover:text-apple-ink"
+        >
+          관리자 개요
+        </Link>
+      </header>
 
         {msg ? (
           <p
@@ -736,7 +735,6 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         >
           {saving ? "수정 중…" : "수정"}
         </button>
-      </div>
     </div>
   );
 }

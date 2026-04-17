@@ -103,7 +103,26 @@ export type SiteCopyConfig = {
   footer: SiteFooterConfig;
 };
 
+/** /program — 어드민에서 편집(내장 가이드 + 마크다운 전후) */
+export type ProgramGuideSettings = {
+  /** 헤더 주요 메뉴에 표시되는 짧은 레이블 */
+  navLabel: string;
+  /** 홈·도움말 등에서 `/program`으로 가는 링크 문구 */
+  promoLinkLabel: string;
+  pageEyebrow: string;
+  pageTitle: string;
+  /** 짧은 리드(HTML 없음, 줄바꿈 허용) */
+  pageLead: string;
+  /** 내장 클리닉 본문(표·유튜브) 표시 */
+  showBuiltInSections: boolean;
+  /** 내장 본문 위에 붙는 마크다운(GFM) */
+  prefixMarkdown: string;
+  /** 내장 본문 아래에 붙는 마크다운(GFM) */
+  appendixMarkdown: string;
+};
+
 export type SiteSettingsMerged = {
   images: SiteImagesConfig;
   copy: SiteCopyConfig;
+  program: ProgramGuideSettings;
 };

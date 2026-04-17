@@ -1,6 +1,19 @@
 import type { SiteSettingsMerged } from "@/types/site-settings";
 
-export const DEFAULT_SITE_SETTINGS: SiteSettingsMerged = {
+const DEFAULT_PROGRAM: SiteSettingsMerged["program"] = {
+  navLabel: "프로그램",
+  promoLinkLabel: "운동 프로그램 가이드",
+  pageEyebrow: "Program",
+  pageTitle: "운동 프로그램 클리닉",
+  pageLead:
+    "헬스장·가정용 중량 트레이닝을 전제로, 근비대·근력을 위한 프로그램 설계와 실행에 쓰이는 개념을 정리했습니다. 의학적 진단·재활 지침을 대체하지 않으며, 통증·심혈관 질환이 있다면 사전에 전문가와 상담하세요.",
+  showBuiltInSections: true,
+  prefixMarkdown: "",
+  appendixMarkdown: "",
+};
+
+export const DEFAULT_SITE_SETTINGS = {
+  program: DEFAULT_PROGRAM,
   images: {
     hero: {
       src: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=82",
@@ -131,4 +144,4 @@ export const DEFAULT_SITE_SETTINGS: SiteSettingsMerged = {
       copyrightLine: "© {year}",
     },
   },
-};
+} satisfies SiteSettingsMerged;

@@ -70,7 +70,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                   통계·보내기
                 </Link>
                 <Link href="/program" className={navBtn}>
-                  프로그램
+                  {site.program.navLabel}
                 </Link>
                 <Link href="/help" className={navBtn}>
                   도움말
