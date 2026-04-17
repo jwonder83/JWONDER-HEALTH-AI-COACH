@@ -56,10 +56,21 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
           <div className="flex min-w-0 flex-wrap items-center gap-4 sm:gap-8">
             <Link
               href="/"
-              className="font-display flex size-10 shrink-0 items-center justify-center border border-apple-ink bg-apple-ink text-[15px] font-semibold text-white transition hover:bg-white hover:text-apple-ink"
+              className="font-display relative flex size-10 shrink-0 items-center justify-center overflow-hidden border border-apple-ink bg-apple-ink text-[15px] font-semibold text-white transition hover:bg-white hover:text-apple-ink"
               aria-label="홈"
             >
-              {initialFromEmail(email)}
+              {site.images.headerLogo.src.trim() ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={site.images.headerLogo.src}
+                  alt={site.images.headerLogo.alt.trim() || "홈"}
+                  className="size-full object-contain p-0.5"
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : (
+                <span aria-hidden>{initialFromEmail(email)}</span>
+              )}
             </Link>
             <nav aria-label="주요 메뉴" className="flex flex-wrap items-center gap-x-1 gap-y-1 sm:gap-x-2">
               <Link href="/" className={navLink}>

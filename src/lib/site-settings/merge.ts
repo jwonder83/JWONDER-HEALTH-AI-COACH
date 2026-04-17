@@ -22,7 +22,7 @@ import { DEFAULT_SITE_SETTINGS } from "./defaults";
 function mergeImageSlot(base: ImageSlot, patch: unknown): ImageSlot {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
-  const src = typeof p.src === "string" && p.src.trim() ? p.src.trim() : base.src;
+  const src = typeof p.src === "string" ? p.src.trim() : base.src;
   const alt = typeof p.alt === "string" ? p.alt : base.alt;
   return { src, alt };
 }
@@ -31,6 +31,7 @@ function mergeImages(base: SiteImagesConfig, patch: unknown): SiteImagesConfig {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
   const keys: (keyof SiteImagesConfig)[] = [
+    "headerLogo",
     "hero",
     "authPanel",
     "dashTile1",

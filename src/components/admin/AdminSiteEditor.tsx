@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useCallback, useState } from "react";
 
 const imageLabels: Record<keyof SiteImagesConfig, string> = {
+  headerLogo: "헤더 홈 로고 (비우면 이메일 이니셜)",
   hero: "메인 히어로",
   authPanel: "로그인·회원가입 패널",
   dashTile1: "대시 타일 1",

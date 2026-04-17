@@ -62,6 +62,8 @@ export type WorkoutFormCopyConfig = {
 };
 
 export type SiteImagesConfig = {
+  /** 상단 헤더 홈 링크 — `src` 비우면 계정 이메일 이니셜 표시 */
+  headerLogo: ImageSlot;
   hero: ImageSlot;
   authPanel: ImageSlot;
   dashTile1: ImageSlot;

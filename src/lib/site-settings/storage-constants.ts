@@ -28,6 +28,7 @@ export const PROGRAM_BUILTIN_IMAGE_SLOT_FOR_KEY: Record<keyof ProgramBuiltinImag
 };
 
 export const SITE_IMAGE_SLOTS = [
+  "headerLogo",
   "hero",
   "authPanel",
   "dashTile1",

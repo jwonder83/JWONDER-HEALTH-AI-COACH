@@ -17,6 +17,10 @@ const DEFAULT_PROGRAM: SiteSettingsMerged["program"] = {
 export const DEFAULT_SITE_SETTINGS = {
   program: DEFAULT_PROGRAM,
   images: {
+    headerLogo: {
+      src: "",
+      alt: "홈",
+    },
     hero: {
       src: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=82",
       alt: "헬스장, 덤벨이 놓인 벤치",
