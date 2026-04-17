@@ -44,8 +44,7 @@ export function SettingsForm({ email }: Props) {
         <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-apple-subtle">이메일</p>
         <p className="mt-2 break-all text-[16px] font-semibold text-apple-ink">{email || "—"}</p>
         <p className="mt-6 text-[13px] leading-relaxed text-apple-subtle">
-          비밀번호를 바꾸려면 아래 버튼으로 재설정 메일을 보내세요. 메일의 링크를 연 뒤 새 비밀번호를 입력합니다. (Supabase Auth·Redirect URL 설정이 맞아야
-          합니다.)
+          비밀번호를 바꾸려면 아래 버튼으로 재설정 메일을 보내세요. 메일의 링크를 연 뒤 새 비밀번호를 입력합니다.
         </p>
         <button
           type="button"
