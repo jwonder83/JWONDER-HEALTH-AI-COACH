@@ -1,12 +1,4 @@
-/** 대시보드 헤더의 「사이트 설정」 링크 표시 전용 (다른 관리자와 분리) */
-const SITE_SETTINGS_HEADER_EMAIL = "jvic83@naver.com";
-
-export function isSiteSettingsHeaderVisible(email: string | null | undefined): boolean {
-  if (!email) return false;
-  return email.trim().toLowerCase() === SITE_SETTINGS_HEADER_EMAIL;
-}
-
-/** ADMIN_EMAILS=이메일1,이메일2 또는 ADMIN_EMAIL 단일 — /admin·저장 API 접근 */
+/** ADMIN_EMAILS=이메일1,이메일2 또는 ADMIN_EMAIL 단일 — /admin·헤더 「사이트 설정」·저장 API 접근 */
 export function isUserAdmin(email: string | null | undefined): boolean {
   if (!email) return false;
   const normalized = email.trim().toLowerCase();
