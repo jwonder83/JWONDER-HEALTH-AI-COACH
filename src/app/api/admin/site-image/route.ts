@@ -1,9 +1,9 @@
 import { isUserAdmin } from "@/lib/site-settings/admin-check";
 import {
+  PROGRAM_BUILTIN_IMAGE_STORAGE_SLOTS,
   SITE_ASSETS_BUCKET,
   SITE_IMAGE_ALLOWED_MIME,
   SITE_IMAGE_SLOTS,
-  type SiteImageSlot,
   SITE_IMAGE_UPLOAD_MAX_BYTES,
 } from "@/lib/site-settings/storage-constants";
 import { createServiceRoleClient } from "@/lib/supabase/admin";
@@ -54,10 +54,11 @@ export async function POST(request: Request) {
   const slotRaw = form.get("slot");
   const file = form.get("file");
 
-  if (typeof slotRaw !== "string" || !(SITE_IMAGE_SLOTS as readonly string[]).includes(slotRaw)) {
+  const allowedSlots = [...SITE_IMAGE_SLOTS, ...PROGRAM_BUILTIN_IMAGE_STORAGE_SLOTS] as readonly string[];
+  if (typeof slotRaw !== "string" || !allowedSlots.includes(slotRaw)) {
     return NextResponse.json({ error: "유효한 slot 값이 필요합니다." }, { status: 400 });
   }
-  const slot = slotRaw as SiteImageSlot;
+  const slot = slotRaw;
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "파일이 필요합니다." }, { status: 400 });

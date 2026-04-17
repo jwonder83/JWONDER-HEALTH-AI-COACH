@@ -1,14 +1,111 @@
 "use client";
 
 import type {
+  ImageSlot,
   ProgramBuiltinImages,
   ProgramBuiltinVideos,
   ProgramGuideSettings,
   ProgramSectionTitles,
   SiteSettingsMerged,
 } from "@/types/site-settings";
+import {
+  PROGRAM_BUILTIN_IMAGE_SLOT_FOR_KEY,
+  type ProgramBuiltinImageStorageSlot,
+} from "@/lib/site-settings/storage-constants";
 import Link from "next/link";
 import { useCallback, useState } from "react";
+
+const PROGRAM_IMAGE_ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
+
+function ProgramBuiltinImageRow({
+  storageSlot,
+  label,
+  value,
+  onChange,
+}: {
+  storageSlot: ProgramBuiltinImageStorageSlot;
+  label: string;
+  value: ImageSlot;
+  onChange: (next: ImageSlot) => void;
+}) {
+  const [upMsg, setUpMsg] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUpMsg(null);
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.set("slot", storageSlot);
+      fd.set("file", file);
+      const res = await fetch("/api/admin/site-image", { method: "POST", body: fd });
+      const body = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok) {
+        setUpMsg(body.error ?? "업로드에 실패했습니다.");
+        return;
+      }
+      if (body.url) {
+        const baseName = file.name.replace(/\.[^.]+$/, "").trim();
+        onChange({
+          src: body.url,
+          alt: value.alt.trim() || baseName || label,
+        });
+        setUpMsg("업로드되었습니다. 아래 「수정」으로 저장하세요.");
+      }
+    } catch {
+      setUpMsg("네트워크 오류로 업로드하지 못했습니다.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-orange-100/80 bg-u-lavender/10 p-3">
+      <p className="text-[11px] font-semibold text-apple-ink">{label}</p>
+      <div className="mt-2">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-orange-200/80 bg-gradient-to-r from-apple/12 to-u-lavender/30 px-3 py-2 text-[13px] font-semibold text-apple-muted transition hover:from-apple/18 hover:to-u-lavender/40 disabled:cursor-not-allowed disabled:opacity-50">
+          <input
+            type="file"
+            accept={PROGRAM_IMAGE_ACCEPT}
+            className="sr-only"
+            disabled={uploading}
+            onChange={(e) => void onPickFile(e)}
+          />
+          {uploading ? "업로드 중…" : "파일에서 이미지 선택"}
+        </label>
+        <p className="mt-1.5 text-[11px] text-apple-subtle">JPEG·PNG·WebP·GIF, 최대 5MB · Supabase Storage `site-assets`</p>
+      </div>
+      {upMsg ? (
+        <p
+          className={`mt-2 rounded-lg border px-2.5 py-2 text-[12px] leading-snug ${
+            upMsg.includes("실패") || upMsg.includes("오류") || upMsg.includes("못했")
+              ? "border-rose-200 bg-rose-50 text-rose-800"
+              : "border-emerald-200 bg-emerald-50 text-emerald-900"
+          }`}
+        >
+          {upMsg}
+        </p>
+      ) : null}
+      {value.src ? (
+        <div className="mt-3 overflow-hidden rounded-lg border border-black/[0.06] bg-zinc-50/80">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={value.src} alt="" className="mx-auto max-h-36 w-full object-contain" />
+        </div>
+      ) : null}
+      <label className="mt-3 block text-[11px] font-medium text-apple-subtle">
+        대체 텍스트 (alt)
+        <input
+          className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+          value={value.alt}
+          onChange={(e) => onChange({ ...value, alt: e.target.value })}
+        />
+      </label>
+    </div>
+  );
+}
 
 const PROGRAM_IMAGE_SLOTS: { key: keyof ProgramBuiltinImages; label: string }[] = [
   { key: "hero", label: "히어로(상단 큰 이미지)" },
@@ -93,7 +190,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         <div>
           <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink">프로그램 안내</h1>
           <p className="mt-2 text-[14px] leading-relaxed text-apple-subtle">
-            헤더 메뉴·페이지 제목·리드·내장 가이드(목차명·섹션 제목·이미지·유튜브)·마크다운(상·하)을 수정합니다. 마크다운은 GFM(목록·표·링크 등)을 지원합니다.
+            헤더 메뉴·페이지 제목·리드·내장 가이드(목차명·섹션 제목·이미지 파일·유튜브)·마크다운(상·하)을 수정합니다. 마크다운은 GFM(목록·표·링크 등)을 지원합니다.
           </p>
         </div>
         <Link
@@ -179,7 +276,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         <div>
           <h2 className="font-display text-[1.1rem] font-bold text-apple-ink">내장 가이드 — 목차·제목·이미지·동영상</h2>
           <p className="mt-1 text-[12px] leading-relaxed text-apple-subtle">
-            본문 각 섹션의 메뉴(목차) 문구, H2 제목, 삽입 이미지(URL)·대체 텍스트, 유튜브 영상 ID·표시 제목을 바꿀 수 있습니다. 목차 항목 개수는 유지됩니다. 앵커
+            본문 각 섹션의 메뉴(목차) 문구, H2 제목, 삽입 이미지(파일 업로드)·대체 텍스트, 유튜브 영상 ID·표시 제목을 바꿀 수 있습니다. 목차 항목 개수는 유지됩니다. 앵커
             연동을 위해 목차의 <code className="rounded bg-black/[0.06] px-1">id</code> 값은 바꾸지 마세요.
           </p>
         </div>
@@ -235,52 +332,30 @@ export function AdminProgramEditor({ initialSettings }: Props) {
         </div>
 
         <div>
-          <p className="text-[12px] font-semibold text-apple-ink">내장 이미지 (URL · alt)</p>
+          <p className="text-[12px] font-semibold text-apple-ink">내장 이미지 (파일 등록 · alt)</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-apple-subtle">
+            각 슬롯마다 「파일에서 이미지 선택」으로 업로드하면 공개 URL이 설정에 저장됩니다. 저장은 페이지 하단 「수정」을 눌러 주세요.
+          </p>
           <div className="mt-3 space-y-4">
             {PROGRAM_IMAGE_SLOTS.map(({ key, label }) => (
-              <div key={key} className="rounded-xl border border-orange-100/80 bg-u-lavender/10 p-3">
-                <p className="text-[11px] font-semibold text-apple-ink">{label}</p>
-                <label className="mt-2 block text-[11px] font-medium text-apple-subtle">
-                  이미지 URL
-                  <input
-                    className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 font-mono text-[12px] text-apple-ink"
-                    value={p.builtinImages[key].src}
-                    onChange={(e) => {
-                      const src = e.target.value;
-                      setSettings((s) => ({
-                        ...s,
-                        program: {
-                          ...s.program,
-                          builtinImages: {
-                            ...s.program.builtinImages,
-                            [key]: { ...s.program.builtinImages[key], src },
-                          },
-                        },
-                      }));
-                    }}
-                  />
-                </label>
-                <label className="mt-2 block text-[11px] font-medium text-apple-subtle">
-                  대체 텍스트 (alt)
-                  <input
-                    className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
-                    value={p.builtinImages[key].alt}
-                    onChange={(e) => {
-                      const alt = e.target.value;
-                      setSettings((s) => ({
-                        ...s,
-                        program: {
-                          ...s.program,
-                          builtinImages: {
-                            ...s.program.builtinImages,
-                            [key]: { ...s.program.builtinImages[key], alt },
-                          },
-                        },
-                      }));
-                    }}
-                  />
-                </label>
-              </div>
+              <ProgramBuiltinImageRow
+                key={key}
+                storageSlot={PROGRAM_BUILTIN_IMAGE_SLOT_FOR_KEY[key]}
+                label={label}
+                value={p.builtinImages[key]}
+                onChange={(next) => {
+                  setSettings((s) => ({
+                    ...s,
+                    program: {
+                      ...s.program,
+                      builtinImages: {
+                        ...s.program.builtinImages,
+                        [key]: next,
+                      },
+                    },
+                  }));
+                }}
+              />
             ))}
           </div>
         </div>
