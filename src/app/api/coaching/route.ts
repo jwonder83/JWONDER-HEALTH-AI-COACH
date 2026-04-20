@@ -1,4 +1,6 @@
 import { buildAiCoaching } from "@/lib/coaching/build-ai-coaching";
+import { parseOnboardingProfile } from "@/lib/onboarding/parse-body";
+import { recomputeUserMemoryProfile } from "@/lib/user-memory/recompute";
 import type { WorkoutRow } from "@/types/workout";
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
@@ -49,9 +51,18 @@ export async function POST(request: Request) {
     );
   }
 
+  const onboarding = parseOnboardingProfile((body as { onboarding?: unknown }).onboarding);
+  const injuryPatch = (body as { injury_history?: unknown }).injury_history;
+
+  const userMemory = recomputeUserMemoryProfile(rows, {
+    onboarding,
+    previous: null,
+    injuryPatch,
+  });
+
   try {
-    const coaching = await buildAiCoaching(rows);
-    return NextResponse.json({ coaching });
+    const coaching = await buildAiCoaching(rows, { userMemory });
+    return NextResponse.json({ coaching, userMemory });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "코칭 생성 중 오류";
     const status = msg.includes("OPENAI_API_KEY") || msg.includes("OpenAI") ? 503 : 502;

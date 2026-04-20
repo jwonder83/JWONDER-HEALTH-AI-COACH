@@ -2,8 +2,11 @@
 
 import { SiteFillImage } from "@/components/site/SiteFillImage";
 import { mapCoachingLogRow } from "@/lib/coaching/map-db-row";
+import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { createClient } from "@/lib/supabase/client";
+import { loadUserMemoryFromBrowser, saveUserMemoryToBrowser } from "@/lib/user-memory/browser-storage";
 import type { CoachingLogRow } from "@/types/coaching";
+import type { UserMemoryProfile } from "@/types/user-memory";
 import type { ImageSlot } from "@/types/site-settings";
 import type { WorkoutRow } from "@/types/workout";
 import { useCallback, useEffect, useState } from "react";
@@ -72,17 +75,33 @@ export function WebCoachingSection({
     setText(null);
     setLoading(true);
     try {
+      let onboarding: OnboardingProfile | null = null;
+      try {
+        const raw = typeof window !== "undefined" ? window.localStorage.getItem(ONBOARDING_LS_KEY) : null;
+        if (raw) onboarding = JSON.parse(raw) as OnboardingProfile;
+      } catch {
+        onboarding = null;
+      }
+      const prevMemory = loadUserMemoryFromBrowser(userId);
+
       const res = await fetch("/api/coaching", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workouts: workoutsSnapshot }),
+        body: JSON.stringify({
+          workouts: workoutsSnapshot,
+          onboarding,
+          injury_history: prevMemory?.injury_history ?? [],
+        }),
       });
-      const body = (await res.json()) as { coaching?: string; error?: string };
+      const body = (await res.json()) as { coaching?: string; error?: string; userMemory?: UserMemoryProfile };
       if (!res.ok) {
         throw new Error(body.error ?? "코칭 요청이 실패했어요. 잠시 후 다시 시도해 주세요.");
       }
       const coaching = body.coaching ?? "";
       setText(coaching);
+      if (body.userMemory) {
+        saveUserMemoryToBrowser(userId, body.userMemory);
+      }
 
       const supabase = createClient();
       const { error: insErr } = await supabase.from("coaching_logs").insert({

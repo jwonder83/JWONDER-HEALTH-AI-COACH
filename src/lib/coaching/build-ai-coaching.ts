@@ -1,5 +1,11 @@
+import { formatUserMemoryForPrompt } from "@/lib/user-memory/format-for-prompt";
+import type { UserMemoryProfile } from "@/types/user-memory";
 import type { WorkoutRow } from "@/types/workout";
 import { buildLocalCoachingText } from "./analyze-workouts";
+
+export type BuildAiCoachingOptions = {
+  userMemory?: UserMemoryProfile | null;
+};
 
 type OpenAIChatResponse = {
   choices?: Array<{ message?: { content?: string | null } }>;
@@ -23,6 +29,7 @@ function formatWorkoutsTable(rows: WorkoutRow[]): string {
 
 const SYSTEM_PROMPT = `당신은 한국어로 답하는 헬스·strength 트레이닝 코치입니다.
 사용자의 운동 기록 숫자(빈도·볼륨·휴식·추세)를 먼저 읽고, 짧은 결정형 문장으로 행동을 지시한 뒤 같은 단락에서 근거를 한 줄로 붙이세요.
+사용자 메모리(목표·경험·선호 종목·보완 부위·부상 이력·일관성·피로 지표)가 주어지면 기록 요약과 모순되지 않게 반영하세요.
 "~해볼까요?", "~어때요?" 같은 추천체는 쓰지 말고 "~하세요.", "~로 진행하세요."처럼 확정 톤을 쓰세요.
 의학적 진단·부상 판정은 하지 말고, 통증·이상이 있으면 전문가 상담을 권하는 문장을 포함하세요.
 마크다운(##, ###, 목록)을 사용해 가독성 있게 작성하세요.`;
@@ -85,9 +92,18 @@ async function fetchCoachingWebSource(url: string): Promise<string> {
   }
 }
 
+function memoryBlock(memory: UserMemoryProfile | null | undefined): string {
+  if (!memory) return "";
+  return (
+    "\n\n## 사용자 메모리(자동 산출)\n\n" +
+    formatUserMemoryForPrompt(memory) +
+    "\n\n위 메모리는 코드가 기록에서 추정한 값입니다. 부상 이력은 사용자가 저장한 경우에만 채워질 수 있습니다.\n"
+  );
+}
+
 /** OpenAI 없이: 기록 요약 + (선택) 웹 참고 문단을 코칭처럼 묶어 반환 */
-async function buildWebOrLocalCoaching(rows: WorkoutRow[]): Promise<string> {
-  const local = buildLocalCoachingText(rows);
+async function buildWebOrLocalCoaching(rows: WorkoutRow[], memory: UserMemoryProfile | null | undefined): Promise<string> {
+  const local = buildLocalCoachingText(rows) + memoryBlock(memory);
   const url = process.env.COACHING_CONTENT_URL?.trim();
 
   if (url && isAllowedCoachingUrl(url)) {
@@ -118,7 +134,11 @@ async function buildWebOrLocalCoaching(rows: WorkoutRow[]): Promise<string> {
   );
 }
 
-async function buildOpenAiCoaching(rows: WorkoutRow[], apiKey: string): Promise<string> {
+async function buildOpenAiCoaching(
+  rows: WorkoutRow[],
+  apiKey: string,
+  memory: UserMemoryProfile | null | undefined,
+): Promise<string> {
   const model = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
   const localSummary = buildLocalCoachingText(rows);
   const table = formatWorkoutsTable(rows);
@@ -134,7 +154,7 @@ ${table}
 아래 요약의 숫자·추세와 모순되지 않게 코칭해 주세요.
 
 ${localSummary}
-
+${memoryBlock(memory)}
 ---
 
 위 자료를 바탕으로 한국어로 코칭을 작성해 주세요. 포함할 내용:
@@ -178,14 +198,15 @@ ${localSummary}
  * 기본: OpenAI 호출 없음 → 기록 요약 + (선택) COACHING_CONTENT_URL 웹 본문.
  * OpenAI 사용: COACHING_USE_OPENAI=true 이고 OPENAI_API_KEY 가 있을 때만.
  */
-export async function buildAiCoaching(rows: WorkoutRow[]): Promise<string> {
+export async function buildAiCoaching(rows: WorkoutRow[], options?: BuildAiCoachingOptions): Promise<string> {
+  const memory = options?.userMemory ?? null;
   const useOpenAi =
     process.env.COACHING_USE_OPENAI === "1" || process.env.COACHING_USE_OPENAI === "true";
   const apiKey = process.env.OPENAI_API_KEY?.trim();
 
   if (useOpenAi && apiKey) {
-    return buildOpenAiCoaching(rows, apiKey);
+    return buildOpenAiCoaching(rows, apiKey, memory);
   }
 
-  return buildWebOrLocalCoaching(rows);
+  return buildWebOrLocalCoaching(rows, memory);
 }

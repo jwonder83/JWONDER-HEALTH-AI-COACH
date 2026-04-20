@@ -15,6 +15,9 @@ import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
 import { isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
+import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
+import { loadUserMemoryFromBrowser, saveUserMemoryToBrowser } from "@/lib/user-memory/browser-storage";
+import { recomputeUserMemoryProfile } from "@/lib/user-memory/recompute";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import type { WorkoutInput, WorkoutRow } from "@/types/workout";
@@ -130,6 +133,24 @@ export function HomeDashboard({ userId, site }: Props) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (!hydrated || typeof window === "undefined") return;
+    let onboarding: OnboardingProfile | null = null;
+    try {
+      const raw = window.localStorage.getItem(ONBOARDING_LS_KEY);
+      if (raw) onboarding = JSON.parse(raw) as OnboardingProfile;
+    } catch {
+      onboarding = null;
+    }
+    const prev = loadUserMemoryFromBrowser(userId);
+    const next = recomputeUserMemoryProfile(workouts, {
+      onboarding,
+      previous: prev,
+      injuryPatch: prev?.injury_history,
+    });
+    saveUserMemoryToBrowser(userId, next);
+  }, [hydrated, workouts, userId]);
 
   async function saveWorkout(input: WorkoutInput): Promise<{ error?: string; pr?: boolean }> {
     const vol = volumeFromNumbers(input.weight_kg, input.reps, input.sets);
