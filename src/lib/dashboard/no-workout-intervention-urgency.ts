@@ -30,7 +30,7 @@ function normalizeInterventionHours(
   patch?: Partial<NoWorkoutInterventionHourBounds> | null,
 ): NoWorkoutInterventionHourBounds {
   if (!patch) return DEFAULT_INTERVENTION_HOURS;
-  let morning = clampHour(patch.morningEndHour, DEFAULT_INTERVENTION_HOURS.morningEndHour);
+  const morning = clampHour(patch.morningEndHour, DEFAULT_INTERVENTION_HOURS.morningEndHour);
   let afternoon = clampHour(patch.afternoonEndHour, DEFAULT_INTERVENTION_HOURS.afternoonEndHour);
   let evening = clampHour(patch.eveningEndHour, DEFAULT_INTERVENTION_HOURS.eveningEndHour);
   if (afternoon < morning) afternoon = morning;

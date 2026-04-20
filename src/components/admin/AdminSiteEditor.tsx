@@ -217,9 +217,9 @@ export function AdminSiteEditor({ initialSettings }: Props) {
   const setExperience = useCallback((patch: Partial<SiteExperienceConfig>) => {
     setSettings((s) => {
       const cur = s.experience;
-      const navLabels = patch.navLabels ? { ...cur.navLabels, ...patch.navLabels } : cur.navLabels;
-      const { navLabels: _drop, ...rest } = patch;
-      return { ...s, experience: { ...cur, ...rest, navLabels } };
+      const { navLabels: patchNav, ...scalarPatch } = patch;
+      const navLabels = patchNav ? { ...cur.navLabels, ...patchNav } : cur.navLabels;
+      return { ...s, experience: { ...cur, ...scalarPatch, navLabels } };
     });
   }, []);
 

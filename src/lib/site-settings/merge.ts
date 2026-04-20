@@ -342,7 +342,7 @@ function mergeNavExperienceLabels(
 function mergeExperience(base: SiteExperienceConfig, patch: unknown): SiteExperienceConfig {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
-  let morning = mergeUIntInRange(base.interventionMorningEndHour, p.interventionMorningEndHour, 0, 23);
+  const morning = mergeUIntInRange(base.interventionMorningEndHour, p.interventionMorningEndHour, 0, 23);
   let afternoon = mergeUIntInRange(base.interventionAfternoonEndHour, p.interventionAfternoonEndHour, 0, 23);
   let evening = mergeUIntInRange(base.interventionEveningEndHour, p.interventionEveningEndHour, 0, 23);
   if (afternoon < morning) afternoon = morning;
