@@ -1,6 +1,7 @@
 "use client";
 
-import { computeLoggingStreak } from "@/lib/workouts/streak";
+import { loadLocalGoals, saveLocalGoals, type LocalGoals } from "@/lib/dashboard/local-goals";
+import { computeLoggingStreakMerged } from "@/lib/workouts/streak";
 import {
   endOfMonth,
   endOfWeekSunday,
@@ -11,34 +12,7 @@ import {
 import type { WorkoutRow } from "@/types/workout";
 import { useEffect, useMemo, useState } from "react";
 
-const LS_GOALS = "jws_goals_v1";
-
-export type LocalGoals = {
-  /** 이번 주에 목표로 하는 기록(행) 개수 */
-  weeklySessionTarget?: number;
-  /** 참고용 목표 체중(kg) */
-  targetWeightKg?: number;
-};
-
-function loadGoals(): LocalGoals {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(LS_GOALS);
-    if (!raw) return {};
-    const p = JSON.parse(raw) as LocalGoals;
-    return {
-      weeklySessionTarget:
-        typeof p.weeklySessionTarget === "number" && p.weeklySessionTarget > 0 ? p.weeklySessionTarget : undefined,
-      targetWeightKg: typeof p.targetWeightKg === "number" && p.targetWeightKg > 0 ? p.targetWeightKg : undefined,
-    };
-  } catch {
-    return {};
-  }
-}
-
-function saveGoals(g: LocalGoals) {
-  localStorage.setItem(LS_GOALS, JSON.stringify(g));
-}
+export type { LocalGoals } from "@/lib/dashboard/local-goals";
 
 type Props = { workouts: WorkoutRow[] };
 
@@ -47,7 +21,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setGoals(loadGoals());
+    setGoals(loadLocalGoals());
   }, []);
 
   const mon = useMemo(() => startOfWeekMonday(), []);
@@ -69,7 +43,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
       ? Math.min(100, Math.round((week.rowCount / goals.weeklySessionTarget) * 100))
       : null;
 
-  const streak = useMemo(() => computeLoggingStreak(workouts), [workouts]);
+  const streak = useMemo(() => computeLoggingStreakMerged(workouts), [workouts]);
 
   return (
     <div className="mt-6 border border-neutral-200 bg-white p-4 shadow-inner sm:p-5">
@@ -165,7 +139,8 @@ export function DashboardGoalsCard({ workouts }: Props) {
                     ...prev,
                     weeklySessionTarget: Number.isFinite(v) && v > 0 ? v : undefined,
                   };
-                  saveGoals(next);
+                  saveLocalGoals(next);
+                  window.dispatchEvent(new Event("jws-goals-changed"));
                   return next;
                 });
               }}
@@ -187,7 +162,8 @@ export function DashboardGoalsCard({ workouts }: Props) {
                     ...prev,
                     targetWeightKg: Number.isFinite(v) && v > 0 ? v : undefined,
                   };
-                  saveGoals(next);
+                  saveLocalGoals(next);
+                  window.dispatchEvent(new Event("jws-goals-changed"));
                   return next;
                 });
               }}

@@ -12,7 +12,10 @@ import {
   isStreakAtRiskEvening,
   isStreakGentleNudge,
 } from "@/lib/workouts/streak-engagement";
-import { computeLoggingStreak } from "@/lib/workouts/streak";
+import { isRecoveryEaseRoutineDay } from "@/lib/dashboard/recovery-workout-ux";
+import { recomputeUserMemoryProfile } from "@/lib/user-memory/recompute";
+import { computeLoggingStreakMerged } from "@/lib/workouts/streak";
+import type { UserMemoryProfile } from "@/types/user-memory";
 import type { WorkoutRow } from "@/types/workout";
 
 export type LocalWeeklyGoal = {
@@ -45,6 +48,8 @@ export type HomeActionViewModel = {
   streakGentleNudge: boolean;
   /** 성취·동기부여 한 줄(카드·배너에 사용) */
   streakMotivationLine: string | null;
+  /** 어제 캘린더 공백 후 오늘 복귀 UX(가벼운 루틴·스트릭 유지 톤) */
+  recoveryAfterMissedYesterday: boolean;
   routine: TodayRoutinePlan;
   estimatedDurationLabel: string;
   /** 결정형 코치 한 줄(명령·확정 톤) */
@@ -70,12 +75,17 @@ function buildCoachLine(args: {
   routineTitle: string;
   streak: number;
   goalProgressPercent: number | null;
+  memory: UserMemoryProfile;
 }): string {
   if (args.todayDone) {
     if (args.streak >= 3) {
       return `${args.streak}일 연속 기록입니다. 오늘은 여기까지 마무리하고 가벼운 스트레칭과 수분 보충을 권장합니다.`;
     }
     return "오늘 세션을 완료했습니다. 짧게 정리 스트레칭으로 마무리하세요.";
+  }
+
+  if (args.memory.personalization_bullets.length > 0) {
+    return args.memory.personalization_bullets[0];
   }
 
   const t = args.routineTitle;
@@ -110,6 +120,8 @@ function buildCoachLineReason(args: {
   weeklySessionTarget: number | null;
   workouts: WorkoutRow[];
   now: Date;
+  memory: UserMemoryProfile;
+  recoveryAfterMissedYesterday: boolean;
 }): string {
   if (args.todayDone) {
     return "오늘 날짜에 저장된 세트가 있어 완료 상태로 표시했습니다.";
@@ -146,6 +158,15 @@ function buildCoachLineReason(args: {
   if (args.goalProgressPercent !== null && args.weeklySessionTarget != null) {
     bits.push(`주간 목표 ${args.weeklySessionTarget}세션 중 ${args.weeklySessionCurrent}(${args.goalProgressPercent}%)`);
   }
+  if (args.memory.preferred_exercises.length > 0) {
+    bits.push(`선호 종목 ${args.memory.preferred_exercises.slice(0, 3).join(", ")}`);
+  }
+  if (args.memory.personalization_bullets.length > 0) {
+    bits.push(`메모리 기반 개인화 ${args.memory.personalization_bullets.length}건`);
+  }
+  if (args.recoveryAfterMissedYesterday) {
+    bits.push("복귀 모드(어제 공백·가벼운 루틴·스트릭 유지 표시)");
+  }
   return `${bits.join(" · ")}입니다.`;
 }
 
@@ -159,13 +180,15 @@ export function buildHomeActionViewModel(
   const now = opts?.now ?? new Date();
   const exp = opts?.experience ?? DEFAULT_SITE_SETTINGS.experience;
   const todayDone = hasWorkoutToday(workouts, now);
-  const streak = computeLoggingStreak(workouts, now);
+  const recoveryAfterMissedYesterday = isRecoveryEaseRoutineDay(workouts, now);
+  const streak = computeLoggingStreakMerged(workouts, now);
   const streakAtRisk = isStreakAtRiskEvening(workouts, hydrated, now);
   const streakGentleNudge = isStreakGentleNudge(workouts, hydrated, now);
   const streakMotivationLine = getStreakMotivationLine(streak, {
     atRisk: streakAtRisk,
     gentle: streakGentleNudge,
     todayDone,
+    recoveryAfterMiss: recoveryAfterMissedYesterday,
   });
   const mon = startOfWeekMonday(now);
   const sun = endOfWeekSunday(mon);
@@ -175,12 +198,18 @@ export function buildHomeActionViewModel(
     target !== null ? Math.min(100, Math.round((week.rowCount / target) * 100)) : null;
 
   const routine = buildOptimizedTodayRoutine(profile, workouts, now);
+  const userMemory = recomputeUserMemoryProfile(workouts, {
+    now,
+    onboarding: profile,
+    todayRoutine: { title: routine.title, description: routine.description },
+  });
   const estimatedDurationLabel = formatEstimatedLabel(routine.estimatedMinutesMin, routine.estimatedMinutesMax);
   const coachLine = buildCoachLine({
     todayDone,
     routineTitle: routine.title,
     streak,
     goalProgressPercent: goalPct,
+    memory: userMemory,
   });
   const coachLineReason = buildCoachLineReason({
     todayDone,
@@ -190,6 +219,8 @@ export function buildHomeActionViewModel(
     weeklySessionTarget: target,
     workouts,
     now,
+    memory: userMemory,
+    recoveryAfterMissedYesterday,
   });
 
   const recent = recentWorkouts(workouts, 3).map((w) => ({
@@ -217,6 +248,7 @@ export function buildHomeActionViewModel(
     streakAtRisk,
     streakGentleNudge,
     streakMotivationLine,
+    recoveryAfterMissedYesterday,
     routine,
     estimatedDurationLabel,
     coachLine,

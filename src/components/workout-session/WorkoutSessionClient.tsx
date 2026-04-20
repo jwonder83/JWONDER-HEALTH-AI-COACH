@@ -5,11 +5,12 @@ import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engin
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
+import { recordWorkoutXp } from "@/lib/gamification/reward-storage";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
 import { writeWorkoutSessionActive } from "@/lib/workout-session/session-bridge";
 import { loadCoachModeEnabled, persistCoachModeEnabled } from "@/lib/workout-session/coach-mode-storage";
 import type { TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
-import type { WorkoutRow } from "@/types/workout";
+import type { WorkoutInput, WorkoutRow } from "@/types/workout";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -266,6 +267,14 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
       setToast(error.message);
       return;
     }
+    const payload: WorkoutInput = {
+      exercise_name: name,
+      weight_kg: w,
+      reps: r,
+      sets: s,
+      success,
+    };
+    const grant = recordWorkoutXp(userId, payload, pr);
     await refresh();
     notifyWorkoutsMutated();
     setSessionSets((prev) => [
@@ -275,9 +284,14 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
     if (pr) {
       setPrHighlight(true);
       window.setTimeout(() => setPrHighlight(false), 5200);
-    } else {
-      setToast("저장 완료");
     }
+    setToast(
+      grant.leveledUp
+        ? `레벨 ${grant.levelAfter}! +${grant.gainedXp} XP`
+        : pr
+          ? `PR! +${grant.gainedXp} XP`
+          : `+${grant.gainedXp} XP · 저장 완료`,
+    );
     if (coachModeRef.current) {
       showCoachCue(`휴식 ${restTargetSec}초. 준비되면 다음 세트 진행하세요.`, 5000);
       setCoachBetween("rest");

@@ -3,6 +3,7 @@
  * 운동 기록·온보딩에서 자동 갱신되며, 향후 DB 동기화 시에도 동일 스키마를 권장합니다.
  */
 export type UserMemoryProfile = {
+  /** 스키마 2: personalization_bullets 추가 */
   schemaVersion: number;
   updatedAt: string;
   goal: string;
@@ -14,4 +15,9 @@ export type UserMemoryProfile = {
   consistency_score: number;
   /** 0–100, 최근 볼륨·빈도·브리핑 피로 점수에 정렬된 누적 부담 지표 */
   fatigue_level: number;
+  /**
+   * 기록에서 자동 생성한 개인화 멘트(언급 + 행동 유도).
+   * 코칭 API·홈 코치 한 줄에서 우선 사용합니다.
+   */
+  personalization_bullets: string[];
 };

@@ -1,6 +1,6 @@
 import { hasWorkoutToday, rowVolume } from "@/lib/dashboard/insights";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
-import { computeLoggingStreak } from "@/lib/workouts/streak";
+import { computeLoggingStreakMerged } from "@/lib/workouts/streak";
 import type { WorkoutRow } from "@/types/workout";
 
 /** 규칙 엔진이 판별한 상황 — UI 배지·추후 GPT 프롬프트 분기에 사용 */
@@ -85,7 +85,7 @@ function calendarDaysBetween(from: Date, to: Date): number {
 /** 기록은 있는데 연속 앵커가 끊긴 상태(최근에 쉰 흔적)로 보일 때 */
 export function isStreakLikelyBroken(workouts: WorkoutRow[], now = new Date()): boolean {
   if (workouts.length === 0) return false;
-  if (computeLoggingStreak(workouts, now) > 0) return false;
+  if (computeLoggingStreakMerged(workouts, now) > 0) return false;
   const sorted = [...workouts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   const last = new Date(sorted[0].created_at);
   return calendarDaysBetween(last, now) >= 2;
@@ -176,7 +176,7 @@ export function buildCoachPresenceContextSnapshot(input: CoachResolverInput): Co
     todayWorkoutComplete,
     todaySessionRowCount: countTodayRows(input.workouts, now),
     todayVolumeApprox: todayVolume(input.workouts, now),
-    streakDays: computeLoggingStreak(input.workouts, now),
+    streakDays: computeLoggingStreakMerged(input.workouts, now),
     streakLikelyBroken: input.hydrated && isStreakLikelyBroken(input.workouts, now),
     weeklyRowCount: week.rowCount,
   };

@@ -15,6 +15,7 @@ type Props = {
     | "streakDays"
     | "streakMotivationLine"
     | "workoutRestTargetSeconds"
+    | "recoveryAfterMissedYesterday"
   >;
   uiState: UserWorkoutUiState;
 };
@@ -76,6 +77,9 @@ export function TodayStatusCard({ model, uiState }: Props) {
           <p className="font-display text-[1.25rem] font-bold tabular-nums text-emerald-900 dark:text-emerald-200">
             {model.hydrated ? `${model.streakDays}일` : "—"}
           </p>
+          {model.hydrated && model.recoveryAfterMissedYesterday && !model.todayWorkoutComplete ? (
+            <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300">유지 모드</p>
+          ) : null}
         </div>
       </div>
 

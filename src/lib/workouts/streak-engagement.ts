@@ -1,6 +1,6 @@
 import { hasWorkoutToday } from "@/lib/dashboard/insights";
 import type { WorkoutRow } from "@/types/workout";
-import { computeLoggingStreak } from "@/lib/workouts/streak";
+import { computeLoggingStreakMerged } from "@/lib/workouts/streak";
 
 /** 연속 일수 뱃지 구간 */
 export const STREAK_MILESTONE_DAYS = [3, 7, 30] as const;
@@ -33,7 +33,7 @@ export function getNextMilestoneRemaining(streak: number): { next: number; remai
 export function isStreakAtRiskEvening(workouts: WorkoutRow[], hydrated: boolean, now = new Date()): boolean {
   if (!hydrated || workouts.length === 0) return false;
   if (hasWorkoutToday(workouts, now)) return false;
-  const streak = computeLoggingStreak(workouts, now);
+  const streak = computeLoggingStreakMerged(workouts, now);
   if (streak < 1) return false;
   const hour = now.getHours();
   return hour >= 17;
@@ -43,7 +43,7 @@ export function isStreakAtRiskEvening(workouts: WorkoutRow[], hydrated: boolean,
 export function isStreakGentleNudge(workouts: WorkoutRow[], hydrated: boolean, now = new Date()): boolean {
   if (!hydrated || workouts.length === 0) return false;
   if (hasWorkoutToday(workouts, now)) return false;
-  const streak = computeLoggingStreak(workouts, now);
+  const streak = computeLoggingStreakMerged(workouts, now);
   if (streak < 2) return false;
   const hour = now.getHours();
   return hour < 17;
@@ -51,8 +51,11 @@ export function isStreakGentleNudge(workouts: WorkoutRow[], hydrated: boolean, n
 
 export function getStreakMotivationLine(
   streak: number,
-  opts: { atRisk: boolean; gentle: boolean; todayDone: boolean },
+  opts: { atRisk: boolean; gentle: boolean; todayDone: boolean; recoveryAfterMiss?: boolean },
 ): string | null {
+  if (opts.recoveryAfterMiss && !opts.todayDone) {
+    return "어제는 쉬었어도 괜찮아요. 오늘은 가벼운 루틴으로 리듬만 되찾으세요.";
+  }
   if (opts.todayDone) {
     if (streak >= 30) return `${streak}일 연속… 이건 거의 시즌2 찍은 거예요. 오늘도 한 판 더 쌓았어요.`;
     if (streak >= 7) return `${streak}일째 밀어붙이는 중. 꾸준함 인정합니다.`;

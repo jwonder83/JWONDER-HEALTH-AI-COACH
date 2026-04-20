@@ -5,6 +5,13 @@ import type { WorkoutRow } from "@/types/workout";
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 
+function parseTodayRoutine(raw: unknown): { title: string; description: string } | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  if (typeof o.title !== "string" || typeof o.description !== "string") return null;
+  return { title: o.title.slice(0, 200), description: o.description.slice(0, 2000) };
+}
+
 function parseWorkoutsFromBody(raw: unknown): WorkoutRow[] | null {
   if (!raw || typeof raw !== "object") return null;
   const w = (raw as { workouts?: unknown }).workouts;
@@ -53,11 +60,13 @@ export async function POST(request: Request) {
 
   const onboarding = parseOnboardingProfile((body as { onboarding?: unknown }).onboarding);
   const injuryPatch = (body as { injury_history?: unknown }).injury_history;
+  const todayRoutine = parseTodayRoutine((body as { todayRoutine?: unknown }).todayRoutine);
 
   const userMemory = recomputeUserMemoryProfile(rows, {
     onboarding,
     previous: null,
     injuryPatch,
+    todayRoutine,
   });
 
   try {

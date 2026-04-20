@@ -5,6 +5,8 @@ import { WorkoutActionSuggestionsCard } from "@/components/dashboard/home/Workou
 import { StreakRiskBanner } from "@/components/gamification/StreakRiskBanner";
 import { NoWorkoutCoachIntervention } from "@/components/dashboard/home/NoWorkoutCoachIntervention";
 import { RecentActivitySummaryCard } from "@/components/dashboard/home/RecentActivitySummaryCard";
+import { BehaviorInterventionBanner } from "@/components/dashboard/home/BehaviorInterventionBanner";
+import { RecoveryReturnBanner } from "@/components/dashboard/home/RecoveryReturnBanner";
 import { TodayRoutinePlanCard } from "@/components/dashboard/home/TodayRoutinePlanCard";
 import { TodayStatusCard } from "@/components/dashboard/home/TodayStatusCard";
 import { TodayWorkoutHeroCard } from "@/components/dashboard/home/TodayWorkoutHeroCard";
@@ -35,7 +37,12 @@ export function HomeActionHub({ workouts, hydrated, userWorkoutUiState, experien
   return (
     <div className={grid} data-user-workout-state={userWorkoutUiState}>
       <UserWorkoutStateRibbon state={userWorkoutUiState} />
-      <StreakRiskBanner visible={model.streakAtRisk} streakDays={model.streakDays} />
+      {model.hydrated && !model.todayWorkoutComplete && model.recoveryAfterMissedYesterday ? <RecoveryReturnBanner /> : null}
+      <StreakRiskBanner
+        visible={model.streakAtRisk}
+        streakDays={model.streakDays}
+        recoveryDay={model.recoveryAfterMissedYesterday}
+      />
       <TodayStatusCard model={model} uiState={userWorkoutUiState} />
       <DailyStatusBriefingCard briefing={model.dailyBriefing} hydrated={model.hydrated} />
       <WorkoutActionSuggestionsCard
@@ -58,6 +65,9 @@ export function HomeActionHub({ workouts, hydrated, userWorkoutUiState, experien
           }}
         />
       ) : null}
+      <BehaviorInterventionBanner
+        adjustments={model.routine.adjustments?.filter((a) => a.type !== "recovery_return")}
+      />
       <TodayRoutinePlanCard
         model={model}
         status={routineFlow.status}

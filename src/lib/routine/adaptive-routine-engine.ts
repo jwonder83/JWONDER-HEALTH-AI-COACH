@@ -6,6 +6,11 @@ import {
   type MuscleGroupId,
 } from "@/lib/workouts/exercise-muscle-group";
 import type { WorkoutRow } from "@/types/workout";
+import { isRecoveryEaseRoutineDay } from "@/lib/dashboard/recovery-workout-ux";
+import {
+  buildWeekdayBehaviorAdjustments,
+  computeBehaviorTimeScale,
+} from "@/lib/interventions/behavior-patterns";
 import { planTodayRoutine, type RoutineAdjustment, type TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
 
 function rowsLastDays(rows: WorkoutRow[], now: Date, days: number): WorkoutRow[] {
@@ -175,6 +180,8 @@ export function buildOptimizedTodayRoutine(
       type: "substitute_stale",
       message: msg,
       reason: `최근 28일에 같은 종목 4번+ 찍었는데, 최근 3세트 볼륨 변동이 4% 미만이에요.`,
+      problemLine: `「${s.name}」에서 볼륨이 거의 오르지 않는 정체 패턴이 감지됐어요.`,
+      solutionLine: `대체 후보를 섞었어요: ${s.hint}.`,
     });
     liveMessages.push(msg);
   }
@@ -185,6 +192,8 @@ export function buildOptimizedTodayRoutine(
       type: "add_weak_muscle",
       message: weak.message,
       reason: `최근 14일 세트 ${weak.windowRowCount}개 합쳤을 때 ${weak.label} 볼륨 비중이 약 ${weak.sharePct}%라 11% 미만 규칙에 걸렸어요.`,
+      problemLine: `최근 2주 기록에서 ${weak.label} 쪽 볼륨 비중이 약 ${weak.sharePct}%로 낮아요.`,
+      solutionLine: `오늘 플랜에 ${weak.label} 보강을 반영했어요: ${ADD_BY_MUSCLE[weak.id]}.`,
     });
     liveMessages.push(weak.message);
   }
@@ -202,6 +211,11 @@ export function buildOptimizedTodayRoutine(
     description += `\n\n(자동 제안) 정체 의심 종목: ${stagnant[0].name} → ${stagnant[0].hint}.`;
   }
 
+  const recoveryEase = isRecoveryEaseRoutineDay(workouts, now);
+  if (recoveryEase) {
+    description += `\n\n(복귀 모드) 어제는 쉬었어도 괜찮아요. 오늘은 강도·시간을 낮춰 리듬만 되찾는 쪽으로 잡았어요.`;
+  }
+
   let maxMin = base.estimatedMinutesMax;
   let minMin = base.estimatedMinutesMin;
   let timeAdjustNote = "";
@@ -211,12 +225,55 @@ export function buildOptimizedTodayRoutine(
     timeAdjustNote = " 상급·벌크 프로필이라 예상 시간 상·하한을 각각 5분 늘렸어요.";
   }
 
+  const recoveryFactor = recoveryEase ? 0.78 : 1;
+
+  const behaviorScale = computeBehaviorTimeScale(workouts, now);
+  const combinedTimeFactor = behaviorScale.factor * recoveryFactor;
+  const timeScaledByBehaviorOrRecovery = combinedTimeFactor < 1;
+  if (timeScaledByBehaviorOrRecovery) {
+    const nextMin = Math.max(12, Math.round(minMin * combinedTimeFactor));
+    const nextMax = Math.max(nextMin + 5, Math.round(maxMin * combinedTimeFactor));
+    minMin = nextMin;
+    maxMin = nextMax;
+    const parts: string[] = [];
+    if (behaviorScale.factor < 1) parts.push("행동 패턴 분석");
+    if (recoveryEase) parts.push("어제 공백 후 복귀");
+    const suffix = parts.length ? ` ${parts.join("·")}으로 예상 시간을 조정했어요.` : " 예상 시간을 조정했어요.";
+    timeAdjustNote = timeAdjustNote ? `${timeAdjustNote}${suffix}` : suffix.trimStart();
+  }
+
+  if (recoveryEase) {
+    adjustments.unshift({
+      type: "recovery_return",
+      message: "어제 운동을 놓쳤습니다. 오늘은 가벼운 루틴으로 다시 시작하세요.",
+      reason: "로컬 캘린더 기준 어제 세트 없음 + 최근 45일 내 기록이 있어 복귀 모드로 분류했어요.",
+      problemLine: "어제 운동을 놓쳤습니다.",
+      solutionLine: "오늘은 가벼운 루틴으로 다시 시작하세요.",
+    });
+    liveMessages.unshift("어제는 쉬었어도 괜찮아요. 오늘은 짧게라도 이어가세요.");
+  }
+
+  const weekdayAdjustments = buildWeekdayBehaviorAdjustments(
+    workouts,
+    now,
+    minMin,
+    maxMin,
+    timeScaledByBehaviorOrRecovery,
+  );
+  adjustments.unshift(...weekdayAdjustments);
+
   const dataBits: string[] = [];
   if (weak) {
     dataBits.push(`최근 14일 세트 ${weak.windowRowCount}건 중 ${weak.label} 볼륨 비중 약 ${weak.sharePct}% (11% 미만)`);
   }
   if (stagnant.length > 0) {
     dataBits.push(`「${stagnant[0].name}」 등 최근 28일 패턴에서 볼륨 정체 신호`);
+  }
+  if (behaviorScale.reasons.length > 0) {
+    dataBits.push(...behaviorScale.reasons);
+  }
+  if (recoveryEase) {
+    dataBits.push("어제 공백 후 복귀일(가벼운 루틴)");
   }
   let recommendationReason = base.recommendationReason;
   if (dataBits.length > 0) {

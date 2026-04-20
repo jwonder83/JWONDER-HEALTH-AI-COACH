@@ -16,6 +16,9 @@ export function loadUserMemoryFromBrowser(userId: string): UserMemoryProfile | n
     const p = JSON.parse(raw) as UserMemoryProfile;
     if (typeof p !== "object" || p === null) return null;
     if (typeof p.goal !== "string") return null;
+    if (!Array.isArray(p.personalization_bullets)) {
+      (p as UserMemoryProfile).personalization_bullets = [];
+    }
     return p;
   } catch {
     return null;

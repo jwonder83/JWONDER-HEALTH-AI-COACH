@@ -3,6 +3,7 @@
 import { SiteFillImage } from "@/components/site/SiteFillImage";
 import { mapCoachingLogRow } from "@/lib/coaching/map-db-row";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
+import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { createClient } from "@/lib/supabase/client";
 import { loadUserMemoryFromBrowser, saveUserMemoryToBrowser } from "@/lib/user-memory/browser-storage";
 import type { CoachingLogRow } from "@/types/coaching";
@@ -83,6 +84,7 @@ export function WebCoachingSection({
         onboarding = null;
       }
       const prevMemory = loadUserMemoryFromBrowser(userId);
+      const routine = buildOptimizedTodayRoutine(onboarding, workoutsSnapshot, new Date());
 
       const res = await fetch("/api/coaching", {
         method: "POST",
@@ -91,6 +93,7 @@ export function WebCoachingSection({
           workouts: workoutsSnapshot,
           onboarding,
           injury_history: prevMemory?.injury_history ?? [],
+          todayRoutine: { title: routine.title, description: routine.description },
         }),
       });
       const body = (await res.json()) as { coaching?: string; error?: string; userMemory?: UserMemoryProfile };

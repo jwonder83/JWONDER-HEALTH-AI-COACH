@@ -1,12 +1,11 @@
 "use client";
 
 import { buildHomeActionViewModel, type LocalWeeklyGoal } from "@/lib/dashboard/home-action-state";
+import { LS_GOALS } from "@/lib/dashboard/local-goals";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import type { SiteExperienceConfig } from "@/types/site-settings";
 import type { WorkoutRow } from "@/types/workout";
 import { useEffect, useMemo, useState } from "react";
-
-const LS_GOALS = "jws_goals_v1";
 
 function loadGoals(): LocalWeeklyGoal {
   if (typeof window === "undefined") return {};

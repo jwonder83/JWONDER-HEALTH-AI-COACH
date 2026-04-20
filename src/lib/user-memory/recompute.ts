@@ -3,6 +3,7 @@ import type { OnboardingProfile } from "@/lib/onboarding/types";
 import type { UserMemoryProfile } from "@/types/user-memory";
 import type { WorkoutRow } from "@/types/workout";
 import { volumeByBodyBucket } from "./bucket-volume";
+import { buildPersonalizationBullets } from "./personalization-bullets";
 
 function goalLabel(onboarding: OnboardingProfile | null | undefined, prev: UserMemoryProfile | null | undefined): string {
   const g = onboarding?.goal;
@@ -74,6 +75,8 @@ export type RecomputeUserMemoryInput = {
   previous?: UserMemoryProfile | null;
   /** API에서 클라이언트가 넘긴 부상 이력만 병합(문자열 배열) */
   injuryPatch?: unknown;
+  /** 있으면 선호 종목이 오늘 플랜에 담겼는지 등 문구를 맞춤 */
+  todayRoutine?: { title: string; description: string } | null;
 };
 
 /**
@@ -91,7 +94,7 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
 
   if (workouts.length === 0) {
     return {
-      schemaVersion: 1,
+      schemaVersion: 2,
       updatedAt: now.toISOString(),
       goal,
       experience_level,
@@ -100,6 +103,7 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
       injury_history: injuries,
       consistency_score: 0,
       fatigue_level: prev?.fatigue_level ?? 12,
+      personalization_bullets: [],
     };
   }
 
@@ -110,9 +114,15 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
 
   const preferred_exercises = topPreferredExercises(workouts, now, 30, 2, 8);
   const weak_points = computeWeakPoints(workouts, now);
+  const personalization_bullets = buildPersonalizationBullets(
+    workouts,
+    now,
+    { preferredExercises: preferred_exercises, weakPoints: weak_points },
+    input.todayRoutine ?? null,
+  );
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     updatedAt: now.toISOString(),
     goal,
     experience_level,
@@ -121,5 +131,6 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
     injury_history: injuries,
     consistency_score,
     fatigue_level,
+    personalization_bullets,
   };
 }

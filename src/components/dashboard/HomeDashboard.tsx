@@ -5,6 +5,9 @@ import { HomeActionHub } from "@/components/dashboard/home/HomeActionHub";
 import { useUserWorkoutUiState } from "@/components/dashboard/home/use-user-workout-ui-state";
 import { OnboardingBanner } from "@/components/dashboard/OnboardingBanner";
 import { DashboardGoalsCard } from "@/components/dashboard/DashboardGoalsCard";
+import { GrowthJourneyCard } from "@/components/dashboard/GrowthJourneyCard";
+import { RewardStatusCard, type LastXpFloat } from "@/components/gamification/RewardStatusCard";
+import { recordWorkoutXp } from "@/lib/gamification/reward-storage";
 import { navSegmentBar, navSegmentItem, navToolbarButton } from "@/components/nav/menu-styles";
 import { SiteFillImage } from "@/components/site/SiteFillImage";
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
@@ -18,6 +21,7 @@ import { isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { loadUserMemoryFromBrowser, saveUserMemoryToBrowser } from "@/lib/user-memory/browser-storage";
 import { recomputeUserMemoryProfile } from "@/lib/user-memory/recompute";
+import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import type { WorkoutInput, WorkoutRow } from "@/types/workout";
@@ -80,6 +84,7 @@ export function HomeDashboard({ userId, site }: Props) {
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [toast, setToast] = useState<{ message: string; variant: "default" | "achievement" } | null>(null);
+  const [lastXpFloat, setLastXpFloat] = useState<LastXpFloat | null>(null);
   const userWorkoutUiState = useUserWorkoutUiState(workouts, hydrated, site.experience.missedDayHourLocal);
 
   const navItems = useMemo(
@@ -144,10 +149,12 @@ export function HomeDashboard({ userId, site }: Props) {
       onboarding = null;
     }
     const prev = loadUserMemoryFromBrowser(userId);
+    const routine = buildOptimizedTodayRoutine(onboarding, workouts, new Date());
     const next = recomputeUserMemoryProfile(workouts, {
       onboarding,
       previous: prev,
       injuryPatch: prev?.injury_history,
+      todayRoutine: { title: routine.title, description: routine.description },
     });
     saveUserMemoryToBrowser(userId, next);
   }, [hydrated, workouts, userId]);
@@ -167,6 +174,17 @@ export function HomeDashboard({ userId, site }: Props) {
     if (error) {
       return { error: error.message };
     }
+    const grant = recordWorkoutXp(userId, input, pr);
+    setLastXpFloat({ gained: grant.gainedXp, leveledUp: grant.leveledUp });
+    window.setTimeout(() => setLastXpFloat(null), 2600);
+    setToast({
+      message: grant.leveledUp
+        ? `레벨 ${grant.levelAfter} 달성! +${grant.gainedXp} XP`
+        : pr
+          ? `PR! +${grant.gainedXp} XP`
+          : `+${grant.gainedXp} XP 획득`,
+      variant: grant.leveledUp || pr ? "achievement" : "default",
+    });
     await refresh();
     notifyWorkoutsMutated();
     return { pr };
@@ -272,6 +290,8 @@ export function HomeDashboard({ userId, site }: Props) {
           userWorkoutUiState={userWorkoutUiState}
           experience={site.experience}
         />
+
+        <RewardStatusCard userId={userId} workouts={workouts} hydrated={hydrated} lastXpFloat={lastXpFloat} />
 
         <OnboardingBanner />
 
@@ -417,6 +437,7 @@ export function HomeDashboard({ userId, site }: Props) {
           </button>
         </div>
 
+        <GrowthJourneyCard workouts={workouts} hydrated={hydrated} />
         <DashboardGoalsCard workouts={workouts} />
       </div>
 

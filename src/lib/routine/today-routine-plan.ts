@@ -8,7 +8,13 @@ export type RoutineInsightSource = "rules" | "gpt";
 
 
 
-export type RoutineAdjustmentType = "substitute_stale" | "add_weak_muscle" | "schedule_hint";
+export type RoutineAdjustmentType =
+  | "substitute_stale"
+  | "add_weak_muscle"
+  | "schedule_hint"
+  | "weekday_skip"
+  | "weekday_low_success"
+  | "recovery_return";
 
 
 
@@ -23,6 +29,14 @@ export type RoutineAdjustment = {
   /** 데이터·규칙에 기반한 근거(신뢰용, 짧게) */
 
   reason: string;
+
+  /** UI: 문제 한 줄 */
+
+  problemLine?: string;
+
+  /** UI: 개입·해결 한 줄(→ 뒤에 붙여 표시) */
+
+  solutionLine?: string;
 
 };
 

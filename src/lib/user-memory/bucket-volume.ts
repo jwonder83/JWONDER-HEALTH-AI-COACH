@@ -62,3 +62,24 @@ export function volumeByBodyBucket(workouts: WorkoutRow[], now: Date, windowDays
   }
   return map;
 }
+
+/** rangeStart~rangeEnd(포함) 구간의 부위군별 볼륨 — 주간 비교·개인화 멘트용 */
+export function volumeByBodyBucketBetween(
+  workouts: WorkoutRow[],
+  rangeStart: Date,
+  rangeEnd: Date,
+): Map<string, { label: string; volume: number }> {
+  const s = rangeStart.getTime();
+  const e = rangeEnd.getTime();
+  const map = new Map<string, { label: string; volume: number }>();
+  for (const w of workouts) {
+    const t = new Date(w.created_at).getTime();
+    if (t < s || t > e) continue;
+    const b = bucketForExercise(w.exercise_name);
+    if (!b) continue;
+    const cur = map.get(b.id) ?? { label: b.label, volume: 0 };
+    cur.volume += rowVolume(w);
+    map.set(b.id, cur);
+  }
+  return map;
+}

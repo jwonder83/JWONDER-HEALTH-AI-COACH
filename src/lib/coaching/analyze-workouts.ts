@@ -1,3 +1,4 @@
+import type { UserMemoryProfile } from "@/types/user-memory";
 import type { WorkoutRow } from "@/types/workout";
 
 function byDateAsc(a: WorkoutRow, b: WorkoutRow) {
@@ -9,13 +10,21 @@ function byDateDesc(a: WorkoutRow, b: WorkoutRow) {
 }
 
 /** 기록만으로 규칙 기반 한국어 코칭 문단 생성 */
-export function buildLocalCoachingText(rows: WorkoutRow[]): string {
+export function buildLocalCoachingText(rows: WorkoutRow[], memory?: UserMemoryProfile | null): string {
   const sorted = [...rows].sort(byDateDesc);
   const recent = sorted.slice(0, 20);
   const lines: string[] = [];
 
   lines.push("## 기록 기반 피드백");
   lines.push("");
+  if (memory?.personalization_bullets?.length) {
+    lines.push("### 사용자 메모리 기반 개인 멘트(우선 반영)");
+    lines.push("");
+    for (const b of memory.personalization_bullets.slice(0, 5)) {
+      lines.push(`- ${b}`);
+    }
+    lines.push("");
+  }
   lines.push(`최근 기준으로 ${recent.length}건을 살펴봤어요.`);
 
   const failCount = recent.filter((r) => !r.success).length;
