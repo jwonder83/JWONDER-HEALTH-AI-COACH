@@ -3,6 +3,7 @@
 import type {
   ImageSlot,
   SiteCopyConfig,
+  SiteExperienceConfig,
   SiteImagesConfig,
   SiteSettingsMerged,
   WorkoutFormCopyConfig,
@@ -213,6 +214,15 @@ export function AdminSiteEditor({ initialSettings }: Props) {
     setSettings((s) => ({ ...s, copy: { ...s.copy, ...patch } }));
   }, []);
 
+  const setExperience = useCallback((patch: Partial<SiteExperienceConfig>) => {
+    setSettings((s) => {
+      const cur = s.experience;
+      const navLabels = patch.navLabels ? { ...cur.navLabels, ...patch.navLabels } : cur.navLabels;
+      const { navLabels: _drop, ...rest } = patch;
+      return { ...s, experience: { ...cur, ...rest, navLabels } };
+    });
+  }, []);
+
   async function onSave() {
     setMsg(null);
     setSaving(true);
@@ -248,14 +258,14 @@ export function AdminSiteEditor({ initialSettings }: Props) {
           <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink">사이트 문구·이미지</h1>
           <p className="mt-2 text-[14px] leading-relaxed text-apple-subtle">
             이미지는 파일로 Supabase Storage에 올리거나 URL을 직접 입력할 수 있습니다. 로그인 화면 문구는 「로그인」 메뉴에서, 프로그램 안내는 「프로그램」에서
-            수정할 수 있습니다.
+            수정할 수 있습니다. 홈·운동 동작과 상단 메뉴 라벨은 아래 「앱 동작」에서 조정합니다.
           </p>
         </div>
         <Link
           href="/admin"
           className="shrink-0 rounded-full border border-neutral-200 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-black hover:text-apple-ink"
         >
-          관리자 개요
+          운영 개요
         </Link>
       </header>
 
@@ -305,6 +315,160 @@ export function AdminSiteEditor({ initialSettings }: Props) {
               onChange={(e) => setCopy({ appDescription: e.target.value })}
             />
           </label>
+        </section>
+
+        <section className="mb-10 space-y-4">
+          <h2 className="text-[15px] font-semibold text-apple-ink">앱 동작 · 상단 메뉴</h2>
+          <p className="text-[13px] leading-relaxed text-apple-subtle">
+            홈에서 오늘 미완으로 바뀌는 시각, 운동 세션 코치 휴식 권장 초, 일별 브리핑의 고부하 판정, 미운동 개입 배너 시간대, 헤더 주요 링크 라벨입니다.
+          </p>
+          <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:grid-cols-2">
+            <label className="block text-[12px] font-medium text-apple-subtle">
+              오늘 미완 전환 시각 (로컬 0–23시)
+              <input
+                type="number"
+                min={0}
+                max={23}
+                className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                value={settings.experience.missedDayHourLocal}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setExperience({
+                    missedDayHourLocal: Number.isFinite(n) ? Math.min(23, Math.max(0, Math.round(n))) : settings.experience.missedDayHourLocal,
+                  });
+                }}
+              />
+            </label>
+            <label className="block text-[12px] font-medium text-apple-subtle">
+              코치 권장 휴식(초, 15–600)
+              <input
+                type="number"
+                min={15}
+                max={600}
+                className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                value={settings.experience.workoutRestTargetSeconds}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setExperience({
+                    workoutRestTargetSeconds: Number.isFinite(n) ? Math.min(600, Math.max(15, Math.round(n))) : settings.experience.workoutRestTargetSeconds,
+                  });
+                }}
+              />
+            </label>
+            <label className="block text-[12px] font-medium text-apple-subtle">
+              브리핑 고부하: 최소 세트 수/일
+              <input
+                type="number"
+                min={1}
+                max={60}
+                className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                value={settings.experience.briefingHighLoadDayMinRows}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setExperience({
+                    briefingHighLoadDayMinRows: Number.isFinite(n) ? Math.min(60, Math.max(1, Math.round(n))) : settings.experience.briefingHighLoadDayMinRows,
+                  });
+                }}
+              />
+            </label>
+            <label className="block text-[12px] font-medium text-apple-subtle">
+              브리핑 고부하: 일 볼륨 합 하한
+              <input
+                type="number"
+                min={100}
+                max={50000}
+                className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                value={settings.experience.briefingHighLoadDayMinVolume}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setExperience({
+                    briefingHighLoadDayMinVolume: Number.isFinite(n)
+                      ? Math.min(50000, Math.max(100, Math.round(n)))
+                      : settings.experience.briefingHighLoadDayMinVolume,
+                  });
+                }}
+              />
+            </label>
+            <label className="block text-[12px] font-medium text-apple-subtle">
+              개입 배너: 오전 구간 끝(시)
+              <input
+                type="number"
+                min={0}
+                max={23}
+                className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                value={settings.experience.interventionMorningEndHour}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setExperience({
+                    interventionMorningEndHour: Number.isFinite(n) ? Math.min(23, Math.max(0, Math.round(n))) : settings.experience.interventionMorningEndHour,
+                  });
+                }}
+              />
+            </label>
+            <label className="block text-[12px] font-medium text-apple-subtle">
+              개입 배너: 오후 구간 끝(시)
+              <input
+                type="number"
+                min={0}
+                max={23}
+                className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                value={settings.experience.interventionAfternoonEndHour}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setExperience({
+                    interventionAfternoonEndHour: Number.isFinite(n)
+                      ? Math.min(23, Math.max(0, Math.round(n)))
+                      : settings.experience.interventionAfternoonEndHour,
+                  });
+                }}
+              />
+            </label>
+            <label className="block text-[12px] font-medium text-apple-subtle sm:col-span-2">
+              개입 배너: 저녁 구간 끝(시)
+              <input
+                type="number"
+                min={0}
+                max={23}
+                className="mt-1 w-full max-w-[12rem] rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                value={settings.experience.interventionEveningEndHour}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  setExperience({
+                    interventionEveningEndHour: Number.isFinite(n)
+                      ? Math.min(23, Math.max(0, Math.round(n)))
+                      : settings.experience.interventionEveningEndHour,
+                  });
+                }}
+              />
+            </label>
+            <p className="text-[11px] leading-relaxed text-apple-subtle sm:col-span-2">
+              시간대 경계는 저장 시 오전 ≤ 오후 ≤ 저녁 순으로 자동 정렬됩니다.
+            </p>
+          </div>
+          <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:grid-cols-2 lg:grid-cols-3">
+            {(
+              [
+                ["home", "홈 (/)"] as const,
+                ["workout", "기록 (/workout)"] as const,
+                ["performance", "성과 (/performance)"] as const,
+                ["help", "도움말 (/help)"] as const,
+                ["settings", "설정 (/settings)"] as const,
+              ] satisfies ReadonlyArray<[keyof SiteExperienceConfig["navLabels"], string]>
+            ).map(([key, label]) => (
+              <label key={key} className="block text-[12px] font-medium text-apple-subtle">
+                {label}
+                <input
+                  className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                  value={settings.experience.navLabels[key]}
+                  onChange={(e) =>
+                    setExperience({
+                      navLabels: { ...settings.experience.navLabels, [key]: e.target.value },
+                    })
+                  }
+                />
+              </label>
+            ))}
+          </div>
         </section>
 
         <section className="mb-10 space-y-4">

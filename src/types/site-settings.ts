@@ -178,6 +178,30 @@ export type ProgramSectionTitles = {
 export type ProgramTocItem = { id: string; label: string };
 
 /** /program — 어드민에서 편집(내장 가이드 + 마크다운 전후) */
+/** 홈 상태·브리핑·운동 세션·헤더 메뉴 등 앱 동작 튜닝 — 어드민 「사이트」에서 편집 */
+export type SiteExperienceConfig = {
+  /** 로컬 시각 이 시각 이후면 홈에서 `missed` UI (0–23) */
+  missedDayHourLocal: number;
+  /** 운동 세션 코치 권장 휴식(초) */
+  workoutRestTargetSeconds: number;
+  /** 일별 브리핑·연속 고부하: 이 세트 수 이상이면 고부하 후보 */
+  briefingHighLoadDayMinRows: number;
+  /** 일별 브리핑·연속 고부하: 일 볼륨 합(kg×회×세트) 기준 */
+  briefingHighLoadDayMinVolume: number;
+  /** 개입 배너: 오전 구간이 끝나는 시각(시) */
+  interventionMorningEndHour: number;
+  interventionAfternoonEndHour: number;
+  interventionEveningEndHour: number;
+  /** 상단 앱 셸 주요 메뉴 라벨 */
+  navLabels: {
+    home: string;
+    workout: string;
+    performance: string;
+    help: string;
+    settings: string;
+  };
+};
+
 export type ProgramGuideSettings = {
   /** 헤더 주요 메뉴에 표시되는 짧은 레이블 */
   navLabel: string;
@@ -207,4 +231,5 @@ export type SiteSettingsMerged = {
   images: SiteImagesConfig;
   copy: SiteCopyConfig;
   program: ProgramGuideSettings;
+  experience: SiteExperienceConfig;
 };

@@ -191,8 +191,8 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
   if (!input.hydrated) {
     return {
       situation: "pre_workout",
-      body: "기록 불러오는 중이에요. 잠시만 기다려 주세요.",
-      reason: "운동 목록을 아직 불러오는 중이에요.",
+      body: "기록을 불러오는 동안 잠시 대기하세요.",
+      reason: "운동 목록을 아직 동기화하는 중입니다.",
       source: "rules",
     };
   }
@@ -206,8 +206,8 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
     case "first_record":
       base = {
         situation: "first_record",
-        body: "아직 기록이 없네요. 첫 세트만 남겨도 패턴 잡기 시작할게요.",
-        reason: "저장된 운동이 아직 없어요.",
+        body: "지금 첫 세트를 남기세요.",
+        reason: "저장된 운동 기록이 아직 없습니다.",
         cta: { label: "첫 세트 남기기", href: "/workout" },
         source: "rules",
       };
@@ -217,12 +217,12 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
         situation: "streak_motivation",
         body:
           sinceLast !== null && sinceLast >= 2
-            ? `${sinceLast}일째 쉬었네요. 오늘 세트 하나만 남기면 스트릭 다시 이어져요.`
-            : "스트릭이 잠깐 끊겼어요. 오늘 한 세트만 적어도 바로 다시 가요.",
+            ? `오늘 한 세트를 기록하세요. ${sinceLast}일째 휴식입니다.`
+            : "오늘 한 세트만 기록하세요. 연속 기록을 다시 켭니다.",
         reason:
           sinceLast !== null
-            ? `스트릭 0 · 마지막 기록 ${sinceLast}일 전`
-            : "지금은 스트릭이 0이에요.",
+            ? `연속 0일이며 마지막 기록은 ${sinceLast}일 전입니다.`
+            : "마지막 기록 이후 연속이 0입니다.",
         cta: { label: "세트 남기기", href: "/workout" },
         source: "rules",
       };
@@ -234,12 +234,12 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
         situation: "post_workout",
         body:
           n > 0
-            ? `오늘 ${n}세트 찍었네요. 볼륨 합은 약 ${vol}—물 많이 마시고 가볍게 스트레칭해요.`
-            : "오늘 세트 기록이 있어요. 짧게 몸만 풀어 주면 회복에 좋아요.",
+            ? `오늘 ${n}세트, 볼륨 합 약 ${vol}까지 썼습니다. 스트레칭하고 수분을 보충하세요.`
+            : "오늘 기록이 있습니다. 짧게 몸만 풀고 마무리하세요.",
         reason:
           n > 0
-            ? `오늘 날짜 세트 ${n}개, 볼륨 합(kg×회×세트) 약 ${vol}로 집계됐어요.`
-            : "오늘 날짜로 저장된 세트가 하나 이상 있어요.",
+            ? `오늘 날짜 세트 ${n}개, 볼륨 합(kg×회×세트) 약 ${vol}로 집계됐습니다.`
+            : "오늘 날짜로 저장된 세트가 있습니다.",
         cta: { label: "성과 화면 가기", href: "/performance" },
         source: "rules",
       };
@@ -256,12 +256,12 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
       let volBit = "";
       if (lastWeek.volume > 40) {
         const p = Math.round(((thisWeek.volume - lastWeek.volume) / lastWeek.volume) * 1000) / 10;
-        volBit = ` 지난주보다 볼륨이 약 ${p}%예요.`;
+        volBit = ` · 전주 대비 볼륨 합 ${p > 0 ? "+" : ""}${p}%`;
       }
       base = {
         situation: "pre_workout",
-        body: "오늘 루틴, 지금 워밍업 들어가도 좋은 타이밍이에요.",
-        reason: `이번 주 ${thisWeek.rowCount}세트 · 최근 7일 ${last7}세트 · 스트릭 ${snap.streakDays}일.${volBit}`.trim(),
+        body: "지금 워밍업에 들어가세요.",
+        reason: `이번 주 ${thisWeek.rowCount}세트 · 최근 7일 ${last7}세트 · 연속 ${snap.streakDays}일${volBit}`.trim(),
         cta: { label: "운동하러 가기", href: "/workout" },
         source: "rules",
       };

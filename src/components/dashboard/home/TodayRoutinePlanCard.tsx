@@ -7,45 +7,49 @@ import { formatEstimatedLabel } from "@/lib/routine/today-routine-plan";
 import type { RoutineFlowStatus } from "@/lib/routine/today-routine-confirmation";
 
 type Props = {
-  model: Pick<HomeActionViewModel, "routine" | "todayWorkoutComplete" | "estimatedDurationLabel">;
+  model: Pick<HomeActionViewModel, "routine" | "todayWorkoutComplete" | "estimatedDurationLabel" | "streakDays">;
   status: RoutineFlowStatus;
   onConfirm: () => void;
+  onRequestPlanChange?: () => void;
 };
 
 function StatusBadge({ status }: { status: RoutineFlowStatus }) {
   if (status === "suggested") {
     return (
-      <span className="inline-flex items-center rounded-full border border-neutral-300 bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-apple-subtle dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-        AI 픽
+      <span className="inline-flex items-center rounded-full border border-violet-400/50 bg-violet-500/15 px-2.5 py-0.5 text-[11px] font-semibold tracking-[-0.02em] text-violet-900 dark:border-violet-500/40 dark:bg-violet-950/50 dark:text-violet-100">
+        오늘 결정
       </span>
     );
   }
   if (status === "confirmed") {
     return (
-      <span className="inline-flex items-center rounded-full border border-emerald-500/50 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-800 dark:border-emerald-500/40 dark:bg-emerald-950/40 dark:text-emerald-200">
-        오늘 이대로 감
+      <span className="inline-flex items-center rounded-full border border-emerald-500/60 bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-semibold tracking-[-0.02em] text-emerald-900 dark:border-emerald-400/50 dark:bg-emerald-950/50 dark:text-emerald-100">
+        확정됨
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-600/40 bg-emerald-600/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-800 dark:border-emerald-400/50 dark:bg-emerald-950/50 dark:text-emerald-200">
-      <span className="inline-flex size-3.5 items-center justify-center rounded-full bg-emerald-600 text-[9px] text-white dark:bg-emerald-500">✓</span>
+    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-600/50 bg-emerald-600/15 px-2.5 py-0.5 text-[11px] font-semibold tracking-[-0.02em] text-emerald-900 dark:border-emerald-400/50 dark:bg-emerald-950/50 dark:text-emerald-100">
+      <span className="inline-flex size-3.5 items-center justify-center rounded-full bg-emerald-600 text-[9px] text-white dark:bg-emerald-500" aria-hidden>
+        ✓
+      </span>
       완료
     </span>
   );
 }
 
-/** 오늘 수행 동작 리스트 · 확정 · 완료 상태 UI */
-export function TodayRoutinePlanCard({ model, status, onConfirm }: Props) {
+/** 오늘 수행 플랜 — suggested → 확정 → 완료 (결정 중심 UX) */
+export function TodayRoutinePlanCard({ model, status, onConfirm, onRequestPlanChange }: Props) {
   const exercises = useMemo(() => buildExerciseListFromPlan(model.routine), [model.routine]);
   const sumMin = sumExerciseMinutes(exercises);
   const planLabel = formatEstimatedLabel(model.routine.estimatedMinutesMin, model.routine.estimatedMinutesMax);
+  const done = model.todayWorkoutComplete;
 
   const shell =
     status === "completed"
       ? "rounded-2xl border-2 border-emerald-500/60 bg-gradient-to-b from-emerald-50/90 to-white shadow-[0_12px_40px_-12px_rgba(16,185,129,0.35)] motion-safe:animate-[routine-done-pop_0.65s_ease-out_1] dark:border-emerald-500/40 dark:from-emerald-950/30 dark:to-zinc-950"
       : status === "confirmed"
-        ? "rounded-2xl border-2 border-emerald-500/45 bg-white shadow-md ring-2 ring-emerald-500/15 dark:border-emerald-500/35 dark:bg-zinc-950 dark:ring-emerald-500/20"
+        ? "rounded-2xl border-2 border-emerald-500/50 bg-white shadow-md ring-2 ring-emerald-500/20 dark:border-emerald-500/40 dark:bg-zinc-950 dark:ring-emerald-500/25"
         : "rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950";
 
   return (
@@ -79,47 +83,77 @@ export function TodayRoutinePlanCard({ model, status, onConfirm }: Props) {
             opacity: 1;
           }
         }
+        @keyframes streak-pulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.85;
+          }
+        }
       `}</style>
 
       <div className="flex flex-col gap-3 border-b border-neutral-200/90 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5 sm:py-5 dark:border-zinc-800">
-        <div>
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p id="today-routine-plan-heading" className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500">
-              오늘 루틴 플랜
+            <p id="today-routine-plan-heading" className="text-[11px] font-semibold tracking-[-0.02em] text-apple-subtle dark:text-zinc-500">
+              오늘 운동 플랜
             </p>
             <StatusBadge status={status} />
           </div>
-          <h3 className="font-display mt-1.5 text-lg font-bold tracking-[-0.02em] text-apple-ink sm:text-xl dark:text-zinc-100">{model.routine.title}</h3>
-          <p className="mt-1 text-[12px] text-apple-subtle dark:text-zinc-400">예상 전체 {model.estimatedDurationLabel} · 동작별 합계 약 {sumMin}분</p>
+
+          {status === "confirmed" && !done ? (
+            <p className="mt-2 inline-flex flex-wrap items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-[13px] font-semibold tracking-[-0.02em] text-emerald-950 dark:border-emerald-500/35 dark:bg-emerald-950/40 dark:text-emerald-50">
+              오늘 운동 (확정됨)
+              <span className="text-[12px] font-medium text-emerald-800/90 dark:text-emerald-200/90">— 이대로 가면 돼요</span>
+            </p>
+          ) : null}
+
+          <h3 className="font-display mt-2 text-lg font-bold tracking-[-0.02em] text-apple-ink sm:text-xl dark:text-zinc-100">{model.routine.title}</h3>
+          <p className="mt-1 text-[12px] text-apple-subtle dark:text-zinc-400">
+            예상 전체 {model.estimatedDurationLabel} · 동작별 합계 약 {sumMin}분
+          </p>
           <p className="mt-2 flex flex-wrap items-start gap-2">
-            <span className="shrink-0 rounded border border-neutral-200 bg-neutral-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-apple-subtle dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-              왜 이 루틴?
+            <span className="shrink-0 rounded-md border border-neutral-200 bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold tracking-[-0.01em] text-apple-subtle dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+              결정 근거
             </span>
             <span className="min-w-0 text-[12px] leading-relaxed text-apple-ink/90 dark:text-zinc-300">{model.routine.recommendationReason}</span>
           </p>
         </div>
-        {status === "suggested" && !model.todayWorkoutComplete ? (
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="shrink-0 rounded-xl border border-black bg-black px-4 py-3 text-[12px] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-white hover:text-black active:scale-[0.99] dark:border-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 sm:min-w-[11rem]"
-          >
-            오늘은 이걸로 확정
-          </button>
-        ) : null}
+        <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+          {status === "suggested" && !done ? (
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="rounded-xl border border-black bg-black px-4 py-3 text-[13px] font-bold tracking-[-0.02em] text-white transition hover:bg-neutral-800 active:scale-[0.99] dark:border-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 sm:min-w-[13rem]"
+            >
+              오늘 플랜 확정하기
+            </button>
+          ) : null}
+          {status === "confirmed" && !done && onRequestPlanChange ? (
+            <button
+              type="button"
+              onClick={onRequestPlanChange}
+              className="text-center text-[12px] font-medium text-apple-subtle underline decoration-neutral-400 underline-offset-4 transition hover:text-apple-ink dark:text-zinc-500 dark:hover:text-zinc-200"
+            >
+              플랜 바꾸기
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="overflow-x-auto px-2 pb-4 pt-2 sm:px-3 sm:pb-5">
         <table className="w-full min-w-[320px] border-collapse text-left text-[13px]">
           <thead>
-            <tr className="border-b border-neutral-200 text-[10px] font-bold uppercase tracking-[0.14em] text-apple-subtle dark:border-zinc-800 dark:text-zinc-500">
+            <tr className="border-b border-neutral-200 text-[10px] font-semibold tracking-[-0.01em] text-apple-subtle dark:border-zinc-800 dark:text-zinc-500">
               <th className="py-2.5 pl-2 pr-2 sm:pl-3">운동</th>
               <th className="w-14 py-2.5 text-center sm:w-16">세트</th>
               <th className="w-20 py-2.5 text-center sm:w-24">횟수</th>
               <th className="w-20 py-2.5 pr-2 text-right sm:w-24 sm:pr-3">예상</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={status === "confirmed" && !done ? "opacity-95" : ""}>
             {exercises.map((row, i) => (
               <tr
                 key={row.id}
@@ -147,13 +181,24 @@ export function TodayRoutinePlanCard({ model, status, onConfirm }: Props) {
             ))}
           </tbody>
         </table>
+        {status === "confirmed" && !done ? (
+          <p className="mt-2 px-2 text-[11px] text-apple-subtle sm:px-3 dark:text-zinc-500">확정된 플랜은 기본적으로 고정이에요. 바꾸려면 위의 「플랜 바꾸기」를 눌러 주세요.</p>
+        ) : null}
       </div>
 
       <p className="border-t border-neutral-200/80 px-4 py-3 text-[11px] leading-relaxed text-apple-subtle sm:px-5 dark:border-zinc-800 dark:text-zinc-500">
-        {status === "suggested" &&
-          "확정해 두면 오늘 뭐 할지 미리 정리돼요. 헬스장이든 홈트든 들어가서 하기만 하면 돼요."}
-        {status === "confirmed" && !model.todayWorkoutComplete && "오늘 루틴은 확정됐어요. 아래 버튼으로 바로 이동해 보세요."}
-        {status === "completed" && "오늘 루틴 완료! 수고했어요."}
+        {status === "suggested" && "AI가 오늘 할 일을 정해 뒀어요. 확정하면 ‘추천’이 아니라 ‘오늘의 결정’으로 고정돼요."}
+        {status === "confirmed" && !done && "확정됐어요. 아래에서 운동을 시작하면 돼요."}
+        {status === "completed" && (
+          <>
+            오늘 플랜 완료! 수고했어요.
+            {model.streakDays > 0 ? (
+              <span className="mt-1.5 block font-semibold text-emerald-800 dark:text-emerald-300 motion-safe:animate-[streak-pulse_1.2s_ease-in-out_2]">
+                스트릭 {model.streakDays}일째 — 오늘도 이어졌어요.
+              </span>
+            ) : null}
+          </>
+        )}
         <span className="mt-1 block text-[10px] opacity-80">참고: 동작별 시간은 {planLabel} 기준으로 자동 배분한 값이에요.</span>
       </p>
     </section>

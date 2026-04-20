@@ -197,7 +197,7 @@ export function AdminProgramEditor({ initialSettings }: Props) {
           href="/admin"
           className="shrink-0 rounded-full border border-neutral-200 bg-white px-4 py-2 text-[13px] font-semibold text-apple-subtle shadow-sm transition hover:border-black hover:text-apple-ink"
         >
-          관리자 개요
+          운영 개요
         </Link>
       </header>
 

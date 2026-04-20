@@ -85,8 +85,8 @@ export function PerformanceClient({ initialRows }: Props) {
       <SectionTitleBlock
         step="02"
         eyebrow="리포트"
-        title="운동 리포트"
-        description="지난주와 비교한 요약, 차트, 필터, CSV까지 한곳에서."
+        title="운동 성과 리포트"
+        description="기간별 요약, 차트, 필터, CSV 내려받기를 한 화면에서 제공합니다."
         right={
           <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px] dark:border-zinc-700 dark:bg-zinc-900">
             {stats.count}건
@@ -125,7 +125,7 @@ export function PerformanceClient({ initialRows }: Props) {
             />
           </label>
           <label htmlFor={idTo} className="block text-[12px] font-semibold text-apple-subtle">
-            끝 날짜
+            종료 날짜
             <input
               id={idTo}
               name="to"
@@ -167,21 +167,21 @@ export function PerformanceClient({ initialRows }: Props) {
           disabled={filtered.length === 0}
           className="mt-6 w-full rounded-lg border border-black bg-black py-3 text-[13px] font-semibold tracking-[-0.02em] text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          CSV 받기 ({filtered.length}건)
+          CSV 내려받기 ({filtered.length}건)
         </button>
       </div>
 
       <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-neutral-200/90 bg-white shadow-sm">
-        <div className="border-b border-neutral-200 bg-black px-4 py-2.5 text-[12px] font-medium tracking-[-0.01em] text-white">미리보기</div>
+        <div className="border-b border-neutral-200 bg-black px-4 py-2.5 text-[12px] font-medium tracking-[-0.01em] text-white">목록 미리보기</div>
         <ul className="max-h-[min(480px,50vh)] divide-y divide-neutral-200 overflow-y-auto">
           {filtered.length === 0 ? (
-            <li className="px-4 py-8 text-center text-[14px] text-apple-subtle">필터 맞는 게 없어요.</li>
+            <li className="px-4 py-8 text-center text-[14px] text-apple-subtle">조건에 맞는 기록이 없습니다.</li>
           ) : (
             filtered.map((w) => (
               <li key={w.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-[14px]">
                 <span className="font-semibold text-apple-ink">{w.exercise_name}</span>
                 <span className="tabular-nums text-apple-subtle">
-                  {Number(w.weight_kg)}kg · {w.reps}×{w.sets} · {w.success ? "성공" : "노답"}
+                  {Number(w.weight_kg)}kg · {w.reps}×{w.sets} · {w.success ? "달성" : "미달"}
                 </span>
                 <time className="w-full text-[12px] text-apple-subtle sm:w-auto">{formatDate(w.created_at)}</time>
               </li>

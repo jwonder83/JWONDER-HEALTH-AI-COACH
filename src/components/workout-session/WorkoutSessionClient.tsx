@@ -6,6 +6,7 @@ import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/type
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
+import { writeWorkoutSessionActive } from "@/lib/workout-session/session-bridge";
 import { loadCoachModeEnabled, persistCoachModeEnabled } from "@/lib/workout-session/coach-mode-storage";
 import type { TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
 import type { WorkoutRow } from "@/types/workout";
@@ -54,7 +55,40 @@ function formatElapsed(ms: number): string {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
-type Props = { userId: string };
+function SessionFlowStepper({ phase }: { phase: Phase }) {
+  const step = phase === "idle" ? 1 : phase === "active" ? 2 : 3;
+  const items: { n: number; label: string }[] = [
+    { n: 1, label: "시작" },
+    { n: 2, label: "진행" },
+    { n: 3, label: "완료" },
+  ];
+  return (
+    <ol
+      className="mt-4 flex list-none items-center justify-center gap-0 text-[10px] font-bold uppercase tracking-[0.12em] text-apple-subtle sm:gap-1 dark:text-zinc-500"
+      aria-label="운동 세션 단계"
+    >
+      {items.map((it, idx) => (
+        <li key={it.n} className="flex items-center">
+          <span
+            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 sm:px-3 ${
+              step === it.n
+                ? "border-emerald-600/50 bg-emerald-50 text-emerald-900 dark:border-emerald-500/45 dark:bg-emerald-950/50 dark:text-emerald-100"
+                : "border-transparent bg-transparent text-apple-subtle opacity-80 dark:text-zinc-500"
+            }`}
+          >
+            <span className="tabular-nums text-[11px] opacity-70">{it.n}</span>
+            {it.label}
+          </span>
+          {idx < items.length - 1 ? (
+            <span className="mx-1 hidden h-px w-6 bg-neutral-300 sm:block dark:bg-zinc-600" aria-hidden />
+          ) : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+type Props = { userId: string; restTargetSeconds?: number };
 
 const fieldBase =
   "w-full rounded-xl border border-neutral-200 bg-white px-4 py-3.5 text-apple-ink shadow-sm outline-none transition focus:border-black focus:ring-2 focus:ring-black/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400 dark:focus:ring-zinc-500/30";
@@ -70,7 +104,13 @@ const btnPrimary = `${btnPrimaryBase} w-full`;
 const cardMuted =
   "rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900/80";
 
-export function WorkoutSessionClient({ userId }: Props) {
+export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
+  const restTargetSec = useMemo(
+    () => Math.min(600, Math.max(15, Math.round(restTargetSeconds ?? 60))),
+    [restTargetSeconds],
+  );
+  const restTargetMs = restTargetSec * 1000;
+
   const [phase, setPhase] = useState<Phase>("idle");
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
   const [profile, setProfile] = useState<OnboardingProfile | null>(null);
@@ -94,6 +134,24 @@ export function WorkoutSessionClient({ userId }: Props) {
   const [coachCue, setCoachCue] = useState<string | null>(null);
   const coachModeRef = useRef(coachMode);
   coachModeRef.current = coachMode;
+  const coachCueTimerRef = useRef<number | null>(null);
+
+  function showCoachCue(msg: string, ms: number) {
+    if (coachCueTimerRef.current !== null) {
+      window.clearTimeout(coachCueTimerRef.current);
+    }
+    setCoachCue(msg);
+    coachCueTimerRef.current = window.setTimeout(() => {
+      setCoachCue(null);
+      coachCueTimerRef.current = null;
+    }, ms);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (coachCueTimerRef.current !== null) window.clearTimeout(coachCueTimerRef.current);
+    };
+  }, []);
 
   const refresh = useCallback(async () => {
     const supabase = createClient();
@@ -116,6 +174,10 @@ export function WorkoutSessionClient({ userId }: Props) {
     setCoachMode(loadCoachModeEnabled());
     void refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    writeWorkoutSessionActive(phase === "active");
+  }, [phase]);
 
   function setCoachModePersist(next: boolean) {
     setCoachMode(next);
@@ -155,6 +217,11 @@ export function WorkoutSessionClient({ userId }: Props) {
   const prevSame = useMemo(() => getLastSameExercise(workouts, exercise), [workouts, exercise]);
 
   function startSession() {
+    if (coachCueTimerRef.current !== null) {
+      window.clearTimeout(coachCueTimerRef.current);
+      coachCueTimerRef.current = null;
+    }
+    setCoachCue(null);
     const guess = guessExerciseFromRoutineTitle(routine.title);
     setExercise((e) => (e.trim() ? e : guess));
     const t = Date.now();
@@ -163,15 +230,13 @@ export function WorkoutSessionClient({ userId }: Props) {
     setSessionSets([]);
     setCoachBetween("lifting");
     setRestStartedAt(null);
-    setCoachCue(null);
     setPhase("active");
   }
 
   function resumeAfterRest() {
     setCoachBetween("lifting");
     setRestStartedAt(null);
-    setCoachCue("자, 다음 세트 가보자고");
-    window.setTimeout(() => setCoachCue(null), 7000);
+    showCoachCue("다음 세트 진행하세요.", 7000);
   }
 
   async function saveSet() {
@@ -214,18 +279,23 @@ export function WorkoutSessionClient({ userId }: Props) {
       setToast("저장 완료");
     }
     if (coachModeRef.current) {
+      showCoachCue(`휴식 ${restTargetSec}초. 준비되면 다음 세트 진행하세요.`, 5000);
       setCoachBetween("rest");
       setRestStartedAt(Date.now());
     }
   }
 
   function finishSession() {
+    if (coachCueTimerRef.current !== null) {
+      window.clearTimeout(coachCueTimerRef.current);
+      coachCueTimerRef.current = null;
+    }
+    setCoachCue(null);
     if (startedAt !== null) {
       setFrozenDurationMs(Date.now() - startedAt);
     }
     setCoachBetween("lifting");
     setRestStartedAt(null);
-    setCoachCue(null);
     setPhase("done");
   }
 
@@ -248,13 +318,20 @@ export function WorkoutSessionClient({ userId }: Props) {
   const inRestPhase = coachMode && phase === "active" && coachBetween === "rest" && restStartedAt !== null;
   const restElapsedMs = inRestPhase ? nowTs - restStartedAt : 0;
   const restElapsedLabel = formatElapsed(restElapsedMs);
-  const longRestNudge = inRestPhase && restElapsedMs >= 90_000;
+  const longRestNudge = inRestPhase && restElapsedMs >= Math.max(90_000, restTargetMs + 30_000);
+  const restReadyForNext = inRestPhase && restElapsedMs >= restTargetMs;
+  const restRemainingMs = inRestPhase ? Math.max(0, restTargetMs - restElapsedMs) : 0;
+  const restRemainingLabel = formatElapsed(restRemainingMs);
   const restBlocksSave = inRestPhase;
 
   return (
     <div className="mx-auto w-full max-w-lg px-4 pb-16 pt-6 text-apple-ink sm:px-6 sm:pt-8 md:max-w-3xl md:pb-20 lg:max-w-6xl lg:px-10 lg:pt-10 dark:text-zinc-100">
       <header className="mb-6 shrink-0 border-b border-neutral-200 pb-4 dark:border-zinc-800 sm:mb-8 lg:mb-10">
-        <div className="flex items-center justify-between gap-3">
+        <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">
+          시작 → 진행 → 완료 한 흐름
+        </p>
+        <SessionFlowStepper phase={phase} />
+        <div className="mt-4 flex items-center justify-between gap-3">
           <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500">코치 모드</span>
           <button
             type="button"
@@ -289,7 +366,7 @@ export function WorkoutSessionClient({ userId }: Props) {
           role="status"
           aria-live="polite"
         >
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">코치</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">AI 코치</p>
           <p className="mt-1 font-display text-[1.2rem] font-bold text-emerald-950 dark:text-emerald-100">{coachCue}</p>
         </div>
       ) : null}
@@ -319,7 +396,7 @@ export function WorkoutSessionClient({ userId }: Props) {
             <div className="md:grid md:grid-cols-[1fr_min(26rem,100%)] md:items-center md:gap-x-12 lg:gap-x-16 xl:grid-cols-[1fr_min(28rem,100%)]">
               <div className="md:text-left">
                 <p className="text-center text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-700 md:text-left dark:text-emerald-400/90">
-                  오늘 한 판
+                  1 · 운동 시작
                 </p>
                 <h1 className="font-display mt-3 text-center text-[1.75rem] font-bold leading-tight tracking-[-0.03em] text-apple-ink sm:text-[2rem] md:text-left lg:text-[2.25rem] dark:text-zinc-100">
                   {routine.title}
@@ -334,10 +411,10 @@ export function WorkoutSessionClient({ userId }: Props) {
                   onClick={startSession}
                   className={`${btnPrimary} rounded-2xl text-[17px] active:scale-[0.99] lg:min-h-[60px] lg:text-[18px]`}
                 >
-                  가보자고
+                  운동 시작하기
                 </button>
                 <p className="mt-4 text-center text-[12px] text-apple-subtle md:text-left dark:text-zinc-500">
-                  세트마다 저장되고 홈이랑 싹 맞춰져요.
+                  세트 입력 → 코치 휴식 → 저장까지 한 화면에서 이어집니다.
                 </p>
                 <p className="mt-2 text-center text-[11px] font-medium leading-relaxed text-apple-subtle md:text-left dark:text-zinc-500">
                   {coachMode
@@ -351,23 +428,32 @@ export function WorkoutSessionClient({ userId }: Props) {
 
         {phase === "active" ? (
           <div className="mx-auto w-full pb-8 lg:pb-12">
+            <p className="mb-4 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500 lg:text-left">
+              2 · 운동 진행
+            </p>
             {inRestPhase ? (
               <div
                 className="mb-6 rounded-2xl border-2 border-sky-500/50 bg-gradient-to-br from-sky-50 via-indigo-50/80 to-violet-50 p-5 shadow-lg ring-2 ring-sky-400/20 dark:border-sky-700/50 dark:from-sky-950/40 dark:via-indigo-950/30 dark:to-violet-950/30 dark:ring-sky-500/15"
                 role="region"
-                aria-label="세트 간 휴식"
+                aria-label="AI 코치 · 세트 간 휴식"
               >
-                <p className="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sky-800 dark:text-sky-300/90">실시간 코치</p>
+                <p className="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sky-800 dark:text-sky-300/90">AI 코치</p>
                 <p className="mt-2 text-center font-display text-[1.35rem] font-bold text-sky-950 dark:text-sky-50" aria-live="polite">
-                  휴식 시간입니다
+                  휴식 {restTargetSec}초
                 </p>
-                <p className="mt-1 text-center text-[13px] font-medium text-sky-900/85 dark:text-sky-100/85">세트 사이 쉬는 타임 — 타이머로 얼마나 쉬었는지 보면 돼요.</p>
+                <p className="mt-1 text-center text-[13px] font-medium text-sky-900/85 dark:text-sky-100/85">
+                  경과 {restElapsedLabel}
+                  {!restReadyForNext ? ` · 권장까지 ${restRemainingLabel}` : null}
+                </p>
                 <p className="mt-4 text-center font-display text-4xl font-bold tabular-nums tracking-tight text-indigo-900 dark:text-indigo-100 sm:text-5xl">
                   {restElapsedLabel}
                 </p>
+                {restReadyForNext && !longRestNudge ? (
+                  <p className="mt-3 text-center text-[13px] font-bold text-indigo-900 dark:text-indigo-100">다음 세트 진행하세요.</p>
+                ) : null}
                 {longRestNudge ? (
                   <p className="mt-3 text-center text-[12px] font-semibold text-indigo-800 dark:text-indigo-200/90">
-                    1분 30초 넘게 쉬었어요. 몸 풀렸으면 다음 세트로 넘어가도 돼요.
+                    1분 30초 넘게 쉬었어요. 다음 세트 진행하세요.
                   </p>
                 ) : null}
                 <button
@@ -375,7 +461,7 @@ export function WorkoutSessionClient({ userId }: Props) {
                   onClick={resumeAfterRest}
                   className="mt-5 w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 text-[16px] font-bold text-white shadow-md transition hover:opacity-95 active:scale-[0.99]"
                 >
-                  다음 세트 갈게
+                  다음 세트 진행하기
                 </button>
               </div>
             ) : null}
@@ -395,10 +481,13 @@ export function WorkoutSessionClient({ userId }: Props) {
 
                 {prevSame ? (
                   <div className="rounded-xl border border-amber-200/90 bg-amber-50 px-4 py-3 dark:border-amber-700/50 dark:bg-amber-950/30">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-800 dark:text-amber-200/90">이전 기록</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-800 dark:text-amber-200/90">이전 기록 (같은 종목)</p>
                     <p className="mt-1 text-[16px] font-semibold text-apple-ink dark:text-zinc-100">
                       {Number(prevSame.weight_kg)}kg × {prevSame.reps} × {prevSame.sets}
                       <span className="ml-2 text-[13px] font-medium text-amber-900/90 dark:text-amber-100/80">볼륨 {rowVolume(prevSame)}</span>
+                    </p>
+                    <p className="mt-1.5 text-[12px] text-amber-900/80 dark:text-amber-200/75">
+                      {new Date(prevSame.created_at).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </p>
                   </div>
                 ) : hydrated && exercise.trim() ? (
@@ -409,13 +498,31 @@ export function WorkoutSessionClient({ userId }: Props) {
 
                 <div>
                   <label className="text-[11px] font-bold uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">중량 (kg)</label>
-                  <div className="mt-2 flex flex-wrap gap-2 lg:gap-3">
-                    {[-5, -2.5, 2.5, 5].map((d) => (
+                  <p className="mt-1 text-[11px] font-semibold text-apple-subtle dark:text-zinc-500">간편 입력</p>
+                  <div className="mt-2 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setWeight((w) => Math.max(0, Math.round((w - 5) * 2) / 2))}
+                      className={`${btnGhost} min-h-[56px] min-w-0 flex-1 text-lg font-bold tabular-nums text-emerald-800 dark:text-emerald-400`}
+                    >
+                      −5
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setWeight((w) => Math.max(0, Math.round((w + 5) * 2) / 2))}
+                      className={`${btnGhost} min-h-[56px] min-w-0 flex-1 text-lg font-bold tabular-nums text-emerald-800 dark:text-emerald-400`}
+                    >
+                      +5
+                    </button>
+                  </div>
+                  <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-apple-subtle dark:text-zinc-500">미세 조정 (kg)</p>
+                  <div className="mt-1.5 flex flex-wrap gap-2 lg:gap-3">
+                    {[-2.5, 2.5].map((d) => (
                       <button
                         key={d}
                         type="button"
                         onClick={() => setWeight((w) => Math.max(0, Math.round((w + d) * 2) / 2))}
-                        className={`${btnGhost} min-w-[4.5rem] flex-1 tabular-nums text-emerald-800 dark:text-emerald-400 sm:min-w-[5.5rem] lg:min-h-[52px] lg:flex-none lg:px-6`}
+                        className={`${btnGhost} min-w-[4.5rem] flex-1 tabular-nums text-emerald-800 dark:text-emerald-400 sm:min-w-[5.5rem] lg:min-h-[48px] lg:flex-none lg:px-5`}
                       >
                         {d > 0 ? `+${d}` : d}
                       </button>
@@ -513,18 +620,22 @@ export function WorkoutSessionClient({ userId }: Props) {
 
         {phase === "done" ? (
           <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center text-center md:max-w-none lg:max-w-5xl">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-800 dark:text-emerald-300/90">3 · 운동 종료</p>
             <div className="w-full md:grid md:grid-cols-[auto_1fr] md:items-start md:gap-10 md:text-left lg:gap-14">
               <div
-                className={`mx-auto flex size-28 items-center justify-center rounded-full border-4 border-emerald-500/40 bg-emerald-100 text-5xl text-emerald-800 transition duration-500 dark:border-emerald-500/35 dark:bg-emerald-950/50 dark:text-emerald-200 md:mx-0 md:size-32 md:text-6xl ${
-                  celebrate ? "scale-100 opacity-100" : "scale-50 opacity-0"
+                className={`mx-auto flex size-28 items-center justify-center rounded-full border-4 border-emerald-500/40 bg-emerald-100 text-5xl text-emerald-800 dark:border-emerald-500/35 dark:bg-emerald-950/50 dark:text-emerald-200 md:mx-0 md:size-32 md:text-6xl ${
+                  celebrate
+                    ? "completion-pop opacity-100 shadow-[0_12px_40px_-8px_rgba(16,185,129,0.45)] ring-4 ring-emerald-400/35"
+                    : "scale-50 opacity-0 transition-[transform,opacity] duration-500"
                 }`}
                 aria-hidden
               >
                 ✓
               </div>
               <div className="min-w-0 md:pt-1">
-                <h2 className="font-display mt-8 text-2xl font-bold text-apple-ink md:mt-0 md:text-3xl dark:text-zinc-100">오늘도 고생했어요</h2>
-                <p className="mt-2 text-[15px] text-apple-subtle md:text-[16px] dark:text-zinc-400">이번 세션 스탯</p>
+                <h2 className="font-display mt-8 text-2xl font-bold text-apple-ink md:mt-0 md:text-3xl dark:text-zinc-100">운동 종료</h2>
+                <p className="mt-2 text-[15px] font-semibold text-apple-ink md:text-[16px] dark:text-zinc-200">결과 요약</p>
+                <p className="mt-1 text-[14px] text-apple-subtle dark:text-zinc-400">오늘 세션을 마쳤어요.</p>
                 {summary.prCount > 0 ? (
                   <p className="mt-2 text-[15px] font-semibold text-amber-800 dark:text-amber-300">PR 세트 {summary.prCount}개 — 오늘도 한계 갈아끼웠네요.</p>
                 ) : null}

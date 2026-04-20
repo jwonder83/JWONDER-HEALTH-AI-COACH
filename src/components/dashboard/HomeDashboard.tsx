@@ -2,6 +2,7 @@
 
 import { WebCoachingSection } from "@/components/coaching/WebCoachingSection";
 import { HomeActionHub } from "@/components/dashboard/home/HomeActionHub";
+import { useUserWorkoutUiState } from "@/components/dashboard/home/use-user-workout-ui-state";
 import { OnboardingBanner } from "@/components/dashboard/OnboardingBanner";
 import { DashboardGoalsCard } from "@/components/dashboard/DashboardGoalsCard";
 import { navSegmentBar, navSegmentItem, navToolbarButton } from "@/components/nav/menu-styles";
@@ -64,8 +65,8 @@ const cardRing =
 const sectionShell =
   "scroll-mt-36 border border-neutral-200 bg-white p-6 shadow-sm sm:scroll-mt-44 sm:p-9 dark:border-zinc-800 dark:bg-zinc-950";
 
-const SECTION_HINT_INPUT = "저장하면 바로 아래 목록에 반영돼요.";
-const SECTION_HINT_LIST = "날짜·종목별로 보고, 필요하면 한 건씩 지울 수 있어요.";
+const SECTION_HINT_INPUT = "저장 즉시 아래 목록에 반영됩니다.";
+const SECTION_HINT_LIST = "날짜와 종목별로 확인하고, 필요 시 개별 삭제할 수 있습니다.";
 
 type Props = {
   userId: string;
@@ -76,6 +77,7 @@ export function HomeDashboard({ userId, site }: Props) {
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [toast, setToast] = useState<{ message: string; variant: "default" | "achievement" } | null>(null);
+  const userWorkoutUiState = useUserWorkoutUiState(workouts, hydrated, site.experience.missedDayHourLocal);
 
   const navItems = useMemo(
     () =>
@@ -151,7 +153,7 @@ export function HomeDashboard({ userId, site }: Props) {
 
   async function handleClear() {
     if (typeof window === "undefined") return;
-    if (!window.confirm("계정에 저장된 모든 운동 기록을 삭제할까요? 이 작업은 되돌릴 수 없습니다.")) return;
+    if (!window.confirm("이 계정에 저장된 모든 운동 기록을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.")) return;
     const supabase = createClient();
     const { error } = await supabase.from("workouts").delete().eq("user_id", userId);
     if (error) {
@@ -164,7 +166,7 @@ export function HomeDashboard({ userId, site }: Props) {
 
   async function handleDeleteOne(id: string) {
     if (typeof window === "undefined") return;
-    if (!window.confirm("이 기록만 삭제할까요?")) return;
+    if (!window.confirm("선택한 기록만 삭제하시겠습니까?")) return;
     const supabase = createClient();
     const { error } = await supabase.from("workouts").delete().eq("id", id).eq("user_id", userId);
     if (error) {
@@ -175,12 +177,23 @@ export function HomeDashboard({ userId, site }: Props) {
     notifyWorkoutsMutated();
   }
 
+  const pageTint =
+    hydrated && userWorkoutUiState === "missed"
+      ? "bg-[radial-gradient(ellipse_100%_72%_at_50%_0%,rgba(244,63,94,0.1),transparent_56%)]"
+      : hydrated && userWorkoutUiState === "active"
+        ? "bg-[radial-gradient(ellipse_100%_72%_at_50%_0%,rgba(99,102,241,0.09),transparent_56%)]"
+        : hydrated && userWorkoutUiState === "completed"
+          ? "bg-[radial-gradient(ellipse_100%_72%_at_50%_0%,rgba(16,185,129,0.09),transparent_56%)]"
+          : hydrated && userWorkoutUiState === "idle"
+            ? "bg-[radial-gradient(ellipse_100%_70%_at_50%_0%,rgba(245,158,11,0.06),transparent_52%)]"
+            : "bg-[radial-gradient(ellipse_100%_70%_at_50%_0%,rgba(0,0,0,0.04),transparent_50%)]";
+
   return (
-    <div className="relative pb-28 text-apple-ink dark:text-zinc-100">
-      <div
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_100%_70%_at_50%_0%,rgba(0,0,0,0.04),transparent_50%)]"
-        aria-hidden
-      />
+    <div
+      className="relative pb-28 text-apple-ink dark:text-zinc-100"
+      data-user-workout-state={hydrated ? userWorkoutUiState : undefined}
+    >
+      <div className={`pointer-events-none absolute inset-0 -z-10 ${pageTint}`} aria-hidden />
       <div className="mx-auto max-w-5xl px-5 pt-6 sm:px-8 sm:pt-8">
         {/* 히어로 */}
         <div className={`relative overflow-hidden sm:rounded-sm ${cardRing}`}>
@@ -207,9 +220,13 @@ export function HomeDashboard({ userId, site }: Props) {
               <div className="pointer-events-auto mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
                 <Link
                   href="/workout"
-                  className="inline-flex items-center justify-center rounded-lg border border-white bg-white px-5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-black transition hover:bg-white/90 active:scale-[0.98] sm:py-3 sm:text-[14px]"
+                  className={`inline-flex items-center justify-center rounded-lg border border-white px-5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-black transition hover:bg-white/90 active:scale-[0.98] sm:py-3 sm:text-[14px] ${
+                    hydrated && (userWorkoutUiState === "idle" || userWorkoutUiState === "missed")
+                      ? "bg-amber-200 font-bold ring-2 ring-white/80 hover:bg-amber-100"
+                      : "bg-white"
+                  }`}
                 >
-                  세트 남기기
+                  {hydrated && userWorkoutUiState === "active" ? "세션 이어가기" : "운동 시작하기"}
                 </Link>
                 <Link
                   href="/program"
@@ -228,7 +245,12 @@ export function HomeDashboard({ userId, site }: Props) {
           </div>
         </div>
 
-        <HomeActionHub workouts={workouts} hydrated={hydrated} />
+        <HomeActionHub
+          workouts={workouts}
+          hydrated={hydrated}
+          userWorkoutUiState={userWorkoutUiState}
+          experience={site.experience}
+        />
 
         <OnboardingBanner />
 

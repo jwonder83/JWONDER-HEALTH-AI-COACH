@@ -1,4 +1,5 @@
 import { WorkoutSessionClient } from "@/components/workout-session/WorkoutSessionClient";
+import { getSiteSettings } from "@/lib/site-settings/load-server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -10,5 +11,6 @@ export default async function WorkoutPage() {
   if (!user) {
     redirect("/login");
   }
-  return <WorkoutSessionClient userId={user.id} />;
+  const site = await getSiteSettings();
+  return <WorkoutSessionClient userId={user.id} restTargetSeconds={site.experience.workoutRestTargetSeconds} />;
 }

@@ -44,12 +44,12 @@ export function AiCoachPresence({ message, className = "", label = "코치" }: A
                 <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">GPT</span>
               ) : null}
             </div>
-            <p className="mt-1.5 text-[14px] font-medium leading-snug text-apple-ink sm:text-[15px]" aria-live="polite">
+            <p className="mt-1.5 text-[15px] font-bold leading-snug text-apple-ink sm:text-[16px]" aria-live="polite">
               {message.body}
             </p>
             <p className="mt-2 flex flex-wrap items-start gap-2">
-              <span className="shrink-0 rounded-md bg-neutral-100/90 px-2 py-0.5 text-[10px] font-medium tracking-[-0.01em] text-apple-subtle dark:bg-zinc-800 dark:text-zinc-400">
-                왜 이런 말이냐면
+              <span className="shrink-0 rounded-md border border-neutral-200/90 bg-neutral-100/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] text-apple-subtle dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                이유
               </span>
               <span className="min-w-0 text-[12px] leading-snug text-apple-subtle dark:text-zinc-400">{message.reason}</span>
             </p>

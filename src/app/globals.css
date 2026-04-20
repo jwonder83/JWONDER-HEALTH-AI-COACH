@@ -60,3 +60,22 @@ a:focus-visible {
 .dark a:focus-visible {
   @apply ring-white/30 ring-offset-zinc-950;
 }
+
+@keyframes workout-complete-pop {
+  0% {
+    transform: scale(0.45);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.completion-pop {
+  animation: workout-complete-pop 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

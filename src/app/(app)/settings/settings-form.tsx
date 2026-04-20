@@ -23,9 +23,9 @@ export function SettingsForm({ email }: Props) {
         setMsg(error.message);
         return;
       }
-      setMsg("재설정 링크가 이메일로 발송되었습니다. 메일함을 확인해 주세요.");
+      setMsg("재설정 링크를 이메일로 보냈습니다. 받은편지함과 스팸함을 확인해 주세요.");
     } catch {
-      setMsg("요청 처리 중 오류가 났습니다.");
+      setMsg("요청을 처리하는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -37,14 +37,14 @@ export function SettingsForm({ email }: Props) {
         step="AC"
         eyebrow="ACCOUNT"
         title="계정 설정"
-        description="로그인된 이메일과 비밀번호 재설정을 관리합니다."
+        description="로그인된 이메일 확인과 비밀번호 재설정을 안내합니다."
       />
 
       <div className="mt-2 border border-neutral-200 bg-white p-6 shadow-sm">
         <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-apple-subtle">이메일</p>
         <p className="mt-2 break-all text-[16px] font-semibold text-apple-ink">{email || "—"}</p>
         <p className="mt-6 text-[13px] leading-relaxed text-apple-subtle">
-          비밀번호를 바꾸려면 아래 버튼으로 재설정 메일을 보내세요. 메일의 링크를 연 뒤 새 비밀번호를 입력합니다.
+          비밀번호를 변경하려면 아래 버튼으로 재설정 메일을 요청하세요. 메일의 링크를 연 뒤 새 비밀번호를 입력합니다.
         </p>
         <button
           type="button"
@@ -52,7 +52,7 @@ export function SettingsForm({ email }: Props) {
           onClick={() => void sendReset()}
           className="mt-6 w-full border border-black bg-black py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black disabled:opacity-45"
         >
-          {loading ? "발송 중…" : "비밀번호 재설정 이메일 보내기"}
+          {loading ? "발송 중…" : "비밀번호 재설정 메일 요청"}
         </button>
         {msg ? (
           <p

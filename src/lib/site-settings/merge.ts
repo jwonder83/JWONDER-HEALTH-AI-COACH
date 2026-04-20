@@ -10,6 +10,7 @@ import type {
   ProgramYoutubeSlot,
   LoginFormCopyConfig,
   SiteCopyConfig,
+  SiteExperienceConfig,
   SiteFooterConfig,
   SiteFooterLink,
   SiteHelpCenter,
@@ -318,6 +319,51 @@ function mergeProgram(base: ProgramGuideSettings, patch: unknown): ProgramGuideS
   };
 }
 
+function mergeUIntInRange(base: number, v: unknown, min: number, max: number): number {
+  if (typeof v !== "number" || !Number.isFinite(v)) return base;
+  return Math.min(max, Math.max(min, Math.round(v)));
+}
+
+function mergeNavExperienceLabels(
+  base: SiteExperienceConfig["navLabels"],
+  patch: unknown,
+): SiteExperienceConfig["navLabels"] {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  return {
+    home: mergeString(base.home, p.home),
+    workout: mergeString(base.workout, p.workout),
+    performance: mergeString(base.performance, p.performance),
+    help: mergeString(base.help, p.help),
+    settings: mergeString(base.settings, p.settings),
+  };
+}
+
+function mergeExperience(base: SiteExperienceConfig, patch: unknown): SiteExperienceConfig {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  let morning = mergeUIntInRange(base.interventionMorningEndHour, p.interventionMorningEndHour, 0, 23);
+  let afternoon = mergeUIntInRange(base.interventionAfternoonEndHour, p.interventionAfternoonEndHour, 0, 23);
+  let evening = mergeUIntInRange(base.interventionEveningEndHour, p.interventionEveningEndHour, 0, 23);
+  if (afternoon < morning) afternoon = morning;
+  if (evening < afternoon) evening = afternoon;
+  return {
+    missedDayHourLocal: mergeUIntInRange(base.missedDayHourLocal, p.missedDayHourLocal, 0, 23),
+    workoutRestTargetSeconds: mergeUIntInRange(base.workoutRestTargetSeconds, p.workoutRestTargetSeconds, 15, 600),
+    briefingHighLoadDayMinRows: mergeUIntInRange(base.briefingHighLoadDayMinRows, p.briefingHighLoadDayMinRows, 1, 60),
+    briefingHighLoadDayMinVolume: mergeUIntInRange(
+      base.briefingHighLoadDayMinVolume,
+      p.briefingHighLoadDayMinVolume,
+      100,
+      50000,
+    ),
+    interventionMorningEndHour: morning,
+    interventionAfternoonEndHour: afternoon,
+    interventionEveningEndHour: evening,
+    navLabels: mergeNavExperienceLabels(base.navLabels, p.navLabels),
+  };
+}
+
 function mergeCopy(base: SiteCopyConfig, patch: unknown): SiteCopyConfig {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
@@ -356,5 +402,6 @@ export function mergeSiteSettingsFromDb(dbJson: unknown): SiteSettingsMerged {
     images: mergeImages(DEFAULT_SITE_SETTINGS.images, root.images),
     copy: mergeCopy(DEFAULT_SITE_SETTINGS.copy, root.copy),
     program: mergeProgram(DEFAULT_SITE_SETTINGS.program, root.program),
+    experience: mergeExperience(DEFAULT_SITE_SETTINGS.experience, root.experience),
   };
 }

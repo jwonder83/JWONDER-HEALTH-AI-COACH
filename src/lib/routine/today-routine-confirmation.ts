@@ -45,6 +45,16 @@ export function writePersistedRoutineFlow(next: PersistedRoutineFlow): void {
   }
 }
 
+/** 확정 취소 → 다시 suggested로 (별도 ‘플랜 바꾸기’에서만 호출) */
+export function clearPersistedRoutineFlow(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(ROUTINE_CONFIRMATION_LS_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 /**
  * 날짜·루틴 지문이 바뀌면 suggested.
  * 오늘 기록이 있으면 completed.

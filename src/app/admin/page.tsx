@@ -6,25 +6,25 @@ const cardClass =
 export default function AdminIndexPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink sm:text-[2rem]">관리자 홈</h1>
+      <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink sm:text-[2rem]">운영 콘솔</h1>
       <p className="mt-3 text-[15px] leading-relaxed text-apple-subtle">
-        수정할 영역을 선택하세요. 변경 사항은 저장 후 해당 화면을 새로고침하면 반영됩니다.
+        편집할 항목을 선택하세요. 저장 후 사용자 화면을 새로고침하면 변경 내용이 반영됩니다.
       </p>
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         <Link href="/admin/site" className={cardClass}>
           <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-apple-subtle">Site</span>
           <span className="font-display mt-2 text-[1.2rem] font-semibold text-apple-ink group-hover:opacity-70">사이트 문구·이미지</span>
-          <span className="mt-2 text-[13px] leading-relaxed text-apple-subtle">앱 타이틀, 히어로, 운동 입력·회원가입 문구, 도움말, 푸터, 이미지 슬롯</span>
+          <span className="mt-2 text-[13px] leading-relaxed text-apple-subtle">앱 타이틀, 히어로, 운동 입력·가입 화면, 도움말, 푸터, 이미지 슬롯</span>
         </Link>
         <Link href="/admin/login" className={cardClass}>
           <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-apple-subtle">Login</span>
           <span className="font-display mt-2 text-[1.2rem] font-semibold text-apple-ink group-hover:opacity-70">로그인 화면</span>
-          <span className="mt-2 text-[13px] leading-relaxed text-apple-subtle">패널 이미지·문구, 카드 제목, 이메일·비밀번호 라벨·버튼·회원가입 링크</span>
+          <span className="mt-2 text-[13px] leading-relaxed text-apple-subtle">패널 이미지·문구, 카드 제목, 폼 라벨·버튼, 회원가입 링크</span>
         </Link>
         <Link href="/admin/program" className={cardClass}>
           <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-apple-subtle">Program</span>
           <span className="font-display mt-2 text-[1.2rem] font-semibold text-apple-ink group-hover:opacity-70">프로그램 안내</span>
-          <span className="mt-2 text-[13px] leading-relaxed text-apple-subtle">메뉴 레이블, 페이지 제목·리드, 내장 가이드 on/off, 마크다운</span>
+          <span className="mt-2 text-[13px] leading-relaxed text-apple-subtle">메뉴 라벨, 페이지 제목·리드, 내장 가이드 표시, 마크다운 전후문</span>
         </Link>
       </div>
     </div>

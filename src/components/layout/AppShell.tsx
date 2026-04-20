@@ -73,22 +73,22 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
             </Link>
             <nav aria-label="주요 메뉴" className="flex flex-wrap items-center gap-x-0.5 gap-y-1 sm:gap-x-1">
               <Link href="/" className={navHeaderLink}>
-                홈
+                {site.experience.navLabels.home}
               </Link>
               <Link href="/workout" className={navHeaderLink}>
-                기록
+                {site.experience.navLabels.workout}
               </Link>
               <Link href="/program" className={navHeaderLink}>
                 {site.program.navLabel}
               </Link>
               <Link href="/performance" className={navHeaderLink}>
-                성과
+                {site.experience.navLabels.performance}
               </Link>
               <Link href="/help" className={navHeaderLink}>
-                도움말
+                {site.experience.navLabels.help}
               </Link>
               <Link href="/settings" className={navHeaderLink}>
-                설정
+                {site.experience.navLabels.settings}
               </Link>
             </nav>
           </div>
@@ -99,7 +99,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
             <ThemeToggle />
             {showAdminLink ? (
               <Link href="/admin" className={navHeaderLink}>
-                관리
+                운영
               </Link>
             ) : null}
             <SignOutButton className={navHeaderLinkMuted} />

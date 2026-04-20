@@ -107,7 +107,7 @@ function detectWeakMuscleLine(
   return {
     id: g.id,
     label: g.label,
-    message: `최근 ${g.label} 쪽이 좀 비어 있어요. 루틴에 ${g.suggestedAddition} 정도만 슬쩍 얹어볼까요?`,
+    message: `오늘 세션에 다음을 포함하세요: ${g.suggestedAddition}`,
     sharePct: g.sharePct,
     windowRowCount: g.windowRowCount,
   };
@@ -120,7 +120,7 @@ function profileScheduleHints(profile: OnboardingProfile | null): RoutineAdjustm
     return [
       {
         type: "schedule_hint",
-        message: "주 2일이면 오늘은 복합 위주로 밀도만 살짝 올려도 충분해요.",
+        message: "주 2일 일정이면 오늘은 복합 위주로 밀도만 올리세요.",
         reason: "온보딩에서 주간 운동일을 2일로 설정했어요.",
       },
     ];
@@ -129,7 +129,7 @@ function profileScheduleHints(profile: OnboardingProfile | null): RoutineAdjustm
     return [
       {
         type: "schedule_hint",
-        message: `주 ${d}일이면 회복 타이트해질 수 있어요. 보조는 짧게, 메인 볼륨은 지키는 쪽으로 가볼까요?`,
+        message: `주 ${d}일 일정이면 오늘은 메인 볼륨을 지키고 보조는 짧게 하세요.`,
         reason: `온보딩 주간 운동일이 ${d}일 이상으로 회복 여유가 상대적으로 줄어요.`,
       },
     ];
@@ -138,7 +138,7 @@ function profileScheduleHints(profile: OnboardingProfile | null): RoutineAdjustm
     return [
       {
         type: "schedule_hint",
-        message: "초급이면 RPE 6~7에서 폼이랑 호흡부터 맞추는 게 제일 이득이에요.",
+        message: "오늘은 RPE 6~7에서 폼과 호흡부터 맞추세요.",
         reason: "온보딩 경험치가 초급으로 저장되어 있어요.",
       },
     ];
@@ -147,7 +147,7 @@ function profileScheduleHints(profile: OnboardingProfile | null): RoutineAdjustm
     return [
       {
         type: "schedule_hint",
-        message: "상급이면 마지막 세트만 RPE 8~9까지 당겨서 과부하 체크해 봐요.",
+        message: "오늘 마지막 세트만 RPE 8~9까지 당기세요.",
         reason: "온보딩 경험치가 상급으로 저장되어 있어요.",
       },
     ];
@@ -170,7 +170,7 @@ export function buildOptimizedTodayRoutine(
 
   const stagnant = detectStagnantExercises(workouts, now);
   for (const s of stagnant) {
-    const msg = `「${s.name}」 볼륨이 너무 무난 편이에요. ${s.hint}로 갈아타서 자극 좀 바꿔볼까요?`;
+    const msg = `「${s.name}」은(는) 빼고 ${s.hint} 중 하나로 대체하세요.`;
     adjustments.push({
       type: "substitute_stale",
       message: msg,

@@ -7,7 +7,7 @@ export function AdminSubNav() {
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3 sm:px-6">
         <span className={navMenuEyebrow}>Admin</span>
-        <nav aria-label="관리자 메뉴" className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <nav aria-label="운영 메뉴" className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <Link href="/admin" className={navPillLink}>
             개요
           </Link>

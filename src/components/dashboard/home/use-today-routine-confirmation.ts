@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  clearPersistedRoutineFlow,
   dateKeyFromDate,
   readPersistedRoutineFlow,
   resolveInitialRoutineStatus,
@@ -54,5 +55,11 @@ export function useTodayRoutineConfirmation({ routine, todayWorkoutComplete }: A
     setStatus("confirmed");
   }, [dateKey, routineKey, todayWorkoutComplete]);
 
-  return { status, confirm };
+  const requestPlanChange = useCallback(() => {
+    if (todayWorkoutComplete) return;
+    clearPersistedRoutineFlow();
+    setStatus("suggested");
+  }, [todayWorkoutComplete]);
+
+  return { status, confirm, requestPlanChange };
 }
