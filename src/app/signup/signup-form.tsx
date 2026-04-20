@@ -47,7 +47,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       setOk(true);
       setLoading(false);
     } catch {
-      setMsg("가입 처리 중 오류가 났습니다. 환경 변수를 확인해 주세요.");
+      setMsg("가입 처리 중 오류가 났어요. Supabase 환경 변수를 확인해 주세요.");
       setLoading(false);
     }
   }
@@ -75,11 +75,11 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       )}
       {ok && !msg && (
         <p className="mt-6 rounded-xl border border-emerald-200/90 bg-emerald-50/95 px-4 py-3 text-[14px] leading-snug text-emerald-900 shadow-sm">
-          가입 요청이 완료되었습니다. 이메일을 확인하거나 바로{" "}
+          가입 요청이 접수됐어요. 메일함을 확인하거나, 바로{" "}
           <button type="button" className="font-semibold underline" onClick={() => router.push("/login")}>
             로그인
           </button>
-          해 보세요.
+          해도 돼요.
         </p>
       )}
 
@@ -121,7 +121,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       </form>
 
       <p className="mt-8 text-center text-[14px] text-apple-subtle">
-        이미 계정이 있나요?{" "}
+        이미 계정 있어?{" "}
         <Link
           href="/login"
           className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60"

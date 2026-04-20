@@ -12,20 +12,19 @@ export default async function HelpPage() {
   const hasExtraLinks = Boolean(statusUrl || feedbackEmail || feedbackFormUrl);
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8 sm:py-14">
-      <SectionTitleBlock step="?" eyebrow="HELP" title={h.pageTitle} />
-      <p className="mt-2 whitespace-pre-wrap text-[16px] leading-relaxed text-apple-subtle">{h.intro}</p>
-      <p className="mt-5 text-[15px] leading-relaxed text-apple-subtle">
-        주간 스플릿·델로드·워밍업·RPE·대체 종목 등은{" "}
+      <SectionTitleBlock step="?" eyebrow="도움" title={h.pageTitle} />
+      <p className="mt-2 whitespace-pre-wrap text-[14px] leading-snug text-apple-subtle sm:text-[15px]">{h.intro}</p>
+      <p className="mt-4 text-[14px] leading-snug text-apple-subtle sm:text-[15px]">
+        스플릿·델로드·RPE 등은{" "}
         <Link href="/program" className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60">
           {site.program.promoLinkLabel}
         </Link>
-        에 모아 두었습니다.
       </p>
-      <p className="mt-6 border-l-2 border-black bg-neutral-50 px-4 py-3 text-[15px] font-medium text-apple-ink">{h.contactLine}</p>
+      <p className="mt-5 rounded-lg border-l-2 border-black/80 bg-neutral-50 px-4 py-3 text-[14px] font-medium text-apple-ink">{h.contactLine}</p>
 
       {hasExtraLinks ? (
         <div className="mt-8 rounded-2xl border border-neutral-200 bg-white/90 px-4 py-4 shadow-sm sm:px-5">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-apple-subtle">추가 안내</p>
+          <p className="text-[12px] font-medium tracking-[-0.01em] text-apple-subtle">더보기</p>
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-apple-subtle">
             {statusUrl ? (
               <a
@@ -59,7 +58,7 @@ export default async function HelpPage() {
         </div>
       ) : null}
 
-      <h2 className="mt-12 text-[13px] font-medium uppercase tracking-[0.22em] text-apple-subtle">{h.faqSectionTitle}</h2>
+      <h2 className="mt-10 text-[13px] font-semibold tracking-[-0.01em] text-apple-subtle">{h.faqSectionTitle}</h2>
       <ul className="mt-4 space-y-3">
         {h.faqItems.map((item, i) => (
           <li key={i} className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">

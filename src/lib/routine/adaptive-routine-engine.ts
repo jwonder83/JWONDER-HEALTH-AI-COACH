@@ -67,10 +67,16 @@ export function detectStagnantExercises(
   return out.slice(0, 2);
 }
 
-function detectWeakMuscleLine(
-  rows: WorkoutRow[],
-  now: Date,
-): { message: string; label: string; id: MuscleGroupId } | null {
+/** 최근 14일 볼륨 기준 부위 불균형(11% 미만) — UI·행동 제안용 */
+export type WeakMuscleGap = {
+  id: MuscleGroupId;
+  label: string;
+  sharePct: number;
+  windowRowCount: number;
+  suggestedAddition: string;
+};
+
+export function detectWeakMuscleGap(rows: WorkoutRow[], now = new Date()): WeakMuscleGap | null {
   const slice = rowsLastDays(rows, now, 14);
   if (slice.length < 5) return null;
   const agg = aggregateVolumeByMuscle(slice);
@@ -86,7 +92,24 @@ function detectWeakMuscleLine(
   return {
     id: weakest.id,
     label,
-    message: `최근 ${label} 운동이 부족해 보여 루틴에 ${add}를 넣었어요.`,
+    sharePct: Math.round(share * 10) / 10,
+    windowRowCount: slice.length,
+    suggestedAddition: add,
+  };
+}
+
+function detectWeakMuscleLine(
+  rows: WorkoutRow[],
+  now: Date,
+): { message: string; label: string; id: MuscleGroupId; sharePct: number; windowRowCount: number } | null {
+  const g = detectWeakMuscleGap(rows, now);
+  if (!g) return null;
+  return {
+    id: g.id,
+    label: g.label,
+    message: `최근 ${g.label} 쪽이 좀 비어 있어요. 루틴에 ${g.suggestedAddition} 정도만 슬쩍 얹어볼까요?`,
+    sharePct: g.sharePct,
+    windowRowCount: g.windowRowCount,
   };
 }
 
@@ -94,16 +117,40 @@ function profileScheduleHints(profile: OnboardingProfile | null): RoutineAdjustm
   if (!profile?.goal) return [];
   const d = profile.daysPerWeek;
   if (d === 2) {
-    return [{ type: "schedule_hint", message: "주 2일이시면 오늘은 복합 위주로 밀도 있게 가져가는 편이 좋아요." }];
+    return [
+      {
+        type: "schedule_hint",
+        message: "주 2일이면 오늘은 복합 위주로 밀도만 살짝 올려도 충분해요.",
+        reason: "온보딩에서 주간 운동일을 2일로 설정했어요.",
+      },
+    ];
   }
   if (d && d >= 5) {
-    return [{ type: "schedule_hint", message: `주 ${d}일 가동이시니, 보조 운동은 짧게 줄이고 메인 볼륨을 지키는 쪽을 추천해요.` }];
+    return [
+      {
+        type: "schedule_hint",
+        message: `주 ${d}일이면 회복 타이트해질 수 있어요. 보조는 짧게, 메인 볼륨은 지키는 쪽으로 가볼까요?`,
+        reason: `온보딩 주간 운동일이 ${d}일 이상으로 회복 여유가 상대적으로 줄어요.`,
+      },
+    ];
   }
   if (profile.experience === "beginner") {
-    return [{ type: "schedule_hint", message: "초급이시면 RPE 6~7에서 폼·호흡을 먼저 맞추는 게 이득이에요." }];
+    return [
+      {
+        type: "schedule_hint",
+        message: "초급이면 RPE 6~7에서 폼이랑 호흡부터 맞추는 게 제일 이득이에요.",
+        reason: "온보딩 경험치가 초급으로 저장되어 있어요.",
+      },
+    ];
   }
   if (profile.experience === "advanced") {
-    return [{ type: "schedule_hint", message: "상급이시면 마지막 세트만 RPE 8~9까지 당겨 과부하를 확인해 보세요." }];
+    return [
+      {
+        type: "schedule_hint",
+        message: "상급이면 마지막 세트만 RPE 8~9까지 당겨서 과부하 체크해 봐요.",
+        reason: "온보딩 경험치가 상급으로 저장되어 있어요.",
+      },
+    ];
   }
   return [];
 }
@@ -123,14 +170,22 @@ export function buildOptimizedTodayRoutine(
 
   const stagnant = detectStagnantExercises(workouts, now);
   for (const s of stagnant) {
-    const msg = `「${s.name}」 볼륨이 한동안 비슷해요. ${s.hint}로 바꿔 과부하를 주는 걸 제안해요.`;
-    adjustments.push({ type: "substitute_stale", message: msg });
+    const msg = `「${s.name}」 볼륨이 너무 무난 편이에요. ${s.hint}로 갈아타서 자극 좀 바꿔볼까요?`;
+    adjustments.push({
+      type: "substitute_stale",
+      message: msg,
+      reason: `최근 28일에 같은 종목 4번+ 찍었는데, 최근 3세트 볼륨 변동이 4% 미만이에요.`,
+    });
     liveMessages.push(msg);
   }
 
   const weak = detectWeakMuscleLine(workouts, now);
   if (weak) {
-    adjustments.push({ type: "add_weak_muscle", message: weak.message });
+    adjustments.push({
+      type: "add_weak_muscle",
+      message: weak.message,
+      reason: `최근 14일 세트 ${weak.windowRowCount}개 합쳤을 때 ${weak.label} 볼륨 비중이 약 ${weak.sharePct}%라 11% 미만 규칙에 걸렸어요.`,
+    });
     liveMessages.push(weak.message);
   }
 
@@ -149,9 +204,25 @@ export function buildOptimizedTodayRoutine(
 
   let maxMin = base.estimatedMinutesMax;
   let minMin = base.estimatedMinutesMin;
+  let timeAdjustNote = "";
   if (profile?.experience === "advanced" && profile.goal === "bulk") {
     maxMin = Math.min(maxMin + 5, 95);
     minMin = Math.min(minMin + 5, 90);
+    timeAdjustNote = " 상급·벌크 프로필이라 예상 시간 상·하한을 각각 5분 늘렸어요.";
+  }
+
+  const dataBits: string[] = [];
+  if (weak) {
+    dataBits.push(`최근 14일 세트 ${weak.windowRowCount}건 중 ${weak.label} 볼륨 비중 약 ${weak.sharePct}% (11% 미만)`);
+  }
+  if (stagnant.length > 0) {
+    dataBits.push(`「${stagnant[0].name}」 등 최근 28일 패턴에서 볼륨 정체 신호`);
+  }
+  let recommendationReason = base.recommendationReason;
+  if (dataBits.length > 0) {
+    recommendationReason = `${base.recommendationReason} — ${dataBits.join(" · ")}${timeAdjustNote}`.trim();
+  } else if (timeAdjustNote) {
+    recommendationReason = `${base.recommendationReason}${timeAdjustNote}`.trim();
   }
 
   return {
@@ -159,6 +230,7 @@ export function buildOptimizedTodayRoutine(
     description,
     estimatedMinutesMin: minMin,
     estimatedMinutesMax: maxMin,
+    recommendationReason,
     liveMessages: liveMessages.slice(0, 3),
     adjustments: adjustments.slice(0, 5),
     source: "rules",

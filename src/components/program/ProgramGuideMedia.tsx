@@ -43,7 +43,7 @@ export function YouTubeEmbed({ id, title }: EmbedProps) {
         />
       </div>
       <figcaption className="mt-2 text-[12px] leading-snug text-apple-subtle">
-        참고용 교육 영상(YouTube). 본 서비스와 채널 간 제휴·보증 관계는 없습니다.
+        참고용 YouTube 영상이에요. 서비스와 채널은 제휴 관계가 아니며, 영상 내용은 보증하지 않아요.
       </figcaption>
     </figure>
   );

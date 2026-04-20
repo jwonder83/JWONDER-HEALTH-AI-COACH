@@ -79,7 +79,7 @@ export function WebCoachingSection({
       });
       const body = (await res.json()) as { coaching?: string; error?: string };
       if (!res.ok) {
-        throw new Error(body.error ?? "코칭 요청에 실패했습니다.");
+        throw new Error(body.error ?? "코칭 요청이 실패했어요. 잠시 후 다시 시도해 주세요.");
       }
       const coaching = body.coaching ?? "";
       setText(coaching);
@@ -93,7 +93,7 @@ export function WebCoachingSection({
         await loadLogs();
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "알 수 없는 오류");
+      setError(e instanceof Error ? e.message : "알 수 없는 오류예요. 다시 한번 눌러 주세요.");
     } finally {
       setLoading(false);
     }

@@ -54,16 +54,16 @@ export function getStreakMotivationLine(
   opts: { atRisk: boolean; gentle: boolean; todayDone: boolean },
 ): string | null {
   if (opts.todayDone) {
-    if (streak >= 30) return `대단해요. ${streak}일 연속! 오늘도 한 걸음 더 쌓았어요.`;
-    if (streak >= 7) return `멋져요. ${streak}일 연속이에요. 꾸준함이 빛나고 있어요.`;
-    if (streak >= 3) return `오늘도 연결했어요. ${streak}일째—리듬이 살아 있어요.`;
-    return "오늘 기록, 잘 마무리했어요. 내일도 이어가 봐요.";
+    if (streak >= 30) return `${streak}일 연속… 이건 거의 시즌2 찍은 거예요. 오늘도 한 판 더 쌓았어요.`;
+    if (streak >= 7) return `${streak}일째 밀어붙이는 중. 꾸준함 인정합니다.`;
+    if (streak >= 3) return `오늘도 연결 성공. ${streak}일째 리듬 좋아요.`;
+    return "오늘 세션 끝. 내일도 이 느낌 유지해 봐요.";
   }
   if (opts.atRisk) {
-    return `오늘 안에 한 세트만 남겨도 연속 ${streak}일이 이어져요. 지금이 가장 좋은 타이밍이에요.`;
+    return `오늘 안에 세트 하나만 남겨도 연속 ${streak}일 살아요. 지금이 찬스 타이밍.`;
   }
   if (opts.gentle && streak >= 2) {
-    return `${streak}일 연속 중이에요. 오늘도 가볍게 이어가 볼까요?`;
+    return `${streak}일 연속 중이에요. 오늘도 가볍게 한 판만?`;
   }
   return null;
 }

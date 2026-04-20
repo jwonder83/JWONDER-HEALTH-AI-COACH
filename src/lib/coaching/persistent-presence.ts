@@ -18,11 +18,13 @@ export type CoachCta = {
   href: string;
 };
 
-/** `AiCoachPresence`에 그대로 넘기는 페이로드 */
+/** `AiCoachPresence`에 그대로 넘기는 페이로드 — 추후 GPT가 동일 필드로 덮어쓰기 쉬움 */
 export type CoachPresenceMessage = {
   situation: CoachPresenceSituation;
   /** 한두 문장, 구어체 */
   body: string;
+  /** 데이터·규칙 기반 근거(신뢰용) */
+  reason: string;
   cta?: CoachCta;
   source: CoachMessageSource;
 };
@@ -103,6 +105,18 @@ function todayVolume(workouts: WorkoutRow[], now: Date): number {
   return Math.round(v * 10) / 10;
 }
 
+function daysSinceLastWorkout(workouts: WorkoutRow[], now: Date): number | null {
+  if (workouts.length === 0) return null;
+  const sorted = [...workouts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const last = new Date(sorted[0].created_at);
+  return calendarDaysBetween(last, now);
+}
+
+function rowsLastNDays(workouts: WorkoutRow[], now: Date, days: number): number {
+  const cut = now.getTime() - days * 86400000;
+  return workouts.filter((w) => new Date(w.created_at).getTime() >= cut).length;
+}
+
 export type CoachResolverInput = {
   pathname: string;
   workouts: WorkoutRow[];
@@ -127,19 +141,19 @@ export function detectCoachSituation(input: CoachResolverInput): CoachPresenceSi
 function surfaceLine(surface: CoachUiSurface, situation: CoachPresenceSituation): string | null {
   if (situation === "first_record" || situation === "streak_motivation") return null;
   if (surface === "program" && situation === "pre_workout") {
-    return "프로그램 페이지예요. 워밍업 체크리스트 확인 후 홈에서 세트를 남겨 주세요.";
+    return "워밍업 체크하고 홈에서 세트 남기면 딱이에요.";
   }
   if (surface === "performance" && situation === "post_workout") {
-    return "퍼포먼스 화면이니까, 오늘 기록만 모아 필터로 훑어보면 좋아요.";
+    return "성과 화면에서 오늘 날짜만 골라보면 정리돼요.";
   }
   if (surface === "settings") {
-    return "설정을 바꾸면 다음 코칭 톤도 같이 맞출게요.";
+    return "설정 바꾸면 코칭 톤도 같이 맞춰 줄게요.";
   }
   if (surface === "help") {
-    return "막히면 FAQ부터 짧게 훑고, 필요하면 문의로 연결해요.";
+    return "막히면 FAQ부터 보고, 그다음 문의로 연락해요.";
   }
   if (surface === "onboarding") {
-    return "프로필만 완료해도 루틴 추천이 훨씬 정확해져요.";
+    return "프로필만 채워도 루틴 추천이 훨씬 정확해져요.";
   }
   return null;
 }
@@ -177,10 +191,14 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
   if (!input.hydrated) {
     return {
       situation: "pre_workout",
-      body: "잠깐만요—기록을 불러오는 중이에요. 곧 맞춤 코멘트 보여 드릴게요.",
+      body: "기록 불러오는 중이에요. 잠시만 기다려 주세요.",
+      reason: "운동 목록을 아직 불러오는 중이에요.",
       source: "rules",
     };
   }
+
+  const last7 = rowsLastNDays(input.workouts, now, 7);
+  const sinceLast = daysSinceLastWorkout(input.workouts, now);
 
   let base: CoachPresenceMessage;
 
@@ -188,16 +206,24 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
     case "first_record":
       base = {
         situation: "first_record",
-        body: "아직 기록이 없네요. 첫 세트만 남겨도 제가 패턴을 잡기 시작해요.",
-        cta: { label: "첫 기록하기", href: "/workout" },
+        body: "아직 기록이 없네요. 첫 세트만 남겨도 패턴 잡기 시작할게요.",
+        reason: "저장된 운동이 아직 없어요.",
+        cta: { label: "첫 세트 남기기", href: "/workout" },
         source: "rules",
       };
       break;
     case "streak_motivation":
       base = {
         situation: "streak_motivation",
-        body: "잠깐 끊겼어도 괜찮아요. 오늘 한 번만 다시 연결해 볼까요?",
-        cta: { label: "다시 시작하기", href: "/workout" },
+        body:
+          sinceLast !== null && sinceLast >= 2
+            ? `${sinceLast}일째 쉬었네요. 오늘 세트 하나만 남기면 스트릭 다시 이어져요.`
+            : "스트릭이 잠깐 끊겼어요. 오늘 한 세트만 적어도 바로 다시 가요.",
+        reason:
+          sinceLast !== null
+            ? `스트릭 0 · 마지막 기록 ${sinceLast}일 전`
+            : "지금은 스트릭이 0이에요.",
+        cta: { label: "세트 남기기", href: "/workout" },
         source: "rules",
       };
       break;
@@ -208,20 +234,39 @@ export function buildCoachPresenceMessage(input: CoachResolverInput): CoachPrese
         situation: "post_workout",
         body:
           n > 0
-            ? `오늘 ${n}세트 기록했어요. 볼륨 합은 약 ${vol}—수분 챙기고 가볍게 풀어주세요.`
-            : "오늘 운동 기록이 있어요. 짧게 스트레칭으로 마무리하면 회복에 좋아요.",
-        cta: { label: "오늘 분석 보기", href: "/performance" },
+            ? `오늘 ${n}세트 찍었네요. 볼륨 합은 약 ${vol}—물 많이 마시고 가볍게 스트레칭해요.`
+            : "오늘 세트 기록이 있어요. 짧게 몸만 풀어 주면 회복에 좋아요.",
+        reason:
+          n > 0
+            ? `오늘 날짜 세트 ${n}개, 볼륨 합(kg×회×세트) 약 ${vol}로 집계됐어요.`
+            : "오늘 날짜로 저장된 세트가 하나 이상 있어요.",
+        cta: { label: "성과 화면 가기", href: "/performance" },
         source: "rules",
       };
       break;
     }
-    default:
+    default: {
+      const mon = startOfWeekMonday(now);
+      const sun = endOfWeekSunday(mon);
+      const thisWeek = rollupPeriod(input.workouts, mon, sun);
+      const prevMon = new Date(mon);
+      prevMon.setDate(prevMon.getDate() - 7);
+      const prevSun = endOfWeekSunday(prevMon);
+      const lastWeek = rollupPeriod(input.workouts, prevMon, prevSun);
+      let volBit = "";
+      if (lastWeek.volume > 40) {
+        const p = Math.round(((thisWeek.volume - lastWeek.volume) / lastWeek.volume) * 1000) / 10;
+        volBit = ` 지난주보다 볼륨이 약 ${p}%예요.`;
+      }
       base = {
         situation: "pre_workout",
-        body: "오늘 루틴, 지금 워밍업부터 시작할 타이밍이에요.",
-        cta: { label: "운동 시작", href: "/workout" },
+        body: "오늘 루틴, 지금 워밍업 들어가도 좋은 타이밍이에요.",
+        reason: `이번 주 ${thisWeek.rowCount}세트 · 최근 7일 ${last7}세트 · 스트릭 ${snap.streakDays}일.${volBit}`.trim(),
+        cta: { label: "운동하러 가기", href: "/workout" },
         source: "rules",
       };
+      break;
+    }
   }
 
   if (extra) {

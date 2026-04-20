@@ -28,7 +28,7 @@ export function StreakMilestoneBadges({ streakDays, hydrated }: Props) {
 
   return (
     <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-zinc-800">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500">연속 도전 뱃지</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500">연속 스택 뱃지</p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {badges.map((b) => (
           <div
@@ -37,17 +37,17 @@ export function StreakMilestoneBadges({ streakDays, hydrated }: Props) {
           >
             <span className="text-[9px] font-bold uppercase tracking-wider opacity-80">연속</span>
             <span className="font-display text-lg font-bold tabular-nums">{b.label}</span>
-            {b.unlocked ? <span className="mt-0.5 text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">달성</span> : <span className="mt-0.5 text-[9px] opacity-70">대기</span>}
+            {b.unlocked ? <span className="mt-0.5 text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">획득</span> : <span className="mt-0.5 text-[9px] opacity-70">잠금</span>}
           </div>
         ))}
       </div>
       {next ? (
         <p className="mt-2 text-[12px] font-medium text-apple-subtle dark:text-zinc-400">
-          다음 <span className="tabular-nums text-apple-ink dark:text-zinc-200">{next.next}일</span> 뱃지까지{" "}
-          <span className="font-semibold tabular-nums text-amber-700 dark:text-amber-300">{next.remaining}일</span>
+          <span className="tabular-nums text-apple-ink dark:text-zinc-200">{next.next}일</span> 뱃지까지{" "}
+          <span className="font-semibold tabular-nums text-amber-700 dark:text-amber-300">{next.remaining}일</span> 남음
         </p>
       ) : streakDays >= 30 ? (
-        <p className="mt-2 text-[12px] font-semibold text-amber-800 dark:text-amber-200">30일 뱃지까지 모두 달성했어요.</p>
+        <p className="mt-2 text-[12px] font-semibold text-amber-800 dark:text-amber-200">30일 뱃지 풀콤보 달성.</p>
       ) : null}
     </div>
   );

@@ -84,9 +84,9 @@ export function PerformanceClient({ initialRows }: Props) {
     <div className="mx-auto max-w-5xl px-4 py-10 text-apple-ink dark:text-zinc-100 sm:px-8 sm:py-14">
       <SectionTitleBlock
         step="02"
-        eyebrow="REPORT"
+        eyebrow="리포트"
         title="운동 리포트"
-        description="지난주와의 차이, 종목·부위 포인트를 문장으로 풀고, 주간 차트와 함께 보여 줍니다. 아래에서 필터·보내기를 할 수 있어요."
+        description="지난주와 비교한 요약, 차트, 필터, CSV까지 한곳에서."
         right={
           <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px] dark:border-zinc-700 dark:bg-zinc-900">
             {stats.count}건
@@ -103,7 +103,7 @@ export function PerformanceClient({ initialRows }: Props) {
       <div className="mt-8 rounded-[1.75rem] border border-neutral-200/90 bg-white/95 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label htmlFor={idQ} className="block text-[12px] font-semibold text-apple-subtle">
-            운동명 포함
+            종목 검색
             <input
               id={idQ}
               name="q"
@@ -114,7 +114,7 @@ export function PerformanceClient({ initialRows }: Props) {
             />
           </label>
           <label htmlFor={idFrom} className="block text-[12px] font-semibold text-apple-subtle">
-            시작일
+            시작 날짜
             <input
               id={idFrom}
               name="from"
@@ -125,7 +125,7 @@ export function PerformanceClient({ initialRows }: Props) {
             />
           </label>
           <label htmlFor={idTo} className="block text-[12px] font-semibold text-apple-subtle">
-            종료일
+            끝 날짜
             <input
               id={idTo}
               name="to"
@@ -145,18 +145,18 @@ export function PerformanceClient({ initialRows }: Props) {
               }}
               className={`w-full ${navToolbarButton}`}
             >
-              필터 초기화
+              초기화
             </button>
           </div>
         </div>
 
         <div className="mt-6 grid gap-3 border-t border-neutral-200/90 pt-6 sm:grid-cols-3">
           <div className="rounded-2xl border border-neutral-200/90 bg-neutral-50 px-4 py-3 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">건수</p>
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle">세트</p>
             <p className="font-display mt-1 text-2xl font-bold tabular-nums">{stats.count}</p>
           </div>
           <div className="rounded-2xl border border-neutral-200/90 bg-neutral-100 px-4 py-3 text-center sm:col-span-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">추정 볼륨 (kg×회×세트 합)</p>
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle">볼륨 합</p>
             <p className="font-display mt-1 text-2xl font-bold tabular-nums">{Math.round(stats.volume * 10) / 10}</p>
           </div>
         </div>
@@ -165,23 +165,23 @@ export function PerformanceClient({ initialRows }: Props) {
           type="button"
           onClick={downloadCsv}
           disabled={filtered.length === 0}
-          className="mt-6 w-full border border-black bg-black py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+          className="mt-6 w-full rounded-lg border border-black bg-black py-3 text-[13px] font-semibold tracking-[-0.02em] text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          CSV 내려받기 ({filtered.length}건)
+          CSV 받기 ({filtered.length}건)
         </button>
       </div>
 
       <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-neutral-200/90 bg-white shadow-sm">
-        <div className="border-b border-neutral-200 bg-black px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.2em] text-white">미리보기</div>
+        <div className="border-b border-neutral-200 bg-black px-4 py-2.5 text-[12px] font-medium tracking-[-0.01em] text-white">미리보기</div>
         <ul className="max-h-[min(480px,50vh)] divide-y divide-neutral-200 overflow-y-auto">
           {filtered.length === 0 ? (
-            <li className="px-4 py-8 text-center text-[14px] text-apple-subtle">조건에 맞는 기록이 없습니다.</li>
+            <li className="px-4 py-8 text-center text-[14px] text-apple-subtle">필터 맞는 게 없어요.</li>
           ) : (
             filtered.map((w) => (
               <li key={w.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-[14px]">
                 <span className="font-semibold text-apple-ink">{w.exercise_name}</span>
                 <span className="tabular-nums text-apple-subtle">
-                  {Number(w.weight_kg)}kg · {w.reps}×{w.sets} · {w.success ? "성공" : "실패"}
+                  {Number(w.weight_kg)}kg · {w.reps}×{w.sets} · {w.success ? "성공" : "노답"}
                 </span>
                 <time className="w-full text-[12px] text-apple-subtle sm:w-auto">{formatDate(w.created_at)}</time>
               </li>

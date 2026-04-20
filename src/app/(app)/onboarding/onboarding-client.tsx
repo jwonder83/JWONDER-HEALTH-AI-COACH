@@ -35,7 +35,7 @@ export function OnboardingClient() {
         setStep(4);
         return;
       }
-      setRoutineMd("루틴 초안을 불러오지 못했습니다. 홈에서 다시 시도해 주세요.");
+      setRoutineMd("루틴 초안을 불러오지 못했어요. 홈으로 가서 다시 시도해 주세요.");
       setStep(4);
     } finally {
       setLoading(false);
@@ -44,20 +44,20 @@ export function OnboardingClient() {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-10 sm:px-6 sm:py-14">
-      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-apple-subtle">온보딩</p>
-      <h1 className="font-display mt-2 text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink">코치에 맞게 시작하기</h1>
-      <p className="mt-3 text-[14px] leading-relaxed text-apple-subtle">4단계로 목표를 알려 주시면 주간 루틴 초안을 드립니다.</p>
+      <p className="text-[11px] font-semibold tracking-[-0.01em] text-apple-subtle">처음 설정</p>
+      <h1 className="font-display mt-2 text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink">나한테 맞게 맞추기</h1>
+      <p className="mt-3 text-[14px] leading-relaxed text-apple-subtle">질문 네 가지만 답하면 주간 루틴 초안을 만들어 줄게요.</p>
 
       {step < 4 ? (
         <div className="mt-8 space-y-8">
           {step === 0 ? (
             <fieldset className="space-y-3">
-              <legend className="text-[13px] font-semibold text-apple-ink">1. 목표</legend>
+              <legend className="text-[13px] font-semibold text-apple-ink">1. 목표가 뭐예요?</legend>
               {(
                 [
-                  ["bulk", "벌크업·근력"],
-                  ["cut", "다이어트·체지방"],
-                  ["maintain", "유지·건강"],
+                  ["bulk", "벌크업·힘 키우기"],
+                  ["cut", "컷·체지방 줄이기"],
+                  ["maintain", "유지·건강 관리"],
                 ] as const
               ).map(([v, lab]) => (
                 <label key={v} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
@@ -70,12 +70,12 @@ export function OnboardingClient() {
 
           {step === 1 ? (
             <fieldset className="space-y-3">
-              <legend className="text-[13px] font-semibold text-apple-ink">2. 운동 경험</legend>
+              <legend className="text-[13px] font-semibold text-apple-ink">2. 운동 경력</legend>
               {(
                 [
-                  ["beginner", "입문 ~ 1년"],
-                  ["intermediate", "1~3년"],
-                  ["advanced", "3년 이상"],
+                  ["beginner", "입문 ~ 1년 차"],
+                  ["intermediate", "1~3년 차"],
+                  ["advanced", "3년 이상 꾸준히"],
                 ] as const
               ).map(([v, lab]) => (
                 <label key={v} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
@@ -88,7 +88,7 @@ export function OnboardingClient() {
 
           {step === 2 ? (
             <fieldset className="space-y-3">
-              <legend className="text-[13px] font-semibold text-apple-ink">3. 주 운동 횟수</legend>
+              <legend className="text-[13px] font-semibold text-apple-ink">3. 일주일에 몇 번?</legend>
               {([2, 3, 4, 5, 6] as const).map((n) => (
                 <label key={n} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
                   <input
@@ -106,7 +106,7 @@ export function OnboardingClient() {
 
           {step === 3 ? (
             <label className="block">
-              <span className="text-[13px] font-semibold text-apple-ink">4. 사용 가능한 장비</span>
+              <span className="text-[13px] font-semibold text-apple-ink">4. 쓸 수 있는 장비</span>
               <textarea
                 className="mt-2 min-h-[120px] w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-[15px] text-apple-ink shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15"
                 value={equipment}
@@ -123,7 +123,7 @@ export function OnboardingClient() {
                 onClick={() => setStep((s) => s - 1)}
                 className="rounded-full border border-neutral-300 bg-white px-5 py-2.5 text-[13px] font-semibold text-apple-ink"
               >
-                이전
+                뒤로
               </button>
             ) : null}
             {step < 3 ? (
@@ -142,19 +142,19 @@ export function OnboardingClient() {
                 onClick={() => void finish()}
                 className="rounded-full border border-black bg-black px-6 py-2.5 text-[13px] font-semibold text-white disabled:opacity-40"
               >
-                {loading ? "만드는 중…" : "루틴 초안 받기"}
+                {loading ? "루틴 만드는 중…" : "루틴 초안 받기"}
               </button>
             )}
           </div>
         </div>
       ) : (
         <div className="mt-8 space-y-4">
-          <p className="text-[13px] font-semibold text-emerald-800">프로필을 저장했습니다.</p>
+          <p className="text-[13px] font-semibold text-emerald-800">프로필 저장 완료!</p>
           <pre className="max-h-[50vh] overflow-auto whitespace-pre-wrap rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-[13px] leading-relaxed text-apple-ink">
             {routineMd}
           </pre>
           <Link href="/" className="inline-flex rounded-full border border-black bg-black px-6 py-2.5 text-[13px] font-semibold text-white">
-            홈으로
+            홈 가기
           </Link>
         </div>
       )}

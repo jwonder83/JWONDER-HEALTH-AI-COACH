@@ -1,18 +1,19 @@
 "use client";
 
-import { navHeaderLinkMuted } from "@/components/nav/menu-styles";
 import { getLastSameExercise, isNewVolumePr, rowVolume, volumeFromNumbers } from "@/lib/dashboard/insights";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
+import { loadCoachModeEnabled, persistCoachModeEnabled } from "@/lib/workout-session/coach-mode-storage";
 import type { TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
 import type { WorkoutRow } from "@/types/workout";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Phase = "idle" | "active" | "done";
+type CoachBetweenPhase = "lifting" | "rest";
 
 type SessionSet = {
   exercise: string;
@@ -87,6 +88,12 @@ export function WorkoutSessionClient({ userId }: Props) {
   const [toast, setToast] = useState<string | null>(null);
   const [prHighlight, setPrHighlight] = useState(false);
   const [celebrate, setCelebrate] = useState(false);
+  const [coachMode, setCoachMode] = useState(true);
+  const [coachBetween, setCoachBetween] = useState<CoachBetweenPhase>("lifting");
+  const [restStartedAt, setRestStartedAt] = useState<number | null>(null);
+  const [coachCue, setCoachCue] = useState<string | null>(null);
+  const coachModeRef = useRef(coachMode);
+  coachModeRef.current = coachMode;
 
   const refresh = useCallback(async () => {
     const supabase = createClient();
@@ -106,8 +113,18 @@ export function WorkoutSessionClient({ userId }: Props) {
 
   useEffect(() => {
     setProfile(loadOnboarding());
+    setCoachMode(loadCoachModeEnabled());
     void refresh();
   }, [refresh]);
+
+  function setCoachModePersist(next: boolean) {
+    setCoachMode(next);
+    persistCoachModeEnabled(next);
+    if (!next) {
+      setCoachBetween("lifting");
+      setRestStartedAt(null);
+    }
+  }
 
   const routine: TodayRoutinePlan = useMemo(
     () => buildOptimizedTodayRoutine(profile, workouts, new Date()),
@@ -144,13 +161,24 @@ export function WorkoutSessionClient({ userId }: Props) {
     setStartedAt(t);
     setNowTs(t);
     setSessionSets([]);
+    setCoachBetween("lifting");
+    setRestStartedAt(null);
+    setCoachCue(null);
     setPhase("active");
   }
 
+  function resumeAfterRest() {
+    setCoachBetween("lifting");
+    setRestStartedAt(null);
+    setCoachCue("자, 다음 세트 가보자고");
+    window.setTimeout(() => setCoachCue(null), 7000);
+  }
+
   async function saveSet() {
+    setCoachCue(null);
     const name = exercise.trim();
     if (!name) {
-      setToast("종목 이름을 입력해 주세요.");
+      setToast("종목 이름부터 적어줘요");
       return;
     }
     setSaving(true);
@@ -183,7 +211,11 @@ export function WorkoutSessionClient({ userId }: Props) {
       setPrHighlight(true);
       window.setTimeout(() => setPrHighlight(false), 5200);
     } else {
-      setToast("세트 저장됨");
+      setToast("저장 완료");
+    }
+    if (coachModeRef.current) {
+      setCoachBetween("rest");
+      setRestStartedAt(Date.now());
     }
   }
 
@@ -191,6 +223,9 @@ export function WorkoutSessionClient({ userId }: Props) {
     if (startedAt !== null) {
       setFrozenDurationMs(Date.now() - startedAt);
     }
+    setCoachBetween("lifting");
+    setRestStartedAt(null);
+    setCoachCue(null);
     setPhase("done");
   }
 
@@ -210,21 +245,54 @@ export function WorkoutSessionClient({ userId }: Props) {
     return "0:00";
   }, [phase, startedAt, nowTs, frozenDurationMs]);
 
+  const inRestPhase = coachMode && phase === "active" && coachBetween === "rest" && restStartedAt !== null;
+  const restElapsedMs = inRestPhase ? nowTs - restStartedAt : 0;
+  const restElapsedLabel = formatElapsed(restElapsedMs);
+  const longRestNudge = inRestPhase && restElapsedMs >= 90_000;
+  const restBlocksSave = inRestPhase;
+
   return (
     <div className="mx-auto w-full max-w-lg px-4 pb-16 pt-6 text-apple-ink sm:px-6 sm:pt-8 md:max-w-3xl md:pb-20 lg:max-w-6xl lg:px-10 lg:pt-10 dark:text-zinc-100">
-      <header className="mb-6 flex shrink-0 items-center justify-between gap-3 border-b border-neutral-200 pb-4 dark:border-zinc-800 sm:mb-8 lg:mb-10">
-        <Link href="/" className={`${navHeaderLinkMuted} -ml-2 !min-h-0 py-2`}>
-          ← 홈
-        </Link>
-        {phase === "active" ? (
-          <span className="font-display text-xl font-bold tabular-nums text-emerald-700 sm:text-2xl md:text-3xl dark:text-emerald-400">
-            {elapsedLabel}
-          </span>
-        ) : (
-          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">운동 모드</span>
-        )}
-        <span className="w-14 shrink-0 sm:w-16" aria-hidden />
+      <header className="mb-6 shrink-0 border-b border-neutral-200 pb-4 dark:border-zinc-800 sm:mb-8 lg:mb-10">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500">코치 모드</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={coachMode}
+            aria-label={coachMode ? "코치 모드 켜짐" : "코치 모드 꺼짐"}
+            onClick={() => setCoachModePersist(!coachMode)}
+            className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${coachMode ? "bg-emerald-600" : "bg-neutral-300 dark:bg-zinc-600"}`}
+          >
+            <span
+              className={`absolute left-1 top-1 size-6 rounded-full bg-white shadow transition-transform ${coachMode ? "translate-x-6" : "translate-x-0"}`}
+            />
+            <span className="sr-only">{coachMode ? "켜짐" : "꺼짐"}</span>
+          </button>
+        </div>
+        <div className="mt-4 flex justify-center">
+          {phase === "active" ? (
+            <span className="font-display text-xl font-bold tabular-nums text-emerald-700 sm:text-2xl md:text-3xl dark:text-emerald-400">
+              {elapsedLabel}
+            </span>
+          ) : phase === "done" ? (
+            <span className="font-display text-lg font-bold tabular-nums text-emerald-700 dark:text-emerald-400">{elapsedLabel}</span>
+          ) : (
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">운동 모드</span>
+          )}
+        </div>
       </header>
+
+      {coachCue ? (
+        <div
+          className="mb-4 rounded-2xl border-2 border-emerald-500/60 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-3.5 text-center shadow-md dark:border-emerald-600/50 dark:from-emerald-950/50 dark:to-teal-950/40"
+          role="status"
+          aria-live="polite"
+        >
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">코치</p>
+          <p className="mt-1 font-display text-[1.2rem] font-bold text-emerald-950 dark:text-emerald-100">{coachCue}</p>
+        </div>
+      ) : null}
 
       {prHighlight ? (
         <div
@@ -233,8 +301,8 @@ export function WorkoutSessionClient({ userId }: Props) {
         >
           <div className="w-full rounded-2xl border-2 border-amber-400/90 bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 px-5 py-4 text-center shadow-[0_16px_48px_-10px_rgba(245,158,11,0.6)] ring-4 ring-amber-300/35">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-100/90">PR</p>
-            <p className="mt-1 font-display text-[1.35rem] font-bold text-white">최고 기록 갱신!</p>
-            <p className="mt-1 text-[14px] font-medium text-amber-50">이번 세트가 종목 최대 볼륨을 넘었어요.</p>
+            <p className="mt-1 font-display text-[1.35rem] font-bold text-white">PR 떴다</p>
+            <p className="mt-1 text-[14px] font-medium text-amber-50">이번 세트가 이 종목 볼륨 최댓값 찍었어요.</p>
           </div>
         </div>
       ) : null}
@@ -251,7 +319,7 @@ export function WorkoutSessionClient({ userId }: Props) {
             <div className="md:grid md:grid-cols-[1fr_min(26rem,100%)] md:items-center md:gap-x-12 lg:gap-x-16 xl:grid-cols-[1fr_min(28rem,100%)]">
               <div className="md:text-left">
                 <p className="text-center text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-700 md:text-left dark:text-emerald-400/90">
-                  오늘 세션
+                  오늘 한 판
                 </p>
                 <h1 className="font-display mt-3 text-center text-[1.75rem] font-bold leading-tight tracking-[-0.03em] text-apple-ink sm:text-[2rem] md:text-left lg:text-[2.25rem] dark:text-zinc-100">
                   {routine.title}
@@ -266,10 +334,15 @@ export function WorkoutSessionClient({ userId }: Props) {
                   onClick={startSession}
                   className={`${btnPrimary} rounded-2xl text-[17px] active:scale-[0.99] lg:min-h-[60px] lg:text-[18px]`}
                 >
-                  운동 시작하기
+                  가보자고
                 </button>
                 <p className="mt-4 text-center text-[12px] text-apple-subtle md:text-left dark:text-zinc-500">
-                  세트마다 저장되며, 홈 기록과 동기화돼요.
+                  세트마다 저장되고 홈이랑 싹 맞춰져요.
+                </p>
+                <p className="mt-2 text-center text-[11px] font-medium leading-relaxed text-apple-subtle md:text-left dark:text-zinc-500">
+                  {coachMode
+                    ? "코치 모드 ON: 세트 저장하면 휴식 타이머 돌고, 다음 세트 때 한 줄로 깨워줘요."
+                    : "코치 모드 켜면 세트 사이 휴식도 재고, 다음 세트 타이밍도 잡아줘요."}
                 </p>
               </div>
             </div>
@@ -278,6 +351,35 @@ export function WorkoutSessionClient({ userId }: Props) {
 
         {phase === "active" ? (
           <div className="mx-auto w-full pb-8 lg:pb-12">
+            {inRestPhase ? (
+              <div
+                className="mb-6 rounded-2xl border-2 border-sky-500/50 bg-gradient-to-br from-sky-50 via-indigo-50/80 to-violet-50 p-5 shadow-lg ring-2 ring-sky-400/20 dark:border-sky-700/50 dark:from-sky-950/40 dark:via-indigo-950/30 dark:to-violet-950/30 dark:ring-sky-500/15"
+                role="region"
+                aria-label="세트 간 휴식"
+              >
+                <p className="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sky-800 dark:text-sky-300/90">실시간 코치</p>
+                <p className="mt-2 text-center font-display text-[1.35rem] font-bold text-sky-950 dark:text-sky-50" aria-live="polite">
+                  휴식 시간입니다
+                </p>
+                <p className="mt-1 text-center text-[13px] font-medium text-sky-900/85 dark:text-sky-100/85">세트 사이 쉬는 타임 — 타이머로 얼마나 쉬었는지 보면 돼요.</p>
+                <p className="mt-4 text-center font-display text-4xl font-bold tabular-nums tracking-tight text-indigo-900 dark:text-indigo-100 sm:text-5xl">
+                  {restElapsedLabel}
+                </p>
+                {longRestNudge ? (
+                  <p className="mt-3 text-center text-[12px] font-semibold text-indigo-800 dark:text-indigo-200/90">
+                    1분 30초 넘게 쉬었어요. 몸 풀렸으면 다음 세트로 넘어가도 돼요.
+                  </p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={resumeAfterRest}
+                  className="mt-5 w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 text-[16px] font-bold text-white shadow-md transition hover:opacity-95 active:scale-[0.99]"
+                >
+                  다음 세트 갈게
+                </button>
+              </div>
+            ) : null}
+
             <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10 xl:gap-14">
               <div className="flex min-w-0 flex-col gap-6 lg:rounded-2xl lg:border lg:border-neutral-200 lg:bg-white lg:p-8 lg:shadow-sm dark:lg:border-zinc-800 dark:lg:bg-zinc-950/50">
                 <div>
@@ -301,7 +403,7 @@ export function WorkoutSessionClient({ userId }: Props) {
                   </div>
                 ) : hydrated && exercise.trim() ? (
                   <div className={`${cardMuted} text-[14px] text-apple-subtle dark:text-zinc-400`}>
-                    이 종목의 저장된 기록이 없어요. 첫 세트를 남겨 보세요.
+                    이 종목 기록 아직 없어요. 첫 세트부터 박아봐요.
                   </div>
                 ) : null}
 
@@ -388,15 +490,20 @@ export function WorkoutSessionClient({ userId }: Props) {
                 </div>
 
                 <div className="flex flex-col gap-3 md:flex-row md:flex-row-reverse md:items-stretch md:gap-4">
-                  <button type="button" disabled={saving} onClick={() => void saveSet()} className={`${btnPrimaryBase} w-full flex-1 rounded-2xl md:min-h-[56px]`}>
-                    {saving ? "저장 중…" : "세트 저장"}
+                  <button
+                    type="button"
+                    disabled={saving || restBlocksSave}
+                    onClick={() => void saveSet()}
+                    className={`${btnPrimaryBase} w-full flex-1 rounded-2xl md:min-h-[56px]`}
+                  >
+                    {saving ? "저장 중…" : restBlocksSave ? "휴식 중 — 위 버튼 먼저" : "세트 저장"}
                   </button>
                   <button
                     type="button"
                     onClick={finishSession}
                     className="w-full shrink-0 rounded-2xl border border-neutral-300 bg-white py-3 text-[14px] font-semibold text-apple-subtle transition hover:border-black hover:text-apple-ink md:max-w-[13rem] md:py-3.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
                   >
-                    운동 마치기
+                    오늘은 여기까지
                   </button>
                 </div>
               </div>
@@ -416,10 +523,10 @@ export function WorkoutSessionClient({ userId }: Props) {
                 ✓
               </div>
               <div className="min-w-0 md:pt-1">
-                <h2 className="font-display mt-8 text-2xl font-bold text-apple-ink md:mt-0 md:text-3xl dark:text-zinc-100">수고했어요</h2>
-                <p className="mt-2 text-[15px] text-apple-subtle md:text-[16px] dark:text-zinc-400">이번 세션 요약</p>
+                <h2 className="font-display mt-8 text-2xl font-bold text-apple-ink md:mt-0 md:text-3xl dark:text-zinc-100">오늘도 고생했어요</h2>
+                <p className="mt-2 text-[15px] text-apple-subtle md:text-[16px] dark:text-zinc-400">이번 세션 스탯</p>
                 {summary.prCount > 0 ? (
-                  <p className="mt-2 text-[15px] font-semibold text-amber-800 dark:text-amber-300">PR 세트 {summary.prCount} — 이번에도 한계를 넘었어요.</p>
+                  <p className="mt-2 text-[15px] font-semibold text-amber-800 dark:text-amber-300">PR 세트 {summary.prCount}개 — 오늘도 한계 갈아끼웠네요.</p>
                 ) : null}
                 <dl className="mt-8 grid w-full gap-3 text-left sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
                   <div className="flex justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900/80 sm:flex-col sm:justify-start sm:gap-1 sm:py-4">
@@ -443,7 +550,7 @@ export function WorkoutSessionClient({ userId }: Props) {
                   href="/"
                   className={`${btnPrimary} mt-10 flex items-center justify-center rounded-2xl md:mt-8 md:inline-flex md:w-auto md:min-w-[12rem] md:px-10`}
                 >
-                  홈으로
+                  홈 가기
                 </Link>
               </div>
             </div>

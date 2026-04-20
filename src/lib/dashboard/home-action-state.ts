@@ -1,3 +1,5 @@
+import { buildDailyStatusBriefing, type DailyStatusBriefing } from "@/lib/dashboard/daily-status-briefing";
+import { buildWorkoutActionSuggestions, type WorkoutActionSuggestion } from "@/lib/dashboard/workout-action-suggestions";
 import { hasWorkoutToday, recentWorkouts } from "@/lib/dashboard/insights";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { formatEstimatedLabel, type TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
@@ -16,6 +18,8 @@ export type LocalWeeklyGoal = {
 };
 
 export type { TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
+export type { DailyStatusBriefing, FatigueLevel } from "@/lib/dashboard/daily-status-briefing";
+export type { WorkoutActionSuggestion, WorkoutActionSuggestionKind } from "@/lib/dashboard/workout-action-suggestions";
 
 export type RecentActivityItem = {
   id: string;
@@ -42,7 +46,13 @@ export type HomeActionViewModel = {
   estimatedDurationLabel: string;
   /** AI 코치 한 줄 — 오늘 행동 유도 우선 */
   coachLine: string;
+  /** coachLine 근거(데이터·규칙 요약) */
+  coachLineReason: string;
   recentActivities: RecentActivityItem[];
+  /** 하루 상태 브리핑(피로도·추천 강도). 서버/로컬 데이터 로드 전에는 null */
+  dailyBriefing: DailyStatusBriefing | null;
+  /** 정체·부위 부족 → 실행 제안(로드 전에는 빈 배열) */
+  actionSuggestions: WorkoutActionSuggestion[];
 };
 
 function buildCoachLine(args: {
@@ -53,19 +63,63 @@ function buildCoachLine(args: {
 }): string {
   if (args.todayDone) {
     if (args.streak >= 3) {
-      return `오늘 운동을 완료했어요. ${args.streak}일 연속입니다. 몸은 쉬게 하고 수분을 챙기세요.`;
+      return `오늘도 해냈네요. ${args.streak}일 연속이에요. 물 한 모금이랑 가벼운 스트칭 정도만 챙겨요.`;
     }
-    return "오늘 운동을 완료했어요. 가벼운 스트레칭으로 마무리하면 회복에 도움이 됩니다.";
+    return "오늘 세션 클리어. 몸 풀어주는 스트칭 한 번이면 딱이에요.";
   }
 
-  const focus = `오늘은 「${args.routineTitle}」이(가) 예정되어 있습니다.`;
+  const focus = `오늘 픽은 「${args.routineTitle}」이에요.`;
   if (args.goalProgressPercent !== null && args.goalProgressPercent < 40) {
-    return `${focus} 이번 주 진행이 아직 여유 있어요—지금 시작하면 리듬을 바로 잡을 수 있어요.`;
+    return `${focus} 이번 주는 아직 여유 타임—지금 한 세트만 박아도 분위기 타요.`;
   }
   if (args.streak === 0) {
-    return `${focus} 첫 세트만 남겨도 연속 기록이 시작돼요.`;
+    return `${focus} 첫 세트만 남겨도 연속 기록 스위치 켜져요.`;
   }
-  return `${focus} 지금 시작해 보세요.`;
+  return `${focus} 지금 들어가면 딱이에요. 루틴은 이미 깔려 있어요.`;
+}
+
+function rowsLastNDays(workouts: WorkoutRow[], now: Date, days: number): number {
+  const cut = now.getTime() - days * 86400000;
+  return workouts.filter((w) => new Date(w.created_at).getTime() >= cut).length;
+}
+
+function buildCoachLineReason(args: {
+  todayDone: boolean;
+  streak: number;
+  goalProgressPercent: number | null;
+  weeklySessionCurrent: number;
+  weeklySessionTarget: number | null;
+  workouts: WorkoutRow[];
+  now: Date;
+}): string {
+  if (args.todayDone) {
+    return "오늘 날짜로 저장된 세트가 있어서 완료로 띄웠어요.";
+  }
+  const mon = startOfWeekMonday(args.now);
+  const sun = endOfWeekSunday(mon);
+  const thisWeek = rollupPeriod(args.workouts, mon, sun);
+  const prevMon = new Date(mon);
+  prevMon.setDate(prevMon.getDate() - 7);
+  const prevSun = endOfWeekSunday(prevMon);
+  const lastWeek = rollupPeriod(args.workouts, prevMon, prevSun);
+  const last7 = rowsLastNDays(args.workouts, args.now, 7);
+  const bits: string[] = [
+    `이번 주 세트 ${thisWeek.rowCount}개`,
+    `최근 7일 세트 ${last7}개`,
+    args.streak > 0 ? `연속 ${args.streak}일째` : "연속은 아직 0일(어제까지 끊김 or 기록 없음)",
+  ];
+  if (lastWeek.volume > 40) {
+    const p = Math.round(((thisWeek.volume - lastWeek.volume) / lastWeek.volume) * 1000) / 10;
+    if (p <= -12) {
+      bits.push(`지난주보다 볼륨 합이 약 ${p}% ↓라 살짝 쉬어가라는 톤 섞었어요`);
+    } else {
+      bits.push(`지난주 대비 볼륨 합 약 ${p}%`);
+    }
+  }
+  if (args.goalProgressPercent !== null && args.weeklySessionTarget != null) {
+    bits.push(`주간 목표 ${args.weeklySessionTarget}세션 중 ${args.weeklySessionCurrent}번째(${args.goalProgressPercent}%)`);
+  }
+  return bits.join(" · ") + ".";
 }
 
 export function buildHomeActionViewModel(
@@ -99,6 +153,15 @@ export function buildHomeActionViewModel(
     streak,
     goalProgressPercent: goalPct,
   });
+  const coachLineReason = buildCoachLineReason({
+    todayDone,
+    streak,
+    goalProgressPercent: goalPct,
+    weeklySessionCurrent: week.rowCount,
+    weeklySessionTarget: target,
+    workouts,
+    now,
+  });
 
   const recent = recentWorkouts(workouts, 3).map((w) => ({
     id: w.id,
@@ -106,6 +169,9 @@ export function buildHomeActionViewModel(
     detail: `${Number(w.weight_kg)}kg × ${w.reps} × ${w.sets}`,
     createdAt: w.created_at,
   }));
+
+  const dailyBriefing = hydrated ? buildDailyStatusBriefing(workouts, now) : null;
+  const actionSuggestions = hydrated ? buildWorkoutActionSuggestions(workouts, now) : [];
 
   return {
     hydrated,
@@ -120,6 +186,9 @@ export function buildHomeActionViewModel(
     routine,
     estimatedDurationLabel,
     coachLine,
+    coachLineReason,
     recentActivities: recent,
+    dailyBriefing,
+    actionSuggestions,
   };
 }

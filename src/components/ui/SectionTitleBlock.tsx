@@ -28,18 +28,18 @@ export function SectionTitleBlock({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 gap-3 sm:gap-4">
           <div
-            className="font-display flex size-11 shrink-0 items-center justify-center border border-apple-ink bg-white text-sm font-semibold text-apple-ink sm:size-12 sm:text-base"
+            className="font-display flex size-11 shrink-0 items-center justify-center rounded-lg border border-apple-ink/80 bg-white text-sm font-semibold text-apple-ink sm:size-12 sm:text-base"
             aria-hidden
           >
             {step}
           </div>
           <div className="min-w-0 pt-0.5">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-apple-subtle sm:text-[11px]">{eyebrow}</p>
-            <h2 className="font-display mt-1.5 text-[1.5rem] font-bold leading-[1.15] tracking-[-0.02em] text-apple-ink sm:text-[1.75rem]">
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle sm:text-[12px]">{eyebrow}</p>
+            <h2 className="font-display mt-1.5 text-[1.45rem] font-bold leading-snug tracking-[-0.02em] text-apple-ink sm:text-[1.65rem]">
               {title}
             </h2>
             {description ? (
-              <div className="mt-2 max-w-2xl text-[14px] leading-relaxed text-apple-subtle sm:text-[15px]">{description}</div>
+              <div className="mt-2 max-w-2xl text-[13px] leading-snug text-apple-subtle sm:text-[14px]">{description}</div>
             ) : null}
           </div>
         </div>

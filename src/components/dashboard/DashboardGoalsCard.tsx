@@ -75,28 +75,27 @@ export function DashboardGoalsCard({ workouts }: Props) {
     <div className="mt-6 border border-neutral-200 bg-white p-4 shadow-inner sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-apple-subtle">이번 주</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-apple-subtle">이번 주 스탯</p>
           <p className="font-display mt-1 text-[1.125rem] font-bold text-apple-ink sm:text-[1.25rem]">
-            기록 {week.rowCount}건 · 볼륨 합{" "}
+            세트 {week.rowCount}개 · 볼륨 합{" "}
             <span className="tabular-nums">{Math.round(week.volume * 10) / 10}</span>
           </p>
           {week.topExercise ? (
             <p className="mt-1 text-[13px] text-apple-subtle">
-              가장 많이 남긴 종목: <span className="font-semibold text-apple-ink">{week.topExercise}</span>
+              제일 많이 찍은 종목: <span className="font-semibold text-apple-ink">{week.topExercise}</span>
             </p>
           ) : (
-            <p className="mt-1 text-[13px] text-apple-subtle">이번 주에는 아직 기록이 없어요.</p>
+            <p className="mt-1 text-[13px] text-apple-subtle">이번 주는 아직 조용해요.</p>
           )}
           {streak > 0 ? (
             <p className="mt-2 text-[12px] font-medium text-apple-subtle">
-              연속 기록{" "}
+              연속 스택{" "}
               <span className="font-display text-[15px] font-bold tabular-nums text-apple-ink">{streak}</span>일 · 오늘
-              또는 어제부터 집계
+              또는 어제 기준
             </p>
           ) : workouts.length > 0 ? (
             <p className="mt-2 text-[12px] text-apple-subtle">
-              연속 기록을 이어가려면 <span className="font-semibold text-apple-ink">오늘 또는 어제</span>에 기록을
-              남겨 보세요.
+              연속 이어가려면 <span className="font-semibold text-apple-ink">오늘 or 어제</span>에 세트 하나만.
             </p>
           ) : null}
         </div>
@@ -105,7 +104,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
           onClick={() => setOpen((o) => !o)}
           className="shrink-0 border border-neutral-300 bg-white px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-apple-ink transition hover:border-black"
         >
-          {open ? "목표 닫기" : "목표 설정"}
+          {open ? "접기" : "목표 편집"}
         </button>
       </div>
 
@@ -114,7 +113,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
           {goals.weeklySessionTarget ? (
             <div>
               <div className="flex justify-between text-[11px] font-semibold text-apple-subtle">
-                <span>주간 기록 목표</span>
+                <span>주간 세트 목표</span>
                 <span className="tabular-nums">
                   {week.rowCount} / {goals.weeklySessionTarget}건
                 </span>
@@ -125,7 +124,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
                 aria-valuenow={week.rowCount}
                 aria-valuemin={0}
                 aria-valuemax={goals.weeklySessionTarget}
-                aria-label="주간 기록 목표 진행"
+                aria-label="주간 세트 목표 진행"
               >
                 <div
                   className="h-full bg-black transition-all duration-500"
@@ -140,7 +139,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
               {lastWeight != null ? (
                 <>
                   {" "}
-                  · 최근 저장 중량{" "}
+                  · 최근 찍힌 중량{" "}
                   <span className="font-semibold tabular-nums text-apple-ink">{lastWeight}kg</span> (참고)
                 </>
               ) : null}
@@ -152,7 +151,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
       {open ? (
         <div className="mt-4 space-y-3 border-t border-neutral-200 pt-4">
           <label className="block text-[12px] font-medium text-apple-subtle">
-            주간 기록 목표(건)
+            주간 세트 목표(개)
             <input
               type="number"
               min={1}
@@ -173,7 +172,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
             />
           </label>
           <label className="block text-[12px] font-medium text-apple-subtle">
-            목표 체중(kg, 참고)
+            목표 체중(kg·참고용)
             <input
               type="number"
               min={1}
@@ -195,7 +194,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
             />
           </label>
           <p className="text-[11px] leading-relaxed text-apple-subtle">
-            이 기기 브라우저에만 저장됩니다. 이번 달 볼륨 합{" "}
+            이 브라우저에만 저장돼요. 이번 달 볼륨 합{" "}
             <span className="font-semibold tabular-nums text-apple-ink">{Math.round(month.volume * 10) / 10}</span>, 기록{" "}
             <span className="font-semibold tabular-nums text-apple-ink">{month.rowCount}</span>건
           </p>

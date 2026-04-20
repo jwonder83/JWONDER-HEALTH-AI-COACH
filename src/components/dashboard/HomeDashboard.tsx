@@ -64,8 +64,8 @@ const cardRing =
 const sectionShell =
   "scroll-mt-36 border border-neutral-200 bg-white p-6 shadow-sm sm:scroll-mt-44 sm:p-9 dark:border-zinc-800 dark:bg-zinc-950";
 
-const SECTION_HINT_INPUT = "필드를 채우고 저장하면 바로 아래 목록에 반영됩니다.";
-const SECTION_HINT_LIST = "날짜·종목 기준으로 기록을 확인하고 한 건씩 지울 수 있어요.";
+const SECTION_HINT_INPUT = "저장하면 바로 아래 목록에 반영돼요.";
+const SECTION_HINT_LIST = "날짜·종목별로 보고, 필요하면 한 건씩 지울 수 있어요.";
 
 type Props = {
   userId: string;
@@ -196,32 +196,32 @@ export function HomeDashboard({ userId, site }: Props) {
               aria-hidden
             />
             <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-12">
-              <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-white/70">{site.copy.mainHero.eyebrow}</p>
+              <p className="text-[11px] font-medium tracking-[-0.01em] text-white/75">{site.copy.mainHero.eyebrow}</p>
               <h1 className="font-display mt-3 max-w-2xl text-[1.875rem] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-[2.5rem] sm:leading-[1.06]">
                 {site.copy.mainHero.titleLine1}
                 <span className="mt-2 block font-semibold text-white/90">{site.copy.mainHero.titleLine2}</span>
               </h1>
-              <p className="mt-4 max-w-lg text-[16px] font-medium leading-relaxed tracking-[-0.01em] text-white/78 sm:mt-5 sm:text-[17px]">
+              <p className="mt-4 max-w-lg text-[15px] font-medium leading-snug tracking-[-0.01em] text-white/80 sm:mt-5 sm:text-[16px]">
                 {site.copy.mainHero.subtitle}
               </p>
               <div className="pointer-events-auto mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
                 <Link
                   href="/workout"
-                  className="inline-flex items-center justify-center border border-white bg-white px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-transparent hover:text-white active:scale-[0.98] sm:py-3 sm:text-[12px]"
+                  className="inline-flex items-center justify-center rounded-lg border border-white bg-white px-5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-black transition hover:bg-white/90 active:scale-[0.98] sm:py-3 sm:text-[14px]"
                 >
-                  운동 시작하기
+                  세트 남기기
                 </Link>
                 <Link
                   href="/program"
-                  className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
+                  className="inline-flex items-center justify-center rounded-lg border border-white/45 bg-white/10 px-5 py-2.5 text-[13px] font-medium tracking-[-0.02em] text-white backdrop-blur-sm transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[14px]"
                 >
                   {site.program.navLabel}
                 </Link>
                 <Link
                   href="/performance"
-                  className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
+                  className="inline-flex items-center justify-center rounded-lg border border-white/45 bg-white/10 px-5 py-2.5 text-[13px] font-medium tracking-[-0.02em] text-white backdrop-blur-sm transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[14px]"
                 >
-                  퍼포먼스
+                  성과 보기
                 </Link>
               </div>
             </div>
@@ -244,7 +244,7 @@ export function HomeDashboard({ userId, site }: Props) {
                 className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 transition duration-500 group-hover:from-black/80"
                 aria-hidden
               />
-              <span className="font-display absolute bottom-3 left-3 text-[10px] font-medium uppercase tracking-[0.2em] text-white sm:text-[11px]">
+              <span className="absolute bottom-3 left-3 text-[11px] font-semibold tracking-[-0.01em] text-white sm:text-[12px]">
                 {t.caption}
               </span>
             </div>
@@ -256,31 +256,31 @@ export function HomeDashboard({ userId, site }: Props) {
           {[
             {
               k: "total",
-              label: "누적 기록",
+              label: "전체",
               value: hydrated ? `${workouts.length}` : "—",
               unit: "건",
-              sub: "저장된 세트 행",
+              sub: "세트 행",
             },
             {
               k: "week",
               label: "이번 주",
               value: hydrated ? `${weekRollup.rowCount}` : "—",
               unit: "건",
-              sub: "월~일 기준",
+              sub: "월~일",
             },
             {
               k: "vol",
-              label: "이번 주 볼륨",
+              label: "주간 볼륨",
               value: hydrated ? `${Math.round(weekRollup.volume * 10) / 10}` : "—",
               unit: "합",
-              sub: weekRollup.topExercise ? `많이 남긴 종목: ${weekRollup.topExercise}` : "종목별 kg×회×세트 합산",
+              sub: weekRollup.topExercise ? `1위 ${weekRollup.topExercise}` : "kg×회×세트",
             },
           ].map((s) => (
             <div
               key={s.k}
-              className="border border-neutral-200 bg-white p-4 shadow-sm sm:p-5"
+              className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-5"
             >
-              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-apple-subtle">{s.label}</p>
+              <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle">{s.label}</p>
               <p className="font-display mt-2 text-[1.35rem] font-bold tabular-nums text-apple-ink sm:text-[1.5rem]">
                 {s.value}
                 <span className="ml-1 text-[13px] font-semibold text-apple-subtle sm:text-[14px]">{s.unit}</span>
@@ -292,70 +292,70 @@ export function HomeDashboard({ userId, site }: Props) {
 
         {/* 빠른 이동 카드 */}
         <div className="mt-8 sm:mt-10">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-apple-subtle">바로 가기</p>
+          <p className="text-[12px] font-medium tracking-[-0.01em] text-apple-subtle">바로가기</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="#section-input"
-              className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
+              className="group flex gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
             >
-              <span className="flex size-11 shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-apple-ink">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 text-apple-ink">
                 <IconPencil className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">운동 기록</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">세트를 남기고 목록에서 바로 확인</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">오늘 세트 남기기</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">저장하면 목록에 바로 떠요</span>
               </span>
             </Link>
             <Link
               href="/program"
-              className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
+              className="group flex gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
             >
-              <span className="flex size-11 shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-apple-ink">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 text-apple-ink">
                 <IconBook className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">{site.program.navLabel}</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">{site.program.navLabel}</span>
                 <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">{site.program.promoLinkLabel}</span>
               </span>
             </Link>
             <Link
               href="/performance"
-              className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
+              className="group flex gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
             >
-              <span className="flex size-11 shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-apple-ink">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 text-apple-ink">
                 <IconChart className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">퍼포먼스</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">추세·필터·CSV 내려받기</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">성과 보기</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">그래프랑 CSV 다운로드</span>
               </span>
             </Link>
             <Link
               href="/help"
-              className="group flex gap-3 border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
+              className="group flex gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:border-black sm:p-5"
             >
-              <span className="flex size-11 shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-apple-ink">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 text-apple-ink">
                 <IconLifeBuoy className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="font-display text-[15px] font-semibold text-apple-ink group-hover:opacity-70">도움말</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">FAQ와 문의 안내</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">도움말</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">FAQ랑 문의 안내</span>
               </span>
             </Link>
           </div>
         </div>
 
         {hydrated && workouts.length === 0 ? (
-          <div className="mt-8 flex flex-col gap-3 border border-dashed border-neutral-300 bg-neutral-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+          <div className="mt-8 flex flex-col gap-3 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
             <div>
-              <p className="font-display text-[15px] font-semibold text-apple-ink">아직 저장된 기록이 없어요</p>
-              <p className="mt-1 text-[13px] leading-relaxed text-apple-subtle">첫 세트를 남기면 여기와 운동 기록에 바로 반영됩니다.</p>
+              <p className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink">아직 기록이 없어요</p>
+              <p className="mt-1 text-[13px] leading-snug text-apple-subtle">첫 세트부터 쌓아볼까요?</p>
             </div>
             <Link
               href="/workout"
-              className="inline-flex shrink-0 items-center justify-center border border-black bg-black px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98]"
+              className="inline-flex shrink-0 items-center justify-center rounded-lg border border-black bg-black px-5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-white transition hover:bg-neutral-800 active:scale-[0.98]"
             >
-              운동 시작하기
+              세트 남기기
             </Link>
           </div>
         ) : null}
@@ -370,7 +370,7 @@ export function HomeDashboard({ userId, site }: Props) {
             ))}
           </nav>
           <button type="button" onClick={handleClear} className={`${navToolbarButton} active:scale-[0.98]`}>
-            전체 삭제
+            전체 지우기
           </button>
         </div>
 
@@ -378,10 +378,10 @@ export function HomeDashboard({ userId, site }: Props) {
       </div>
 
       <main className="mx-auto max-w-5xl space-y-14 px-5 py-14 sm:space-y-20 sm:px-8 sm:py-20">
-        <section id="section-input" className={sectionShell}>
+        <section id="section-input" className={`${sectionShell} rounded-xl`}>
           <SectionTitleBlock
             step="01"
-            eyebrow="INPUT"
+            eyebrow="입력"
             title={site.copy.mainNavSectionLabels[0]}
             description={
               <>
@@ -392,14 +392,13 @@ export function HomeDashboard({ userId, site }: Props) {
                 >
                   {site.program.promoLinkLabel}
                 </Link>
-                에서 루틴·워밍업·RPE 팁을 볼 수 있어요.
               </>
             }
           />
           <WorkoutForm
             onSaved={(r) => {
               if (r?.pr) {
-                setToast({ message: "새 PR이에요! 볼륨 최고 기록을 갱신했습니다.", variant: "achievement" });
+                setToast({ message: "새 PR이에요! 이 종목 볼륨 최고 기록을 갱신했어요.", variant: "achievement" });
               }
             }}
             saveWorkout={saveWorkout}
@@ -409,14 +408,14 @@ export function HomeDashboard({ userId, site }: Props) {
           />
         </section>
 
-        <section id="section-list" className={sectionShell}>
+        <section id="section-list" className={`${sectionShell} rounded-xl`}>
           <SectionTitleBlock
             step="02"
-            eyebrow="LIST"
+            eyebrow="기록"
             title={site.copy.mainNavSectionLabels[1]}
             description={SECTION_HINT_LIST}
             right={
-              <span className="border border-neutral-200 bg-neutral-50 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-apple-ink tabular-nums">
+              <span className="rounded-lg border border-neutral-200 bg-neutral-50 px-3.5 py-1.5 text-[12px] font-medium tracking-[-0.01em] text-apple-ink tabular-nums">
                 {hydrated ? `${workouts.length}건` : "—"}
               </span>
             }
@@ -431,10 +430,10 @@ export function HomeDashboard({ userId, site }: Props) {
           />
         </section>
 
-        <section id="section-coach" className={sectionShell}>
+        <section id="section-coach" className={`${sectionShell} rounded-xl`}>
           <SectionTitleBlock
             step="03"
-            eyebrow="COACH"
+            eyebrow="코치"
             title={site.copy.mainNavSectionLabels[2]}
             description={site.copy.webCoachingHint}
           />

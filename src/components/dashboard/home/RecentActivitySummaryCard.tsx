@@ -25,17 +25,17 @@ export function RecentActivitySummaryCard({ items, hydrated }: Props) {
     <section className={shell} aria-labelledby="recent-activity-heading">
       <div className="flex items-center justify-between gap-2">
         <h2 id="recent-activity-heading" className="text-[10px] font-bold uppercase tracking-[0.2em] text-apple-subtle">
-          최근 활동
+          최근에 한 것들
         </h2>
         <Link href="/performance" className="text-[11px] font-semibold text-apple-ink underline underline-offset-4 hover:opacity-60">
-          전체 보기
+          전체 타임라인
         </Link>
       </div>
 
       {!hydrated ? (
         <p className="mt-4 text-[13px] text-apple-subtle">불러오는 중…</p>
       ) : items.length === 0 ? (
-        <p className="mt-4 text-[13px] leading-relaxed text-apple-subtle">아직 저장된 세트가 없어요. 위에서 운동을 시작하고 첫 기록을 남겨 보세요.</p>
+        <p className="mt-4 text-[13px] leading-relaxed text-apple-subtle">아직 기록판이 조용해요. 위에서 한 세트만 박아도 바로 채워져요.</p>
       ) : (
         <ul className="mt-3 space-y-3">
           {items.map((w) => (

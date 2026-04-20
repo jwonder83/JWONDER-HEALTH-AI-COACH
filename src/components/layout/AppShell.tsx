@@ -55,7 +55,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
           <div className="flex min-w-0 flex-wrap items-center gap-4 sm:gap-8">
             <Link
               href="/"
-              className="font-display relative flex size-10 shrink-0 items-center justify-center overflow-hidden border border-apple-ink bg-apple-ink text-[15px] font-semibold text-white transition hover:bg-white hover:text-apple-ink"
+              className="font-display relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-apple-ink bg-apple-ink text-[15px] font-semibold text-white transition hover:bg-white hover:text-apple-ink"
               aria-label="홈"
             >
               {site.images.headerLogo.src.trim() ? (
@@ -76,30 +76,30 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                 홈
               </Link>
               <Link href="/workout" className={navHeaderLink}>
-                운동
+                기록
               </Link>
               <Link href="/program" className={navHeaderLink}>
                 {site.program.navLabel}
               </Link>
               <Link href="/performance" className={navHeaderLink}>
-                퍼포먼스
+                성과
               </Link>
               <Link href="/help" className={navHeaderLink}>
                 도움말
               </Link>
               <Link href="/settings" className={navHeaderLink}>
-                계정
+                설정
               </Link>
             </nav>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-3">
-            <span className="hidden max-w-[200px] truncate text-[11px] uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500 sm:inline">
+            <span className="hidden max-w-[200px] truncate text-[12px] tracking-[-0.01em] text-apple-subtle dark:text-zinc-500 sm:inline">
               {email}
             </span>
             <ThemeToggle />
             {showAdminLink ? (
               <Link href="/admin" className={navHeaderLink}>
-                사이트 설정
+                관리
               </Link>
             ) : null}
             <SignOutButton className={navHeaderLinkMuted} />
@@ -113,7 +113,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
 
       <footer className="mt-auto border-t border-neutral-200 bg-white px-4 py-12 dark:border-zinc-800 dark:bg-zinc-950 sm:px-6">
         <div className="mx-auto max-w-6xl text-center">
-          <p className="font-display text-[11px] font-medium uppercase tracking-[0.28em] text-apple-ink dark:text-zinc-100">
+          <p className="text-[12px] font-semibold tracking-[-0.01em] text-apple-ink dark:text-zinc-100">
             {site.copy.footer.primaryLine}
           </p>
           {site.copy.footer.secondaryLine.trim() ? (
@@ -137,7 +137,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
             ))}
           </div>
           {footerMeta?.statusUrl || footerMeta?.feedbackMailto || footerMeta?.feedbackFormUrl ? (
-            <p className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[11px] uppercase tracking-[0.14em] text-apple-subtle dark:text-zinc-500">
+            <p className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] tracking-[-0.01em] text-apple-subtle dark:text-zinc-500">
               {footerMeta.statusUrl ? (
                 <>
                   <FooterNavLink
@@ -176,7 +176,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
               ) : null}
             </p>
           ) : null}
-          <p className="mt-8 whitespace-pre-line text-[11px] uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">
+          <p className="mt-8 whitespace-pre-line text-[11px] tracking-[-0.01em] text-apple-subtle dark:text-zinc-500">
             {footerCopyrightLine(site.copy.footer.copyrightLine)}
           </p>
         </div>

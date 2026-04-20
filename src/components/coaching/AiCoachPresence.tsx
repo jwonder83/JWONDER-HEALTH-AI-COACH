@@ -12,13 +12,13 @@ export type AiCoachPresenceProps = {
 };
 
 const situationLabel: Record<CoachPresenceMessage["situation"], string> = {
-  first_record: "첫 기록",
-  streak_motivation: "동기 부여",
-  post_workout: "오늘 분석",
-  pre_workout: "시작 추천",
+  first_record: "첫 시작",
+  streak_motivation: "스트릭 리셋",
+  post_workout: "운동 후",
+  pre_workout: "운동 전",
 };
 
-export function AiCoachPresence({ message, className = "", label = "AI 코치" }: AiCoachPresenceProps) {
+export function AiCoachPresence({ message, className = "", label = "코치" }: AiCoachPresenceProps) {
   const tag = situationLabel[message.situation];
 
   return (
@@ -29,23 +29,29 @@ export function AiCoachPresence({ message, className = "", label = "AI 코치" }
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4">
         <div className="flex min-w-0 items-start gap-3 sm:items-center">
           <span
-            className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white text-[10px] font-bold uppercase tracking-wider text-apple-ink shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/15 to-indigo-500/10 text-[11px] font-bold tracking-[-0.02em] text-violet-900 ring-1 ring-violet-200/80 dark:from-violet-400/20 dark:to-indigo-400/10 dark:text-violet-100 dark:ring-violet-500/30"
             aria-hidden
           >
             AI
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-apple-subtle">{label}</span>
-              <span className="rounded-full border border-neutral-200 bg-white px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-apple-subtle dark:border-zinc-700 dark:bg-zinc-900">
+              <span className="text-[12px] font-semibold tracking-[-0.02em] text-apple-ink dark:text-zinc-100">{label}</span>
+              <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-medium tracking-[-0.01em] text-apple-subtle dark:bg-zinc-800 dark:text-zinc-300">
                 {tag}
               </span>
               {message.source === "gpt" ? (
-                <span className="text-[9px] font-medium text-emerald-600 dark:text-emerald-400">GPT</span>
+                <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">GPT</span>
               ) : null}
             </div>
-            <p className="mt-1.5 text-[14px] font-medium leading-relaxed text-apple-ink sm:text-[15px]" aria-live="polite">
+            <p className="mt-1.5 text-[14px] font-medium leading-snug text-apple-ink sm:text-[15px]" aria-live="polite">
               {message.body}
+            </p>
+            <p className="mt-2 flex flex-wrap items-start gap-2">
+              <span className="shrink-0 rounded-md bg-neutral-100/90 px-2 py-0.5 text-[10px] font-medium tracking-[-0.01em] text-apple-subtle dark:bg-zinc-800 dark:text-zinc-400">
+                왜 이런 말이냐면
+              </span>
+              <span className="min-w-0 text-[12px] leading-snug text-apple-subtle dark:text-zinc-400">{message.reason}</span>
             </p>
           </div>
         </div>

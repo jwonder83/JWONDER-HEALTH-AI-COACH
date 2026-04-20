@@ -20,7 +20,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
     <>
       <GuideFigure src={bi.hero.src} alt={bi.hero.alt} priority className="mt-8" />
 
-      <nav aria-label="이 페이지 목차" className="mt-10 flex flex-wrap gap-2 border-y border-neutral-200 py-5 dark:border-zinc-800">
+      <nav aria-label="이 페이지 뭐 있나" className="mt-10 flex flex-wrap gap-2 border-y border-neutral-200 py-5 dark:border-zinc-800">
         {program.toc.map((item) => (
           <a key={item.id} href={`#${item.id}`} className={navPillLinkCompact}>
             {item.label}
@@ -32,19 +32,20 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="framework" className="mt-14 scroll-mt-28 space-y-4">
         <h2 className={h2}>{st.framework}</h2>
         <p className={body}>
-          근육은 <strong className="text-apple-ink">기계적 장력·대사 스트레스</strong>에 적응합니다. 프로그램의 핵심은{" "}
-          <strong className="text-apple-ink">점진적 과부하(Progressive Overload)</strong>, <strong>특이성(Specificity)</strong>, 그리고{" "}
-          <strong>회복-적응(SRA: Stimulus–Recovery–Adaptation)</strong>의 균형입니다. 주간 볼륨·강도·종목 선택은 모두 이 세 축 위에서 조정됩니다.
+          근육은 <strong className="text-apple-ink">장력·대사 스트레스</strong>에 맞춰 자라요. 프로그램의 뼈대는{" "}
+          <strong className="text-apple-ink">점진 과부하(Progressive Overload)</strong>, <strong>특이성(Specificity)</strong>, 그리고{" "}
+          <strong>자극–회복–적응(SRA)</strong> 밸런스예요. 주간 볼륨·강도·종목 고르는 건 전부 이 세 축 위에서 돌아갑니다.
         </p>
         <ul className={`${body} list-inside list-disc space-y-2`}>
           <li>
-            <strong className="text-apple-ink">개체차</strong>가 큽니다. 동일한 템플릿이라도 수면·영양·스트레스·컨디션에 따라 주간 허용 볼륨(MRV)이 달라집니다.
+            <strong className="text-apple-ink">사람마다 체감 겁나 다름</strong>. 같은 템플릿이어도 잠·밥·스트레스·컨디션 따라 주간에 버틸 수 있는 볼륨(MRV)이
+            달라져요.
           </li>
           <li>
-            <strong className="text-apple-ink">측정 가능한 변수</strong>로 주기를 관리하세요: 중량, 총 세트 수, RPE/RIR, 주간 총 볼륨(kg×회×세트), 종목별 분포.
+            <strong className="text-apple-ink">숫자로 주기 잡기</strong>: 중량, 총 세트, RPE/RIR, 주간 총 볼륨(kg×회×세트), 부위별 비중.
           </li>
           <li>
-            <strong className="text-apple-ink">기술(Technique) 우선</strong> — 부하 상승은 관절 각도·밸런스·가동범위가 유지될 때만 의미가 있습니다.
+            <strong className="text-apple-ink">폼 먼저</strong> — 무게 올리는 건 관절 각·밸런스·ROM이 지켜질 때만 의미 있어요.
           </li>
         </ul>
         <YouTubeEmbed id={bv.framework.videoId} title={bv.framework.title} />
@@ -54,14 +55,14 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="split" className="mt-16 scroll-mt-28 space-y-5">
         <h2 className={h2}>{st.split}</h2>
         <p className={body}>
-          <strong className="text-apple-ink">분할(Split)</strong>은 한 세션당 신경·대사 부담을 분산시키고, 부위별 주간 세트 수를 MEV~MAV 구간에 두기 위한
-          도구입니다. 초보는 전신 또는 상·하 2분할로 시작해 패턴을 익히고, 중급 이후에는 푸시/풀/레그 또는 부위별 4~5분할로 세분화하는 경우가 많습니다.
+          <strong className="text-apple-ink">분할(Split)</strong>은 한 번에 너무 때리지 않게 부담 나누고, 부위별 주간 세트를 MEV~MAV 쪽에 두려는 도구예요.
+          입문은 전신이나 상·하 2분할로 패턴 익히고, 중급 넘어가면 푸시/풀/레그나 부위 4~5분할로 쪼개는 경우가 많아요.
         </p>
         <GuideFigure src={bi.barbell.src} alt={bi.barbell.alt} />
         <YouTubeEmbed id={bv.split.videoId} title={bv.split.title} />
         <div className="grid gap-4 lg:grid-cols-2">
           <div className={card}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-subtle">초급 · 주 3일 (전신 또는 상하)</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-subtle">입문 · 주 3일 (전신 또는 상·하)</p>
             <ul className="mt-3 space-y-2 text-[14px] leading-snug text-apple-ink">
               <li>
                 <span className="font-semibold">A일</span> — 하체 복합(스쿼트/레그프레스) + 보조 1~2 + 코어
@@ -74,7 +75,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
               </li>
             </ul>
             <p className="mt-3 text-[12px] leading-relaxed text-apple-subtle">
-              세션당 큰 동작 4~6개, 세트 총합은 부위별 가이드(아래 볼륨 랜드마크)에 맞춰 점진적으로 올립니다.
+              세션당 큰 동작 4~6개, 세트 합은 아래 볼륨 랜드마크를 보면서 천천히 올리면 돼요.
             </p>
           </div>
           <div className={card}>
@@ -88,8 +89,7 @@ export function ProgramGuideBuiltIn({ program }: Props) {
               </li>
             </ul>
             <p className="mt-3 text-[12px] leading-relaxed text-apple-subtle">
-              동일 근군은 보통 <strong className="text-apple-ink">48~72시간</strong> 간격을 두고, 주간 세트가 MRV에 근접하면 관절·정신 피로도가 먼저 신호를
-              줍니다.
+              같은 근육은 보통 <strong className="text-apple-ink">48~72시간</strong> 텀 두고, 주간 세트가 MRV 근처면 관절·멘탈이 먼저 “그만” 신호 줘요.
             </p>
           </div>
         </div>
@@ -99,45 +99,45 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="volume" className="mt-16 scroll-mt-28 space-y-4">
         <h2 className={h2}>{st.volume}</h2>
         <p className={body}>
-          르네상스 퍼리오다이제이션 등에서 널리 쓰는 프레임으로, <strong className="text-apple-ink">근육당 주간 세트</strong>를 설계할 때 참고합니다. 수치는
-          population 가이드이며, 개인은 기록과 회복 신호로 보정해야 합니다.
+          르네상스 퍼리오다이제이션 쪽에서 많이 쓰는 틀로, <strong className="text-apple-ink">근육당 주간 세트</strong> 짤 때 참고해요. 숫자는 평균 가이드고,
+          본인은 기록이랑 회복 신호로 꼭 보정해야 합니다.
         </p>
         <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-[13px] text-apple-ink sm:text-[14px]">
             <thead className="border-b border-neutral-200 bg-neutral-100 text-[10px] font-bold uppercase tracking-[0.12em] text-apple-subtle sm:text-[11px]">
               <tr>
                 <th className="px-3 py-2.5 sm:px-4">용어</th>
-                <th className="px-3 py-2.5 sm:px-4">의미</th>
-                <th className="px-3 py-2.5 sm:px-4">실무 적용</th>
+                <th className="px-3 py-2.5 sm:px-4">뜻</th>
+                <th className="px-3 py-2.5 sm:px-4">현장에서</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200 text-apple-subtle">
               <tr>
                 <td className="px-3 py-2.5 font-semibold text-apple-ink sm:px-4">MV</td>
                 <td className="px-3 py-2.5 sm:px-4">유지 볼륨</td>
-                <td className="px-3 py-2.5 sm:px-4">휴식·여행 주에도 이하로 내려가지 않으면 근육 유지에 유리</td>
+                <td className="px-3 py-2.5 sm:px-4">여행 주에도 이 밑으로만 안 가면 유지에 유리</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-semibold text-apple-ink sm:px-4">MEV</td>
                 <td className="px-3 py-2.5 sm:px-4">최소 효과 볼륨</td>
-                <td className="px-3 py-2.5 sm:px-4">성장을 기대하는 최소 주간 세트 하한(근육·경험치별 상이)</td>
+                <td className="px-3 py-2.5 sm:px-4">성장 기대할 때 최소 주간 세트 하한(근육·경험마다 다름)</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-semibold text-apple-ink sm:px-4">MAV</td>
                 <td className="px-3 py-2.5 sm:px-4">최대 적응 볼륨</td>
-                <td className="px-3 py-2.5 sm:px-4">장기적으로 가장 많이 머무를 “성장 효율” 구간의 평균대</td>
+                <td className="px-3 py-2.5 sm:px-4">오래 머물기 좋은 “성장 효율” 구간 평균대</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-semibold text-apple-ink sm:px-4">MRV</td>
                 <td className="px-3 py-2.5 sm:px-4">최대 회복 가능 볼륨</td>
-                <td className="px-3 py-2.5 sm:px-4">이 이상은 관절·정신 피로·수행도 붕괴 위험 — 델로드·종목 로테이션 신호</td>
+                <td className="px-3 py-2.5 sm:px-4">이 위로 가면 관절·멘탈·폼 다 깨질 확률 ↑ — 델로드·종목 바꿀 타이밍</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p className={body}>
-          근비대 목적의 <strong className="text-apple-ink">대근군당 주 10~20세트</strong>는 흔한 출발점이나, 큰 근육(대사두·등광배)·작은 근육(측면삼각·비복근)의
-          내성은 크게 다릅니다. 아래 영상은 세트 수를 올릴 때의 근거와 주의를 다룹니다.
+          근비대 목적이면 <strong className="text-apple-ink">큰 근육당 주 10~20세트</strong>가 흔한 출발점인데, 대퇴사두·광배랑 측면삼각·비복 같은 작은 데는
+          버티는 양이 완전 다름. 아래 영상은 세트 올릴 때 근거·주의점.
         </p>
         <GuideFigure src={bi.plates.src} alt={bi.plates.alt} />
         <YouTubeEmbed id={bv.volumeMain.videoId} title={bv.volumeMain.title} />
@@ -165,19 +165,18 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="deload" className="mt-16 scroll-mt-28 space-y-4">
         <h2 className={h2}>{st.deload}</h2>
         <p className={body}>
-          <strong className="text-apple-ink">누적 피로(Fatigue)</strong>는 1RM보다 먼저 수행 속도·RPE·정밀도를 깎아냅니다. 보통{" "}
-          <strong className="text-apple-ink">3:1 또는 4:1</strong> 비율(3~4주 적응 주 + 1주 델로드)을 쓰거나, 자동조절 지표(RPE 급등, 수면 악화, 통증
-          패턴 변화)로 델로드를 당깁니다.
+          <strong className="text-apple-ink">누적 피로</strong>는 1RM 말고도 속도·RPE·폼부터 먼저 갉아먹어요. 보통{" "}
+          <strong className="text-apple-ink">3:1 또는 4:1</strong>(적응 3~4주 + 델로드 1주) 쓰거나, RPE 폭주·잠 망가짐·통증 패턴 바뀌면 델로드를 앞당깁니다.
         </p>
         <ul className={`${body} list-inside list-disc space-y-2`}>
           <li>
-            <strong className="text-apple-ink">볼륨 델로드</strong>: 총 세트 30~50% 절감, 강도는 중간 RPE로 유지해 동작감을 잃지 않기
+            <strong className="text-apple-ink">볼륨 델로드</strong>: 총 세트 30~50% 깎고, 강도는 중간 RPE로 느낌은 유지
           </li>
           <li>
-            <strong className="text-apple-ink">강도 델로드</strong>: 세트 수는 유지하되 중량·RIR 완화 — 관절이 예민할 때 선호
+            <strong className="text-apple-ink">강도 델로드</strong>: 세트 수는 그대로, 중량·RIR만 살짝 — 관절 예민할 때 많이 씀
           </li>
           <li>
-            <strong className="text-apple-ink">전환 델로드</strong>: 변형 스쿼트·그립 변경 등 동일 패턴 반복에 따른 조직 과사용 완화
+            <strong className="text-apple-ink">전환 델로드</strong>: 스쿼트 변형·그립 바꾸기 등 같은 패턴만 반복해서 쌓인 부담 풀기
           </li>
         </ul>
         <GuideFigure src={bi.calm.src} alt={bi.calm.alt} />
@@ -188,14 +187,14 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="order" className="mt-16 scroll-mt-28 space-y-4">
         <h2 className={h2}>{st.order}</h2>
         <p className={body}>
-          <strong className="text-apple-ink">신경 요구가 큰 복합 동작</strong>을 앞에 두면, 스테빌라이저 피로가 쌓이기 전에 중추 신경계 자원을 투입할 수
-          있습니다. <strong>프리-익스오스트(Pre-exhaust)</strong>는 고립운동을 먼저 넣어 복합에서 표적 근육을 한계까지 끌어올리는 기법으로, 초보·허리 보호
-          목적이 아니라면 보통 뒤쪽 배치가 안전합니다.
+          <strong className="text-apple-ink">신경 많이 쓰는 복합</strong>을 앞에 두면, 스테빌라이저 지치기 전에 CNS 타이밍 잡기 좋아요.{" "}
+          <strong>프리-익스오스트(Pre-exhaust)</strong>는 고립 먼저 넣고 복합에서 타깃 근육까지 끌고 가는 기법인데, 입문·허리 보호 아니면 보통 뒤에 두는 게
+          안전한 편.
         </p>
         <ol className={`${body} list-inside list-decimal space-y-2`}>
-          <li>올림픽 리프트·스매스 스쿼트 등 파워 패턴(해당 시)</li>
-          <li>주종목 복합(스쿼트·데드·벤치·풀업 등)</li>
-          <li>보조 복합(런지·딥스·딥로우 변형)</li>
+          <li>올림픽 리프트·스매스 스쿼트 등 파워 패턴(할 때만)</li>
+          <li>메인 복합(스쿼트·데드·벤치·풀업 등)</li>
+          <li>보조 복합(런지·딥스·로우 변형)</li>
           <li>고립·머신·케이블로 볼륨 마무리</li>
         </ol>
         <GuideFigure src={bi.athlete.src} alt={bi.athlete.alt} />
@@ -205,16 +204,16 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="warmup" className="mt-16 scroll-mt-28 space-y-4">
         <h2 className={h2}>{st.warmup}</h2>
         <p className={body}>
-          <strong className="text-apple-ink">RAMP</strong>는 Raise(체온) – Activate(근활성) – Mobilize(가동) – Potentiate(본 동작 패턴)의 흐름으로 정리할
-          수 있습니다. 15~20분을 넘기면 피로가 누적되어 본 세트 품질이 떨어질 수 있으니, <strong className="text-apple-ink">짧고 특이성 있게</strong> 구성하세요.
+          <strong className="text-apple-ink">RAMP</strong>로 정리하면 Raise(체온) – Activate(깨우기) – Mobilize(가동) – Potentiate(본 동작 패턴) 흐름이에요.
+          15~20분 넘기면 오히려 본 세트 퀄 떨어질 수 있으니 <strong className="text-apple-ink">짧고 오늘 할 동작에 맞게</strong> 짜세요.
         </p>
         <GuideFigure src={bi.stretch.src} alt={bi.stretch.alt} />
         <YouTubeEmbed id={bv.warmupMain.videoId} title={bv.warmupMain.title} />
         <div className={card}>
           <p className="text-[13px] font-bold text-apple-ink">쿨다운</p>
           <p className={`mt-2 ${body}`}>
-            본 운동 직후에는 <strong className="text-apple-ink">저강도 유산소 5~8분</strong>과 당일 주동근 위주의 <strong>정적 스트레칭 30~60초×2~3세트</strong>
-            로 교감신경을 낮추고 혈류를 유지합니다. 극단적인 통증 유발 스트레칭은 피합니다.
+            본 세트 끝나면 <strong className="text-apple-ink">저강도 유산소 5~8분</strong>이랑 오늘 메인으로 쓴 근육 위주{" "}
+            <strong>정적 스트레칭 30~60초×2~3세트</strong>로 심박·긴장 낮추고 혈류 유지. 아픈 각도로 억지 스트레칭은 X.
           </p>
           <YouTubeEmbed id={bv.cooldown.videoId} title={bv.cooldown.title} />
         </div>
@@ -224,43 +223,43 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="rpe" className="mt-16 scroll-mt-28 space-y-4">
         <h2 className={h2}>{st.rpe}</h2>
         <p className={body}>
-          <strong className="text-apple-ink">RPE(Rate of Perceived Exertion)</strong>는 주관적 체력감, <strong>RIR(Reps in Reserve)</strong>는 실패 직전까지
-          남겨둔 반복 추정치입니다. 초보는 RIR 2~4에서 기술을 고정하고, 중급 이후 점진적으로 RIR 0~2 구간을 일부 세트에 도입하는 식으로 확장합니다.
+          <strong className="text-apple-ink">RPE</strong>는 체감 난이도, <strong>RIR</strong>은 실패 직전까지 남은 반복 추정이에요. 입문은 RIR 2~4에서 폼
+          고정하고, 중급 넘어가면 일부 세트만 RIR 0~2로 천천히 확장.
         </p>
         <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-[12px] text-apple-ink sm:text-[13px]">
             <thead className="border-b border-neutral-200 bg-neutral-100 text-[10px] font-medium uppercase tracking-[0.1em] text-apple-subtle">
               <tr>
                 <th className="px-3 py-2 sm:px-4">RPE(10점)</th>
-                <th className="px-3 py-2 sm:px-4">대략적 RIR</th>
-                <th className="px-3 py-2 sm:px-4">세트 느낌</th>
+                <th className="px-3 py-2 sm:px-4">대충 RIR</th>
+                <th className="px-3 py-2 sm:px-4">느낌</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200 text-apple-subtle">
               <tr>
                 <td className="px-3 py-2 font-semibold text-apple-ink sm:px-4">10</td>
-                <td className="px-3 py-2 sm:px-4">0 (실패 또는 직전)</td>
-                <td className="px-3 py-2 sm:px-4">추가 반복 불가</td>
+                <td className="px-3 py-2 sm:px-4">0 (실패 또는 바로 직전)</td>
+                <td className="px-3 py-2 sm:px-4">더 못 밈</td>
               </tr>
               <tr>
                 <td className="px-3 py-2 font-semibold text-apple-ink sm:px-4">9</td>
                 <td className="px-3 py-2 sm:px-4">~1</td>
-                <td className="px-3 py-2 sm:px-4">아주 무겁게, 기술 경계</td>
+                <td className="px-3 py-2 sm:px-4">개무겁고 폼 경계선</td>
               </tr>
               <tr>
                 <td className="px-3 py-2 font-semibold text-apple-ink sm:px-4">8</td>
                 <td className="px-3 py-2 sm:px-4">~2</td>
-                <td className="px-3 py-2 sm:px-4">근비대 구간에서 자주 쓰는 상한</td>
+                <td className="px-3 py-2 sm:px-4">근비대에서 자주 쓰는 상한 느낌</td>
               </tr>
               <tr>
                 <td className="px-3 py-2 font-semibold text-apple-ink sm:px-4">7</td>
                 <td className="px-3 py-2 sm:px-4">~3</td>
-                <td className="px-3 py-2 sm:px-4">기술·볼륨 누적에 유리</td>
+                <td className="px-3 py-2 sm:px-4">폼·볼륨 쌓기 좋음</td>
               </tr>
               <tr>
                 <td className="px-3 py-2 font-semibold text-apple-ink sm:px-4">≤6</td>
                 <td className="px-3 py-2 sm:px-4">4+</td>
-                <td className="px-3 py-2 sm:px-4">워밍업·펌핑·회복 세션</td>
+                <td className="px-3 py-2 sm:px-4">워밍업·펌핑·가볍게 도는 날</td>
               </tr>
             </tbody>
           </table>
@@ -273,8 +272,8 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="alternatives" className="mt-16 scroll-mt-28 space-y-4">
         <h2 className={h2}>{st.alternatives}</h2>
         <p className={body}>
-          관절 각도·하중 벡터를 바꾸면 <strong className="text-apple-ink">동일 “운동 패턴”을 보존</strong>한 채 부담 부위를 분산할 수 있습니다. 통증이 있을
-          때는 무게를 줄이는 것보다 <strong className="text-apple-ink">각도·ROM·도구</strong>를 먼저 바꾸는 편이 안전한 경우가 많습니다.
+          관절 각·하중 방향만 바꿔도 <strong className="text-apple-ink">같은 “운동 패턴”</strong>은 유지한 채 부담 나눌 수 있어요. 뭔가 아프면 무게부터
+          깎기보다 <strong className="text-apple-ink">각도·ROM·도구</strong> 먼저 바꾸는 쪽이 안전한 경우가 많음.
         </p>
         <GuideFigure src={bi.rack.src} alt={bi.rack.alt} />
         <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
@@ -282,40 +281,40 @@ export function ProgramGuideBuiltIn({ program }: Props) {
             <thead className="border-b border-neutral-200 bg-neutral-100 text-[10px] font-bold uppercase tracking-[0.12em] text-apple-subtle sm:text-[11px]">
               <tr>
                 <th className="px-3 py-2.5 sm:px-4">본 동작</th>
-                <th className="px-3 py-2.5 sm:px-4">대안(유사 패턴)</th>
-                <th className="px-3 py-2.5 sm:px-4">메모</th>
+                <th className="px-3 py-2.5 sm:px-4">비슷한 대안</th>
+                <th className="px-3 py-2.5 sm:px-4">팁</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200">
               <tr>
                 <td className="px-3 py-2.5 font-medium sm:px-4">바벨 백스쿼트</td>
                 <td className="px-3 py-2.5 text-apple-subtle sm:px-4">세이프티바 스쿼트, SSB, 고블릿, 레그프레스</td>
-                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">척추 압박·전방 심부담 완화</td>
+                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">척추 압·전방 심 부담 줄이기</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-medium sm:px-4">콘벤셔널 데드</td>
                 <td className="px-3 py-2.5 text-apple-subtle sm:px-4">루마니안, 스모, 덤벨 RDL, 힙힌지 머신</td>
-                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">햄스트링·등 각도 조절</td>
+                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">햄·등 각도 조절</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-medium sm:px-4">바벨 벤치</td>
                 <td className="px-3 py-2.5 text-apple-subtle sm:px-4">덤벨, 머신, 플로어 프레스, 푸시업</td>
-                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">견관절 외회전 한계 시 유리</td>
+                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">어깨 외회전 빡빡할 때</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-medium sm:px-4">풀업</td>
                 <td className="px-3 py-2.5 text-apple-subtle sm:px-4">랫풀다운, 어시스트, 체스트 서포티드 로우</td>
-                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">수직 당김 패턴 유지</td>
+                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">위에서 당기는 패턴 유지</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-medium sm:px-4">스탠딩 OHP</td>
                 <td className="px-3 py-2.5 text-apple-subtle sm:px-4">시티드 덤벨, 핀숄더프레스, 랜드마인</td>
-                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">허리 보상 동작 감소</td>
+                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">허리 보상 덜 나옴</td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 font-medium sm:px-4">바벨 로우</td>
                 <td className="px-3 py-2.5 text-apple-subtle sm:px-4">케이블 로우, 체스트패드 머신로우</td>
-                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">허리 중립 유지 용이</td>
+                <td className="px-3 py-2.5 text-apple-subtle sm:px-4">허리 중립 잡기 쉬움</td>
               </tr>
             </tbody>
           </table>
@@ -326,17 +325,17 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="checklist" className="mt-16 scroll-mt-28 space-y-6">
         <h2 className={h2}>{st.checklist}</h2>
         <p className={body}>
-          아래는 <strong className="text-apple-ink">관찰 가능한 체크포인트</strong>입니다. 통증이 있으면 폼 교정 전에 의학적 평가를 고려하세요.
+          아래는 <strong className="text-apple-ink">눈으로 볼 수 있는 체크</strong>예요. 통증 있으면 폼 튜닝 전에 병원·전문가 루트 먼저 고려.
         </p>
 
         <div className="grid items-start gap-6 lg:grid-cols-2">
           <div className={card}>
             <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">스쿼트</p>
             <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
-              <li>발 스크류(외측 전방으로 회전력)로 아치 유지</li>
-              <li>무릎 트랙은 발가락 2~5지 방향과 일치</li>
-              <li>흉추 전만 유지, 목은 중립~약간 위</li>
-              <li>골반 깊이는 개인 가동·부하에 맞춰 “병렬~약간 아래”부터 점진</li>
+              <li>발 스크류(바깥·앞으로 살짝 비틀기)로 아치 유지</li>
+              <li>무릎 방향은 발가락 2~5번 쪽이랑 맞추기</li>
+              <li>흉추 살짝 세우고, 목은 중립~살짝 위</li>
+              <li>앉는 깊이는 가동·무게 보고 “허벅지 거의 평행~살짝 아래”부터 천천히</li>
             </ul>
           </div>
           <YouTubeEmbed id={bv.squat.videoId} title={bv.squat.title} />
@@ -346,10 +345,10 @@ export function ProgramGuideBuiltIn({ program }: Props) {
           <div className={card}>
             <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">데드리프트·힙힌지</p>
             <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
-              <li>견갑은 바로 “당기는” 것이 아니라 중립 견고화</li>
-              <li>바는 항상 중족부에 수직으로 걸리게</li>
-              <li>들어 올리기 시 슬관절·고관절 동시 확장(더블 카벤)</li>
-              <li>허리 둥근막(라운딩) 발생 시 즉시 중단·강도 하향</li>
+              <li>견갑은 억지로 당기기보다 중립으로 단단히</li>
+              <li>바는 중족 쪽에 수직으로 걸리게</li>
+              <li>올릴 때 무릎·엉덩이 같이 펴기(더블 익스텐션 느낌)</li>
+              <li>허리 말리기(라운딩) 나오면 바로 스톱·강도 내리기</li>
             </ul>
           </div>
           <YouTubeEmbed id={bv.deadlift.videoId} title={bv.deadlift.title} />
@@ -359,10 +358,10 @@ export function ProgramGuideBuiltIn({ program }: Props) {
           <div className={card}>
             <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">벤치 프레스</p>
             <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
-              <li>견갑 하후·내측 고정, 흉추 약간 아치</li>
-              <li>팔꿈치 45° 전후(정면에서 보면 몸통과 각도)</li>
-              <li>바 경로는 대개 턱선 쪽에서 시작해 흉골 하부 쪽 J자</li>
-              <li>하체 다리 드라이브로 안정적 베이스</li>
+              <li>견갑 아래·안쪽으로 고정, 흉추 살짝 아치</li>
+              <li>팔꿈치 45° 전후(앞에서 보면 몸이랑 각)</li>
+              <li>바는 보통 턱 근처에서 시작해서 흉골 아래로 J자</li>
+              <li>하체 레그 드라이브로 베이스 단단히</li>
             </ul>
           </div>
           <YouTubeEmbed id={bv.bench.videoId} title={bv.bench.title} />
@@ -371,9 +370,9 @@ export function ProgramGuideBuiltIn({ program }: Props) {
         <div className={card}>
           <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-apple-subtle">로우·수평당김</p>
           <ul className="mt-2 list-inside list-disc space-y-1.5 text-[13px] leading-relaxed text-apple-subtle sm:text-[14px]">
-            <li>견갑 후인·하행 후 견고해진 뒤 전완으로 당김</li>
-            <li>과도한 요추 과신전 대신 흉추 중립~소확장</li>
-            <li>케이블은 케이블-전완 방향이 곧 저항 벡터</li>
+            <li>견갑 뒤로 내린 뒤 단단해지면 전완으로 당기기</li>
+            <li>허리만 과하게 꺾지 말고 흉추는 중립~살짝만</li>
+            <li>케이블은 줄–전완 방향이 저항 방향</li>
           </ul>
         </div>
       </section>
@@ -382,8 +381,8 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="micro" className="mt-16 scroll-mt-28 space-y-3">
         <h2 className={h2}>{st.micro}</h2>
         <p className={body}>
-          한 주에 <strong className="text-apple-ink">한 가지 변수만</strong> 바꿉니다. 예: “모든 스쿼트 세트 RIR 2 유지”, “벤치 바닿터치 일관화”, “풀업
-          하강 3초 편심”. 대시보드의 주간 기록 목표와 병행하면 실행이 쉬워집니다.
+          한 주에 <strong className="text-apple-ink">변수 하나만</strong> 건드려요. 예: “스쿼트 전부 RIR 2”, “벤치 바닥 터치 매번 동일”, “풀업 내려갈 때 3초”.
+          대시보드 주간 목표랑 같이 쓰면 실천하기가 더 쉬워져요.
         </p>
       </section>
 
@@ -391,12 +390,12 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="stats" className="mt-16 scroll-mt-28 space-y-3">
         <h2 className={h2}>{st.stats}</h2>
         <p className={body}>
-          주간·월간 볼륨, 종목 비중, 연속 기록은 앱의{" "}
+          주간·월간 볼륨, 종목 비중, 연속 기록은{" "}
           <Link href="/performance" className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60">
-            퍼포먼스
+            성과 화면
           </Link>
-          과 대시보드 카드에서 확인할 수 있습니다. CSV로 내려받아 엑셀·시트에서 <strong className="text-apple-ink">4주 이동 평균</strong>을 그리면 MRV 접근
-          신호를 조기에 볼 수 있습니다.
+          이랑 대시보드 카드에서 볼 수 있어요. CSV를 받아 시트에 <strong className="text-apple-ink">4주 이동 평균</strong>을 그려 두면 MRV에 가까워지는지
+          빨리 파악하기 좋아요.
         </p>
       </section>
 
@@ -404,8 +403,8 @@ export function ProgramGuideBuiltIn({ program }: Props) {
       <section id="safety" className="mt-16 scroll-mt-28 space-y-3">
         <h2 className={h2}>{st.safety}</h2>
         <p className="rounded-sm border border-neutral-300 bg-neutral-50 px-4 py-3 text-[14px] leading-relaxed text-apple-ink">
-          흉통, 실신 전조, 날카로운 관절통, 호흡곤란이 있으면 즉시 중단하고 응급·의료기관을 이용하세요. 본 문서는 일반적인 힘 트레이닝 정보이며 개인별
-          진단·처방을 대체하지 않습니다.
+          가슴 쓰린 느낌, 실신 직전 느낌, 날카로운 관절통, 숨 막히면 바로 멈추고 응급·의료 쪽으로. 여기 글은 일반 힘 트레이닝 정보일 뿐이고, 진단·처방
+          대신은 못 해요.
         </p>
       </section>
     </>

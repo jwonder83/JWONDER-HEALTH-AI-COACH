@@ -47,13 +47,13 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
 
   const errorHint =
     err === "auth"
-      ? "인증에 실패했습니다. 다시 시도해 주세요."
+      ? "로그인이 안 됐어요. 이메일이랑 비밀번호를 다시 확인해 주세요."
       : err === "config"
-        ? "이전에 설정 오류로 이동된 링크일 수 있습니다. 주소의 ?error=… 를 지우고 다시 시도해 보세요."
+        ? "예전 설정 오류 링크일 수 있어요. 주소에서 ?error=… 부분을 지우고 새로고침해 보세요."
         : err === "server"
-          ? "앱을 불러오는 중 오류가 났습니다. 잠시 후 다시 시도하거나 Vercel·Supabase 상태를 확인해 주세요."
+          ? "앱을 불러오다가 오류가 났어요. 잠시 후 다시 시도하거나 Vercel·Supabase 상태를 확인해 주세요."
           : err === "no_code"
-            ? "인증 코드가 없습니다."
+            ? "인증 코드가 비어 있어요."
             : null;
 
   async function onSubmit(e: React.FormEvent) {
@@ -74,7 +74,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
       // 전체 이동: 새 탭·클라이언트 로그인 직후에도 세션 쿠키가 서버에 반영되도록 함
       window.location.assign(safe);
     } catch {
-      setMsg("로그인 처리 중 오류가 났습니다. 환경 변수를 확인해 주세요.");
+      setMsg("로그인 처리 중 오류가 났어요. 환경 변수(Supabase) 설정을 확인해 주세요.");
       setLoading(false);
     }
   }

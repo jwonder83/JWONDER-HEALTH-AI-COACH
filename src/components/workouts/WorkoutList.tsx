@@ -123,9 +123,9 @@ function PerformanceOverview({
     <div className="border-b border-neutral-200 bg-gradient-to-b from-neutral-50/90 to-white px-4 py-5 dark:border-zinc-800 dark:from-zinc-900/80 dark:to-zinc-950 sm:px-6 sm:py-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-apple-subtle">성과 요약</p>
-          <h3 className="font-display mt-1 text-[1.25rem] font-bold tracking-[-0.02em] text-apple-ink dark:text-zinc-100 sm:text-[1.4rem]">기록 분석</h3>
-          <p className="mt-1 max-w-md text-[13px] leading-relaxed text-apple-subtle">볼륨·PR·부위 비중은 저장된 세트를 자동으로 묶어 보여 줘요.</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-apple-subtle">한눈에 스탯</p>
+          <h3 className="font-display mt-1 text-[1.25rem] font-bold tracking-[-0.02em] text-apple-ink dark:text-zinc-100 sm:text-[1.4rem]">기록 들여다보기</h3>
+          <p className="mt-1 max-w-md text-[13px] leading-relaxed text-apple-subtle">볼륨·PR·부위 비중은 저장된 세트를 알아서 묶어서 보여줘요.</p>
         </div>
       </div>
 
@@ -138,7 +138,7 @@ function PerformanceOverview({
         <div className="rounded-2xl border border-amber-200/80 bg-amber-50/90 p-4 shadow-sm dark:border-amber-900/40 dark:bg-amber-950/30">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-900/80 dark:text-amber-200/90">볼륨 PR</p>
           <p className="font-display mt-1 text-[1.35rem] font-bold tabular-nums text-amber-950 dark:text-amber-100">{prCount}회</p>
-          <p className="mt-0.5 text-[11px] text-amber-900/70 dark:text-amber-200/70">종목별 최고 갱신</p>
+          <p className="mt-0.5 text-[11px] text-amber-900/70 dark:text-amber-200/70">종목별 최댓값 갈아끼운 횟수</p>
         </div>
         <div className="col-span-2 rounded-2xl border border-neutral-200/90 bg-white p-4 shadow-sm sm:col-span-1 dark:border-zinc-800 dark:bg-zinc-900/80">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle">총 세트 행</p>
@@ -259,7 +259,7 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
                       onClick={() => onDeleteItem(w.id)}
                       className="border border-neutral-300 bg-white px-3 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-apple-subtle transition hover:border-black hover:text-apple-ink dark:border-zinc-600 dark:bg-zinc-900 dark:hover:border-zinc-400"
                     >
-                      삭제
+                      지우기
                     </button>
                   ) : null}
                 </div>
