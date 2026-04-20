@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
+import { navPillLinkCompact } from "@/components/nav/menu-styles";
 import { SUPABASE_VERCEL_DEPLOY_HINT } from "@/lib/supabase/deploy-hint";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
@@ -84,9 +85,9 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
         href="/admin"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed right-4 top-4 z-50 border border-neutral-200 bg-white/95 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.18em] text-apple-ink shadow-sm backdrop-blur-md transition hover:border-black sm:right-6 sm:top-5"
+        className={`fixed right-4 top-4 z-50 shadow-sm backdrop-blur-md sm:right-6 sm:top-5 ${navPillLinkCompact} !bg-white/95 dark:!bg-zinc-950/90`}
       >
-        ADMIN
+        Admin
       </Link>
       <main id="main-content" tabIndex={-1} className="outline-none">
     <AuthSplitShell

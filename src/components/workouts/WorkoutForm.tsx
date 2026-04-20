@@ -2,7 +2,14 @@
 
 import type { WorkoutFormCopyConfig } from "@/types/site-settings";
 import type { WorkoutInput, WorkoutRow } from "@/types/workout";
-import { getLastSameExercise, maxVolumeForExercise, rowVolume, volumeFromNumbers } from "@/lib/dashboard/insights";
+import {
+  getLastSameExercise,
+  isNewVolumePr,
+  maxVolumeForExercise,
+  rowVolume,
+  volumeFromNumbers,
+} from "@/lib/dashboard/insights";
+import { inferPrimaryMuscleGroup, muscleGroupLabel } from "@/lib/workouts/exercise-muscle-group";
 import { useEffect, useId, useMemo, useState } from "react";
 
 type Props = {
@@ -138,8 +145,17 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
   const prevSame = useMemo(() => getLastSameExercise(allWorkouts, form.exercise_name), [allWorkouts, form.exercise_name]);
   const prevVol = prevSame ? rowVolume(prevSame) : 0;
   const deltaPct =
-    prevVol > 0 && volumePreview > 0 ? Math.round(((volumePreview - prevVol) / prevVol) * 100) : prevSame ? null : null;
+    prevVol > 0 && volumePreview > 0 ? Math.round(((volumePreview - prevVol) / prevVol) * 100 * 10) / 10 : prevSame ? null : null;
+  const weightDeltaPct = useMemo(() => {
+    if (!prevSame || Number(prevSame.weight_kg) <= 0) return null;
+    const cw = Number(form.weight_kg);
+    return Math.round(((cw - Number(prevSame.weight_kg)) / Number(prevSame.weight_kg)) * 100 * 10) / 10;
+  }, [prevSame, form.weight_kg]);
   const bestVol = useMemo(() => maxVolumeForExercise(allWorkouts, form.exercise_name), [allWorkouts, form.exercise_name]);
+  const muscleLabel = useMemo(
+    () => muscleGroupLabel(inferPrimaryMuscleGroup(form.exercise_name)),
+    [form.exercise_name],
+  );
 
   function bumpWeight(delta: number) {
     setForm((f) => ({ ...f, weight_kg: Math.max(0, Math.round((Number(f.weight_kg) + delta) * 2) / 2) }));
@@ -308,18 +324,42 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
             required
           />
         </label>
-        <div className="sm:col-span-2 rounded-xl border border-neutral-200/80 bg-neutral-50 px-3 py-2.5 text-[13px] text-apple-subtle">
-          <span className="font-semibold text-apple-ink">이번 세트 볼륨</span>{" "}
-          <span className="tabular-nums text-apple-ink">{Math.round(volumePreview * 10) / 10}</span>
-          {bestVol > 0 ? (
-            <span className="ml-2 text-[12px]">· 종목 최고 {Math.round(bestVol * 10) / 10}</span>
-          ) : null}
-          {deltaPct !== null ? (
-            <span className={`ml-2 text-[12px] font-medium ${deltaPct >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
-              직전 대비 {deltaPct >= 0 ? "+" : ""}
-              {deltaPct}%
+        <div className="sm:col-span-2 rounded-xl border border-neutral-200/80 bg-neutral-50 px-3 py-2.5 text-[13px] text-apple-subtle dark:border-zinc-700 dark:bg-zinc-900/60">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="rounded-full border border-neutral-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-apple-subtle dark:border-zinc-600 dark:bg-zinc-900">
+              추정 부위 · {muscleLabel}
             </span>
-          ) : null}
+            {form.exercise_name.trim() && isNewVolumePr(allWorkouts, form.exercise_name, volumePreview) ? (
+              <span className="rounded-full border border-amber-300/80 bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/50 dark:text-amber-100">
+                PR 달성 예상
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-2 text-[13px]">
+            <span className="font-semibold text-apple-ink dark:text-zinc-100">이번 세트 볼륨</span>{" "}
+            <span className="tabular-nums text-apple-ink dark:text-zinc-100">{Math.round(volumePreview * 10) / 10}</span>
+            {bestVol > 0 ? (
+              <span className="ml-2 text-[12px]">· 종목 최고 {Math.round(bestVol * 10) / 10}</span>
+            ) : null}
+          </p>
+          <p className="mt-1 flex flex-wrap gap-2 text-[12px]">
+            {deltaPct !== null ? (
+              <span
+                className={`font-semibold tabular-nums ${deltaPct > 0 ? "text-emerald-700 dark:text-emerald-400" : deltaPct < 0 ? "text-rose-700 dark:text-rose-400" : "text-apple-subtle"}`}
+              >
+                볼륨 직전 대비 {deltaPct > 0 ? "+" : ""}
+                {deltaPct}%
+              </span>
+            ) : null}
+            {weightDeltaPct !== null ? (
+              <span
+                className={`font-semibold tabular-nums ${weightDeltaPct > 0 ? "text-teal-700 dark:text-teal-400" : weightDeltaPct < 0 ? "text-orange-700 dark:text-orange-300" : "text-apple-subtle"}`}
+              >
+                중량 직전 대비 {weightDeltaPct > 0 ? "+" : ""}
+                {weightDeltaPct}%
+              </span>
+            ) : null}
+          </p>
         </div>
         <div className="sm:col-span-2">
           <fieldset className="min-w-0 border-0 p-0">

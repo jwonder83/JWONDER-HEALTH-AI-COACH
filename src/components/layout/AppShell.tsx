@@ -1,3 +1,4 @@
+import { navHeaderLink, navHeaderLinkMuted } from "@/components/nav/menu-styles";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import Link from "next/link";
@@ -46,9 +47,6 @@ function FooterNavLink({ href, className, children }: { href: string; className:
   );
 }
 
-const navLink =
-  "px-2 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-apple-ink transition-opacity hover:opacity-50 sm:px-3 sm:text-[12px] dark:text-zinc-200 dark:hover:opacity-70";
-
 export function AppShell({ email, showAdminLink, site, children, footerMeta }: Props) {
   return (
     <div className="flex min-h-screen flex-col text-apple-ink dark:text-zinc-100">
@@ -73,37 +71,38 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                 <span aria-hidden>{initialFromEmail(email)}</span>
               )}
             </Link>
-            <nav aria-label="주요 메뉴" className="flex flex-wrap items-center gap-x-1 gap-y-1 sm:gap-x-2">
-              <Link href="/" className={navLink}>
+            <nav aria-label="주요 메뉴" className="flex flex-wrap items-center gap-x-0.5 gap-y-1 sm:gap-x-1">
+              <Link href="/" className={navHeaderLink}>
                 홈
               </Link>
-              <Link href="/program" className={navLink}>
+              <Link href="/workout" className={navHeaderLink}>
+                운동
+              </Link>
+              <Link href="/program" className={navHeaderLink}>
                 {site.program.navLabel}
               </Link>
-              <Link href="/performance" className={navLink}>
+              <Link href="/performance" className={navHeaderLink}>
                 퍼포먼스
               </Link>
-              <Link href="/help" className={navLink}>
+              <Link href="/help" className={navHeaderLink}>
                 도움말
               </Link>
-              <Link href="/settings" className={navLink}>
+              <Link href="/settings" className={navHeaderLink}>
                 계정
               </Link>
             </nav>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-3">
-            <span className="hidden max-w-[200px] truncate text-[11px] uppercase tracking-[0.12em] text-apple-subtle dark:text-zinc-500 sm:inline">
+            <span className="hidden max-w-[200px] truncate text-[11px] uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500 sm:inline">
               {email}
             </span>
             <ThemeToggle />
             {showAdminLink ? (
-              <Link href="/admin" className={navLink}>
+              <Link href="/admin" className={navHeaderLink}>
                 사이트 설정
               </Link>
             ) : null}
-            <SignOutButton
-              className={`${navLink} border border-transparent hover:border-neutral-300 hover:opacity-100 dark:hover:border-zinc-600`}
-            />
+            <SignOutButton className={navHeaderLinkMuted} />
           </div>
         </div>
       </header>

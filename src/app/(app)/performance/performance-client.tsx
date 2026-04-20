@@ -1,15 +1,9 @@
 "use client";
 
 import { BodyWeightPanel } from "@/components/bodyweight/BodyWeightPanel";
-import { computeOneLineInsight, last7DaysVolumeSeries } from "@/lib/dashboard/insights";
+import { navToolbarButton } from "@/components/nav/menu-styles";
+import { PerformanceStoryReport } from "@/components/performance/PerformanceStoryReport";
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
-import {
-  endOfMonth,
-  endOfWeekSunday,
-  rollupPeriod,
-  startOfMonth,
-  startOfWeekMonday,
-} from "@/lib/workouts/period-stats";
 import type { WorkoutRow } from "@/types/workout";
 import { useId, useMemo, useState } from "react";
 
@@ -62,57 +56,6 @@ export function PerformanceClient({ initialRows }: Props) {
     return { count: filtered.length, volume };
   }, [filtered]);
 
-  const weekLine = useMemo(() => {
-    const mon = startOfWeekMonday();
-    const sun = endOfWeekSunday(mon);
-    const r = rollupPeriod(initialRows, mon, sun);
-    const top = r.topExercise ? ` · 가장 많이 한 종목 ${r.topExercise}` : "";
-    return `이번 주 총 볼륨 ${Math.round(r.volume * 10) / 10} · 기록 ${r.rowCount}건${top}`;
-  }, [initialRows]);
-
-  const monthLine = useMemo(() => {
-    const s = startOfMonth();
-    const e = endOfMonth();
-    const r = rollupPeriod(initialRows, s, e);
-    const top = r.topExercise ? ` · 가장 많이 한 종목 ${r.topExercise}` : "";
-    return `이번 달 총 볼륨 ${Math.round(r.volume * 10) / 10} · 기록 ${r.rowCount}건${top}`;
-  }, [initialRows]);
-
-  const monthInsight = useMemo(() => {
-    const s = startOfMonth();
-    const e = endOfMonth();
-    const sTs = s.getTime();
-    const eTs = e.getTime();
-    const inRange = initialRows.filter((w) => {
-      const t = new Date(w.created_at).getTime();
-      return t >= sTs && t <= eTs;
-    });
-    if (inRange.length === 0) return null;
-    const counts = new Map<string, number>();
-    for (const w of inRange) {
-      const name = w.exercise_name.trim() || "기타";
-      counts.set(name, (counts.get(name) ?? 0) + 1);
-    }
-    let top: string | null = null;
-    let max = 0;
-    for (const [k, v] of counts) {
-      if (v > max) {
-        max = v;
-        top = k;
-      }
-    }
-    if (!top || max === 0) return null;
-    const pct = Math.round((max / inRange.length) * 100);
-    if (pct >= 38) {
-      return `이번 달 기록의 약 ${pct}%가 「${top}」예요. 반대쪽 부위·운동도 골고루 넣었는지 한 번 점검해 보세요.`;
-    }
-    return "이번 달은 종목이 비교적 고르게 섞여 있어요. 한 줄 요약과 함께 보면 좋아요.";
-  }, [initialRows]);
-
-  const series7 = useMemo(() => last7DaysVolumeSeries(initialRows), [initialRows]);
-  const maxVol = useMemo(() => Math.max(1, ...series7.map((s) => s.volume)), [series7]);
-  const coachLine = useMemo(() => computeOneLineInsight(initialRows), [initialRows]);
-
   function downloadCsv() {
     const header = ["created_at", "exercise_name", "weight_kg", "reps", "sets", "success"];
     const lines = [header.join(",")];
@@ -141,63 +84,23 @@ export function PerformanceClient({ initialRows }: Props) {
     <div className="mx-auto max-w-5xl px-4 py-10 text-apple-ink dark:text-zinc-100 sm:px-8 sm:py-14">
       <SectionTitleBlock
         step="02"
-        eyebrow="PERFORMANCE"
-        title="퍼포먼스"
-        description="주간·월간 볼륨과 최근 7일 추세를 보고, 필터·CSV로 보냅니다."
+        eyebrow="REPORT"
+        title="운동 리포트"
+        description="지난주와의 차이, 종목·부위 포인트를 문장으로 풀고, 주간 차트와 함께 보여 줍니다. 아래에서 필터·보내기를 할 수 있어요."
         right={
-          <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px]">
+          <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px] dark:border-zinc-700 dark:bg-zinc-900">
             {stats.count}건
           </span>
         }
       />
 
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">코치 인사이트</p>
-        <p className="mt-2 text-[14px] font-medium leading-relaxed text-apple-ink sm:text-[15px] dark:text-zinc-100">{coachLine}</p>
-        <p className="mt-2 text-[11px] text-apple-subtle dark:text-zinc-500">규칙 기반 문구이며 외부 AI를 호출하지 않습니다.</p>
+      <div className="mt-8">
+        <PerformanceStoryReport rows={initialRows} />
       </div>
 
       <BodyWeightPanel />
 
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">최근 7일 볼륨</p>
-        <p className="mt-1 text-[12px] text-apple-subtle">일별 kg×회×세트 합산</p>
-        <div className="mt-4 flex h-40 items-end justify-between gap-1.5 sm:gap-2">
-          {series7.map((s) => {
-            const barH = Math.max(6, Math.round((s.volume / maxVol) * 128));
-            return (
-              <div key={s.key} className="flex min-w-0 flex-1 flex-col items-center gap-1">
-                <div
-                  className="w-full max-w-[44px] rounded-t-md bg-black/85 sm:max-w-none"
-                  style={{ height: `${barH}px` }}
-                  title={`${s.label}: ${Math.round(s.volume * 10) / 10}`}
-                />
-                <span className="text-[10px] font-medium text-apple-subtle">{s.label}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-[1.25rem] border border-neutral-200/90 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-neutral-100">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">주간 한 줄</p>
-          <p className="mt-1.5 text-[13px] font-medium leading-snug text-apple-ink">{weekLine}</p>
-        </div>
-        <div className="rounded-[1.25rem] border border-neutral-200/90 bg-neutral-50 px-4 py-3 shadow-sm ring-1 ring-neutral-100">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle">월간 한 줄</p>
-          <p className="mt-1.5 text-[13px] font-medium leading-snug text-apple-ink">{monthLine}</p>
-        </div>
-      </div>
-
-      {monthInsight ? (
-        <div className="mt-3 rounded-[1.25rem] border border-neutral-200/80 bg-neutral-50 px-4 py-3 text-[13px] leading-snug text-apple-ink ring-1 ring-neutral-100 sm:text-[14px]">
-          <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-apple-subtle">월간 인사이트</span>
-          <p className="mt-1.5 font-medium">{monthInsight}</p>
-        </div>
-      ) : null}
-
-      <div className="mt-2 rounded-[1.75rem] border border-neutral-200/90 bg-white/95 p-5 shadow-sm sm:p-6">
+      <div className="mt-8 rounded-[1.75rem] border border-neutral-200/90 bg-white/95 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label htmlFor={idQ} className="block text-[12px] font-semibold text-apple-subtle">
             운동명 포함
@@ -240,7 +143,7 @@ export function PerformanceClient({ initialRows }: Props) {
                 setFrom("");
                 setTo("");
               }}
-              className="w-full rounded-full border border-neutral-200 bg-neutral-100 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-apple-ink transition hover:bg-neutral-200"
+              className={`w-full ${navToolbarButton}`}
             >
               필터 초기화
             </button>

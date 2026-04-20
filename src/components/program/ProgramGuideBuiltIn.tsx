@@ -1,3 +1,4 @@
+import { navPillLinkCompact } from "@/components/nav/menu-styles";
 import Link from "next/link";
 import { GuideFigure, YouTubeEmbed } from "@/components/program/ProgramGuideMedia";
 import type { ProgramGuideSettings } from "@/types/site-settings";
@@ -19,13 +20,9 @@ export function ProgramGuideBuiltIn({ program }: Props) {
     <>
       <GuideFigure src={bi.hero.src} alt={bi.hero.alt} priority className="mt-8" />
 
-      <nav aria-label="이 페이지 목차" className="mt-10 flex flex-wrap gap-2 border-y border-neutral-200 py-5">
+      <nav aria-label="이 페이지 목차" className="mt-10 flex flex-wrap gap-2 border-y border-neutral-200 py-5 dark:border-zinc-800">
         {program.toc.map((item) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            className="rounded-sm border border-neutral-200 bg-white px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-apple-ink transition hover:border-black hover:bg-neutral-50"
-          >
+          <a key={item.id} href={`#${item.id}`} className={navPillLinkCompact}>
             {item.label}
           </a>
         ))}

@@ -1,9 +1,10 @@
 "use client";
 
 import { WebCoachingSection } from "@/components/coaching/WebCoachingSection";
-import { CoachHub } from "@/components/dashboard/CoachHub";
+import { HomeActionHub } from "@/components/dashboard/home/HomeActionHub";
 import { OnboardingBanner } from "@/components/dashboard/OnboardingBanner";
 import { DashboardGoalsCard } from "@/components/dashboard/DashboardGoalsCard";
+import { navSegmentBar, navSegmentItem, navToolbarButton } from "@/components/nav/menu-styles";
 import { SiteFillImage } from "@/components/site/SiteFillImage";
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
 import { Toast } from "@/components/ui/Toast";
@@ -11,6 +12,7 @@ import { WorkoutForm } from "@/components/workouts/WorkoutForm";
 import { WorkoutList } from "@/components/workouts/WorkoutList";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
+import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
 import { isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
 import type { SiteSettingsMerged } from "@/types/site-settings";
@@ -73,7 +75,7 @@ type Props = {
 export function HomeDashboard({ userId, site }: Props) {
   const [workouts, setWorkouts] = useState<WorkoutRow[]>([]);
   const [hydrated, setHydrated] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; variant: "default" | "achievement" } | null>(null);
 
   const navItems = useMemo(
     () =>
@@ -143,6 +145,7 @@ export function HomeDashboard({ userId, site }: Props) {
       return { error: error.message };
     }
     await refresh();
+    notifyWorkoutsMutated();
     return { pr };
   }
 
@@ -156,6 +159,7 @@ export function HomeDashboard({ userId, site }: Props) {
       return;
     }
     await refresh();
+    notifyWorkoutsMutated();
   }
 
   async function handleDeleteOne(id: string) {
@@ -168,6 +172,7 @@ export function HomeDashboard({ userId, site }: Props) {
       return;
     }
     await refresh();
+    notifyWorkoutsMutated();
   }
 
   return (
@@ -200,12 +205,12 @@ export function HomeDashboard({ userId, site }: Props) {
                 {site.copy.mainHero.subtitle}
               </p>
               <div className="pointer-events-auto mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
-                <a
-                  href="#section-input"
+                <Link
+                  href="/workout"
                   className="inline-flex items-center justify-center border border-white bg-white px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-transparent hover:text-white active:scale-[0.98] sm:py-3 sm:text-[12px]"
                 >
-                  바로 기록하기
-                </a>
+                  운동 시작하기
+                </Link>
                 <Link
                   href="/program"
                   className="inline-flex items-center justify-center border border-white/50 bg-transparent px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[12px]"
@@ -223,7 +228,7 @@ export function HomeDashboard({ userId, site }: Props) {
           </div>
         </div>
 
-        <CoachHub workouts={workouts} />
+        <HomeActionHub workouts={workouts} hydrated={hydrated} />
 
         <OnboardingBanner />
 
@@ -346,36 +351,25 @@ export function HomeDashboard({ userId, site }: Props) {
               <p className="font-display text-[15px] font-semibold text-apple-ink">아직 저장된 기록이 없어요</p>
               <p className="mt-1 text-[13px] leading-relaxed text-apple-subtle">첫 세트를 남기면 여기와 운동 기록에 바로 반영됩니다.</p>
             </div>
-            <a
-              href="#section-input"
+            <Link
+              href="/workout"
               className="inline-flex shrink-0 items-center justify-center border border-black bg-black px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.98]"
             >
-              기록 입력으로 이동
-            </a>
+              운동 시작하기
+            </Link>
           </div>
         ) : null}
 
         {/* 스티키 내비 — 가독성 우선(큰 글씨·굵게·대비) */}
         <div className="sticky top-4 z-20 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center sm:justify-between">
-          <nav
-            aria-label="페이지 섹션"
-            className="flex w-full max-w-2xl flex-wrap divide-neutral-200 border border-neutral-200 bg-white sm:flex-nowrap sm:divide-x"
-          >
+          <nav aria-label="페이지 섹션" className={navSegmentBar}>
             {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="min-h-[48px] flex-1 bg-white px-3 py-3 text-center text-[13px] font-medium uppercase tracking-[0.12em] text-apple-ink transition hover:bg-black hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-2 sm:flex-none sm:min-w-[6.75rem] sm:px-5 sm:text-[12px]"
-              >
+              <a key={item.href} href={item.href} className={navSegmentItem}>
                 {item.label}
               </a>
             ))}
           </nav>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="border border-neutral-300 bg-white px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-apple-subtle transition hover:border-black hover:text-black active:scale-[0.98]"
-          >
+          <button type="button" onClick={handleClear} className={`${navToolbarButton} active:scale-[0.98]`}>
             전체 삭제
           </button>
         </div>
@@ -404,8 +398,9 @@ export function HomeDashboard({ userId, site }: Props) {
           />
           <WorkoutForm
             onSaved={(r) => {
-              void refresh();
-              if (r?.pr) setToast("새 PR이에요! 볼륨 최고 기록을 갱신했습니다.");
+              if (r?.pr) {
+                setToast({ message: "새 PR이에요! 볼륨 최고 기록을 갱신했습니다.", variant: "achievement" });
+              }
             }}
             saveWorkout={saveWorkout}
             copy={site.copy.workoutForm}
@@ -457,7 +452,7 @@ export function HomeDashboard({ userId, site }: Props) {
         </section>
       </main>
 
-      <Toast message={toast} onDismiss={() => setToast(null)} />
+      <Toast message={toast?.message ?? null} variant={toast?.variant ?? "default"} onDismiss={() => setToast(null)} durationMs={toast?.variant === "achievement" ? 5200 : 4200} />
     </div>
   );
 }

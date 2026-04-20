@@ -1,3 +1,4 @@
+import { AppCoachSurface } from "@/components/coaching/AppCoachSurface";
 import { AppShell } from "@/components/layout/AppShell";
 import { isUserAdmin } from "@/lib/site-settings/admin-check";
 import { getSiteSettings } from "@/lib/site-settings/load-server";
@@ -32,7 +33,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     };
     return (
       <AppShell email={user.email ?? ""} showAdminLink={showAdminLink} site={site} footerMeta={footerMeta}>
-        {children}
+        <AppCoachSurface userId={user.id}>{children}</AppCoachSurface>
       </AppShell>
     );
   } catch {
