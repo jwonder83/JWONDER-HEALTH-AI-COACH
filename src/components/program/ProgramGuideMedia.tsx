@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SiteFillImage } from "@/components/site/SiteFillImage";
 
 const figureRing =
   "overflow-hidden rounded-sm border border-neutral-200 bg-white shadow-[0_12px_40px_-16px_rgba(0,0,0,0.08)] ring-1 ring-neutral-100";
@@ -10,18 +10,13 @@ type FigureProps = {
   className?: string;
 };
 
+/** 관리자 업로드(Supabase 등) URL은 `next/image` 원격 허용 목록과 어긋날 수 있어 `SiteFillImage`(일반 img) 사용 */
 export function GuideFigure({ src, alt, priority = false, className = "mt-5" }: FigureProps) {
   return (
     <figure className={`${figureRing} ${className}`}>
-      <Image
-        src={src}
-        alt={alt}
-        width={1200}
-        height={675}
-        className="aspect-[16/9] w-full object-cover"
-        sizes="(max-width: 640px) 100vw, 896px"
-        priority={priority}
-      />
+      <div className="relative aspect-[16/9] w-full">
+        <SiteFillImage src={src} alt={alt} priority={priority} />
+      </div>
     </figure>
   );
 }

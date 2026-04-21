@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "JWonder Health",
+    "slug": "jwonder-health-ai-coach",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "jwonder",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#dbc4a8"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jwonder.healthcoach"
+    },
+    "android": {
+      "package": "com.jwonder.healthcoach",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#dbc4a8"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#047857"
+        }
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "12773180-182e-471e-93e4-f01955b1daf8"
+      }
+    }
+  }
+}

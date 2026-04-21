@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { recordWorkoutXp } from "@/lib/gamification/reward-storage";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
+import { postToNativeApp } from "@/lib/native-app-bridge";
 import { writeWorkoutSessionActive } from "@/lib/workout-session/session-bridge";
 import { loadCoachModeEnabled, persistCoachModeEnabled } from "@/lib/workout-session/coach-mode-storage";
 import type { TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
@@ -311,6 +312,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
     setCoachBetween("lifting");
     setRestStartedAt(null);
     setPhase("done");
+    postToNativeApp({ type: "WORKOUT_COMPLETED", completedAt: new Date().toISOString() });
   }
 
   const summary = useMemo(() => {
