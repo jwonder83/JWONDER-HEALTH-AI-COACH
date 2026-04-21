@@ -11,6 +11,9 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 
+/** `Request#formData()` 반환 타입이 DOM `FormData`와 어긋나 빌드가 깨지는 경우를 피하기 위한 최소 형태 */
+type MultipartForm = Pick<globalThis.FormData, "get">;
+
 function extFromMime(mime: string): string {
   switch (mime) {
     case "image/jpeg":
@@ -44,9 +47,9 @@ export async function POST(request: Request) {
   const gate = await requireAdmin();
   if ("error" in gate) return gate.error;
 
-  let form: FormData;
+  let form: MultipartForm;
   try {
-    form = await request.formData();
+    form = (await request.formData()) as unknown as MultipartForm;
   } catch {
     return NextResponse.json({ error: "multipart 요청이 필요합니다." }, { status: 400 });
   }
