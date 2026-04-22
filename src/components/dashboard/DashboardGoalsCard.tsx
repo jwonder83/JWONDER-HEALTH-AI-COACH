@@ -46,7 +46,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
   const streak = useMemo(() => computeLoggingStreakMerged(workouts), [workouts]);
 
   return (
-    <div className="mt-6 border border-neutral-200 bg-white p-4 shadow-inner sm:p-5">
+    <div id="section-weekly-goals" className="mt-6 border border-neutral-200 bg-white p-4 shadow-inner sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-apple-subtle">이번 주 스탯</p>
@@ -130,7 +130,7 @@ export function DashboardGoalsCard({ workouts }: Props) {
               type="number"
               min={1}
               className="mt-1 w-full border border-neutral-200 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15"
-              placeholder="예: 12"
+              placeholder="예: 5 (주 5세트)"
               defaultValue={goals.weeklySessionTarget ?? ""}
               onBlur={(e) => {
                 const v = parseInt(e.target.value, 10);

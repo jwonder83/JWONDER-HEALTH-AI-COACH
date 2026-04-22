@@ -79,3 +79,21 @@ a:focus-visible {
 .completion-pop {
   animation: workout-complete-pop 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+/* 주간 목표 “손해” 프리뷰 — 진행률 바가 한번 줄어드는 느낌 */
+@keyframes weekly-stake-dip-once {
+  0% {
+    transform: scaleX(1);
+  }
+  55% {
+    transform: scaleX(var(--stake-end-scale, 0.88));
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.weekly-stake-dip-once {
+  transform-origin: left center;
+  animation: weekly-stake-dip-once 1.35s cubic-bezier(0.4, 0, 0.2, 1) 1 both;
+}

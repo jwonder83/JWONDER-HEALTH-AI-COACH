@@ -6,7 +6,9 @@ import { formatEstimatedLabel, type TodayRoutinePlan } from "@/lib/routine/today
 import { applyDailyCheckinToRoutinePlan } from "@/lib/habit-loop/apply-checkin-to-routine";
 import type { DailyCheckinRecord } from "@/lib/habit-loop/daily-checkin";
 import { conditionLabelKo, conditionToFatigueSignal } from "@/lib/habit-loop/daily-checkin";
+import { applyWeeklyStakeToRoutine } from "@/lib/habit-loop/apply-weekly-stake-to-routine";
 import { mergeDailyCheckinIntoBriefing } from "@/lib/habit-loop/merge-checkin-briefing";
+import { computeWeeklyStake, type WeeklyStakeModel } from "@/lib/dashboard/weekly-stake";
 import type { OnboardingProfile } from "@/lib/onboarding/types";
 import { DEFAULT_SITE_SETTINGS } from "@/lib/site-settings/defaults";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
@@ -30,6 +32,7 @@ export type { TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
 export type { BriefingDecisionKind, DailyStatusBriefing, FatigueLevel } from "@/lib/dashboard/daily-status-briefing";
 export type { UserWorkoutUiState } from "@/lib/dashboard/user-workout-ui-state";
 export type { WorkoutActionSuggestion, WorkoutActionSuggestionKind } from "@/lib/dashboard/workout-action-suggestions";
+export type { WeeklyStakeModel } from "@/lib/dashboard/weekly-stake";
 
 export type RecentActivityItem = {
   id: string;
@@ -73,6 +76,8 @@ export type HomeActionViewModel = {
   hasDailyCheckin: boolean;
   /** 마지막 운동 이후 캘린더 일수(null이면 기록 없음) */
   daysSinceLastWorkout: number | null;
+  /** 주간 목표 “손해” 압박 모델(목표 미설정 시 null) */
+  weeklyStake: WeeklyStakeModel | null;
 };
 
 export type BuildHomeActionViewModelOpts = {
@@ -224,8 +229,11 @@ export function buildHomeActionViewModel(
   const goalPct =
     target !== null ? Math.min(100, Math.round((week.rowCount / target) * 100)) : null;
 
+  const weeklyStake = computeWeeklyStake(target, week.rowCount, hydrated, todayDone, now);
+
   let routine = buildOptimizedTodayRoutine(profile, workouts, now);
   routine = applyDailyCheckinToRoutinePlan(routine, checkin);
+  routine = applyWeeklyStakeToRoutine(routine, weeklyStake);
   const checkinFatigueSignal = checkin ? conditionToFatigueSignal(checkin.condition) : null;
   const userMemory = recomputeUserMemoryProfile(workouts, {
     now,
@@ -295,5 +303,6 @@ export function buildHomeActionViewModel(
     confirmedPlanLine,
     hasDailyCheckin: Boolean(checkin),
     daysSinceLastWorkout: sinceLast,
+    weeklyStake,
   };
 }

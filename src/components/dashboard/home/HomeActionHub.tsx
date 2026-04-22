@@ -1,5 +1,6 @@
 "use client";
 
+import { WeeklyStakeCard } from "@/components/dashboard/home/WeeklyStakeCard";
 import { ContinuityPulseStrip } from "@/components/habit-loop/ContinuityPulseStrip";
 import { InactiveCoachBanner } from "@/components/habit-loop/InactiveCoachBanner";
 import { DailyStatusBriefingCard } from "@/components/dashboard/home/DailyStatusBriefingCard";
@@ -49,6 +50,7 @@ export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, 
         userWorkoutUiState={userWorkoutUiState}
         hasDailyCheckin={model.hasDailyCheckin}
       />
+      <WeeklyStakeCard stake={model.weeklyStake} hydrated={model.hydrated} todayWorkoutComplete={model.todayWorkoutComplete} />
       {model.hydrated &&
       !model.todayWorkoutComplete &&
       model.daysSinceLastWorkout !== null &&
