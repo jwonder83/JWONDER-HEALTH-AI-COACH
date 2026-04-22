@@ -68,14 +68,12 @@ export function buildClosingReportPlanFeedbackUi(
   const deltas = computeClosingFeedbackDeltas(kind, todayRowCount);
 
   if (kind === "missed_evening") {
-    const weeklyPart = hasWeeklySessionGoal
-      ? "주간 세션 목표를 약 12% 낮췄고, "
-      : "";
+    const weeklyPart = hasWeeklySessionGoal ? "이번 주 목표는 12%쯤 줄였고, " : "";
     return {
       completionPercent: 0,
       tone: "fail",
-      headline: "오늘 미수행",
-      effectLine: `→ ${weeklyPart}내일 루틴 권장 강도를 10% 낮춥니다.`,
+      headline: "오늘은 쉬었네요",
+      effectLine: `→ ${weeklyPart}내일 세기는 10% 정도 낮춰 둘게요.`,
       weeklyAdjusted: hasWeeklySessionGoal,
     };
   }
@@ -85,7 +83,7 @@ export function buildClosingReportPlanFeedbackUi(
       completionPercent: pct,
       tone: pct >= 85 ? "success" : "warn",
       headline: `오늘 수행률 ${pct}%`,
-      effectLine: `→ 내일 권장 강도를 약 ${deltas.intensityDelta}% 올립니다.`,
+      effectLine: `→ 내일 세기는 ${deltas.intensityDelta}% 정도 올려 둘게요.`,
       weeklyAdjusted: false,
     };
   }
@@ -94,7 +92,7 @@ export function buildClosingReportPlanFeedbackUi(
     completionPercent: pct,
     tone: "warn",
     headline: `오늘 수행률 ${pct}%`,
-    effectLine: `→ 내일 권장 강도를 약 ${Math.abs(deltas.intensityDelta)}% 낮춥니다.`,
+    effectLine: `→ 내일 세기는 ${Math.abs(deltas.intensityDelta)}% 정도 낮출게요.`,
     weeklyAdjusted: false,
   };
 }

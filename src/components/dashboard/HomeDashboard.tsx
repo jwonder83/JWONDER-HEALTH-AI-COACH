@@ -93,8 +93,8 @@ const cardRing =
 const sectionShell =
   "scroll-mt-36 border border-neutral-200 bg-white p-6 shadow-sm sm:scroll-mt-44 sm:p-9 dark:border-zinc-800 dark:bg-zinc-950";
 
-const SECTION_HINT_INPUT = "저장 즉시 아래 목록에 반영됩니다.";
-const SECTION_HINT_LIST = "날짜와 종목별로 확인하고, 필요 시 개별 삭제할 수 있습니다.";
+const SECTION_HINT_INPUT = "저장하면 바로 아래 목록에 붙어요.";
+const SECTION_HINT_LIST = "날짜·종목별로 보다가 필요하면 하나씩 지울 수 있어요.";
 
 type Props = {
   userId: string;
@@ -208,9 +208,9 @@ export function HomeDashboard({ userId, site }: Props) {
     const checkin = loadDailyCheckin(userId);
     const b = checkin ? mergeDailyCheckinIntoBriefing(base, checkin) : base;
     if (b.decisionKind === "rest") {
-      return "AI 코치: 오늘은 회복 우선이에요. 가벼운 세트만 남기거나 쉬어도 괜찮아요.";
+      return "오늘은 쉬는 쪽이 맞아 보여요. 가볍게만 하거나 패스해도 돼요.";
     }
-    return `AI 코치(세트·휴식): 오늘 권장 강도 약 ${b.recommendedIntensityPercent}% · 다음 세트 전 휴식 60~120초를 추천해요.`;
+    return `오늘은 평소의 ${b.recommendedIntensityPercent}%쯤으로 가 볼까요. 세트 사이에는 60~120초 쉬는 걸 추천해요.`;
   }, [hydrated, workouts, site.experience, userId, habitLoopTick]);
 
   const weekProgressPercent = useMemo(() => {
@@ -434,7 +434,7 @@ export function HomeDashboard({ userId, site }: Props) {
                   href="#today-single-action"
                   className="inline-flex w-full max-w-sm items-center justify-center rounded-xl border-2 border-white bg-white/95 px-6 py-3.5 text-[14px] font-bold tracking-[-0.02em] text-black shadow-lg transition hover:bg-white active:scale-[0.98] sm:py-4 sm:text-[15px]"
                 >
-                  오늘 할 일로 이동
+                  오늘 카드 보기
                 </Link>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] font-medium text-white/75">
                   <Link href="/program" className="underline decoration-white/40 underline-offset-4 transition hover:text-white">
@@ -534,8 +534,8 @@ export function HomeDashboard({ userId, site }: Props) {
                 <IconPencil className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">오늘 세트 남기기</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">저장하면 목록에 바로 떠요</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">오늘 줄 적기</span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">저장하면 목록에 바로 붙어요</span>
               </span>
             </Link>
             <Link
@@ -581,13 +581,13 @@ export function HomeDashboard({ userId, site }: Props) {
           <div className="mt-8 flex flex-col gap-3 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
             <div>
               <p className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink">아직 기록이 없어요</p>
-              <p className="mt-1 text-[13px] leading-snug text-apple-subtle">첫 세트부터 쌓아볼까요?</p>
+              <p className="mt-1 text-[13px] leading-snug text-apple-subtle">한 줄부터 쌓아 볼까요?</p>
             </div>
             <Link
               href="/workout"
               className="inline-flex shrink-0 items-center justify-center rounded-lg border border-black bg-black px-5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-white transition hover:bg-neutral-800 active:scale-[0.98]"
             >
-              세트 남기기
+              줄 적기
             </Link>
           </div>
         ) : null}

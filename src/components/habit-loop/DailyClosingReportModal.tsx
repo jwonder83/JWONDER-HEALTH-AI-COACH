@@ -79,23 +79,23 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
 
   if (!open) return null;
 
-  const title = kind === "completed" ? "오늘 마감 리포트" : "오늘 하루 정리";
+  const title = kind === "completed" ? "오늘 마무리" : "오늘 정리";
   const aiEval =
     kind === "completed"
-      ? `오늘 목표를 약 ${completionPct}% 달성했습니다.${todayList.length ? ` 세트 ${todayList.length}건을 기록했어요.` : ""}`
-      : "오늘은 세트 기록이 없었습니다. 괜찮아요 — 리듬만 다시 잡으면 됩니다.";
+      ? `오늘은 대략 ${completionPct}% 정도 채웠어요.${todayList.length ? ` 세트 ${todayList.length}줄 적었네요.` : ""}`
+      : "오늘은 줄이 없었네요. 괜찮아요, 내일 다시 맞추면 돼요.";
 
   const nextLine =
     kind === "completed"
       ? streak >= 3
-        ? `${streak}일 연속입니다. 내일은 강도를 유지하거나 5%만 올려도 충분해요.`
-        : "내일은 오늘과 비슷한 강도로 이어가 보세요."
-      : "내일은 20분 가벼운 루틴으로 다시 시작하세요.";
+        ? `${streak}일째 이어가고 있어요. 내일은 오늘이랑 비슷하게만 가도 돼요.`
+        : "내일도 오늘이랑 비슷한 세기로 가 볼까요."
+      : "내일은 20분만 가볍게 돌아와도 좋아요.";
 
   return (
     <div className={scrim} role="dialog" aria-modal="true" aria-labelledby="close-report-title">
       <div className={panel}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">루프 마감</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">하루 마감</p>
         <h2
           id="close-report-title"
           className="font-display mt-2 text-[1.65rem] font-bold tracking-[-0.03em] text-apple-ink sm:text-[1.85rem] dark:text-zinc-100"
@@ -117,16 +117,16 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
             <p className="mt-1 text-[15px] font-bold leading-snug">{planFeedbackUi.headline}</p>
             <p className="mt-1 text-[14px] font-semibold leading-relaxed opacity-95">{planFeedbackUi.effectLine}</p>
             <p className="mt-2 text-[11px] font-medium leading-snug opacity-80">
-              닫기 시 위 내용이 저장되어 내일 권장 강도·주간 목표에 반영됩니다.
+              닫으면 위 내용이 저장돼서 내일 세기랑 주간 목표에 반영돼요.
             </p>
           </div>
           <div className={innerBlock}>
-            <p className="text-[10px] font-bold uppercase tracking-wide text-apple-subtle dark:text-zinc-500">AI 평가</p>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-apple-subtle dark:text-zinc-500">짧은 평</p>
             <p className="mt-1 text-[15px] font-medium leading-relaxed text-apple-ink dark:text-zinc-200">{aiEval}</p>
           </div>
           {growthLine ? (
             <p className="rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-[14px] font-bold text-amber-950 dark:border-amber-800/50 dark:bg-amber-950/35 dark:text-amber-100">
-              {growthLine} 성장 🔥
+              {growthLine} (지난주보다 올랐어요)
             </p>
           ) : null}
           <div className={innerBlock}>
@@ -142,7 +142,7 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
               onClick={onDismiss}
               className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-black px-6 text-[14px] font-bold text-white transition hover:bg-neutral-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
             >
-              빠른 루틴 시작
+              운동 화면 열기
             </Link>
           ) : null}
           <button
@@ -153,7 +153,7 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
             닫기
           </button>
         </div>
-        <p className="mt-4 text-center text-[11px] text-apple-subtle dark:text-zinc-500">오늘은 한 번만 뜹니다. 내일 아침 다시 체크인해요.</p>
+        <p className="mt-4 text-center text-[11px] text-apple-subtle dark:text-zinc-500">오늘은 이거 한 번만 떠요. 내일 아침에 또 체크인해 주세요.</p>
       </div>
     </div>
   );

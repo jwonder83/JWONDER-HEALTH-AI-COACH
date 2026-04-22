@@ -9,18 +9,18 @@ import type {
 
 /** 목차 id는 앵커(#id)와 섹션 id와 일치해야 합니다. */
 export const DEFAULT_PROGRAM_TOC: ProgramTocItem[] = [
-  { id: "framework", label: "훈련 원칙" },
-  { id: "split", label: "주간 분할" },
-  { id: "volume", label: "볼륨 기준" },
-  { id: "deload", label: "델로드·휴식" },
-  { id: "order", label: "운동 순서" },
+  { id: "framework", label: "원칙" },
+  { id: "split", label: "주간 나누기" },
+  { id: "volume", label: "볼륨" },
+  { id: "deload", label: "델로드·쉼" },
+  { id: "order", label: "순서" },
   { id: "warmup", label: "워밍업·쿨다운" },
   { id: "rpe", label: "RPE·RIR" },
-  { id: "alternatives", label: "대체 동작" },
+  { id: "alternatives", label: "바꿔 하기" },
   { id: "checklist", label: "동작 체크" },
   { id: "micro", label: "작은 목표" },
-  { id: "stats", label: "기록 점검" },
-  { id: "safety", label: "안전 안내" },
+  { id: "stats", label: "기록 보기" },
+  { id: "safety", label: "안전" },
 ];
 
 export const DEFAULT_PROGRAM_BUILTIN_IMAGES: ProgramBuiltinImages = {
@@ -72,24 +72,24 @@ export const DEFAULT_PROGRAM_BUILTIN_VIDEOS: ProgramBuiltinVideos = {
 };
 
 export const DEFAULT_PROGRAM_VOLUME_EXTERNAL_LINK: ProgramExternalVideoLink = {
-  lead: "심화 학습(영문):",
-  anchorLabel: "볼륨 랜드마크 추정 (Renaissance Periodization)",
+  lead: "더 보기(영문):",
+  anchorLabel: "볼륨 어느 정도가 적당한지 (RP)",
   href: "https://www.youtube.com/watch?v=M2PP8AAXgPo",
 };
 
 export const DEFAULT_PROGRAM_SECTION_TITLES: ProgramSectionTitles = {
-  framework: "훈련 원칙 — 과학적 기반 한눈에",
-  split: "주간 분할·중주기",
-  volume: "볼륨 랜드마크(MV~MRV)",
-  deload: "델로드·피로·주기",
-  order: "운동 순서 — 신경·대사 부담",
-  warmup: "워밍업(RAMP)·쿨다운",
-  rpe: "RPE·RIR로 강도 맞추기",
-  alternatives: "대체 동작·도구 선택",
-  checklist: "종목별 체크포인트와 영상",
-  micro: "작은 목표로 주간 운영",
-  stats: "기록으로 주기 점검",
-  safety: "안전·의학적 유의",
+  framework: "훈련할 때 기본으로 두면 좋은 것들",
+  split: "한 주를 어떻게 나눌지",
+  volume: "볼륨은 대충 이 정도",
+  deload: "델로드랑 피로",
+  order: "순서 — 먼저 뭐 할지",
+  warmup: "워밍업이랑 쿨다운",
+  rpe: "RPE·RIR로 세기 맞추기",
+  alternatives: "몸이나 장비 바꿀 때",
+  checklist: "종목별로 볼 것 + 영상",
+  micro: "짧게 잡는 목표",
+  stats: "기록 보면서 고치기",
+  safety: "다치지 말기",
 };
 
 export function defaultProgramGuideBase(): Pick<

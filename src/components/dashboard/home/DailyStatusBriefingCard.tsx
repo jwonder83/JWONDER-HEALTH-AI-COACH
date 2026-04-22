@@ -25,9 +25,9 @@ function fatigueTextClass(level: FatigueLevel): string {
 }
 
 function decisionKindLabel(kind: BriefingDecisionKind): string {
-  if (kind === "rest") return "휴식 결정";
-  if (kind === "intensity_cap") return "강도 하향";
-  return "표준 진행";
+  if (kind === "rest") return "오늘 쉼";
+  if (kind === "intensity_cap") return "가볍게";
+  return "평소대로";
 }
 
 function decisionKindBadgeClass(kind: BriefingDecisionKind): string {
@@ -61,17 +61,17 @@ export function DailyStatusBriefingCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 id="daily-briefing-heading" className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">
-            하루 브리핑 · 행동 결정
+            오늘 몸 · 대충 정리
           </h2>
-          <p className="mt-1 text-[11px] font-medium text-apple-subtle">데이터 → 해석 → 결정</p>
+          <p className="mt-1 text-[11px] font-medium text-apple-subtle">기록 보고 오늘만 짧게</p>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           {hydrated && briefing && coachTrustConfidencePercent > 0 ? (
             <span
               className="rounded-full border border-indigo-400/50 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-extrabold tabular-nums tracking-wide text-indigo-900 dark:border-indigo-500/40 dark:bg-indigo-950/50 dark:text-indigo-100"
-              title="최근 기록 양·패턴·체크인 반영도를 합친 규칙 기반 지표입니다."
+              title="기록 양이랑 패턴, 체크인까지 합쳐서 대충 맞을 확률이에요."
             >
-              추천 신뢰도: {coachTrustConfidencePercent}%
+              맞을 듯: {coachTrustConfidencePercent}%
             </span>
           ) : null}
           {!hydrated || !briefing ? null : (
@@ -94,7 +94,7 @@ export function DailyStatusBriefingCard({
         <>
           {confirmedPlanLine ? (
             <div className="mt-4 rounded-xl border border-violet-300/80 bg-white/90 px-3.5 py-3.5 shadow-sm dark:border-violet-800/50 dark:bg-zinc-900/50">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-800/90 dark:text-violet-300/90">확정 플랜</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-800/90 dark:text-violet-300/90">오늘 플랜</p>
               <p className="mt-2 text-[15px] font-extrabold leading-snug tracking-[-0.02em] text-apple-ink dark:text-zinc-50 sm:text-[16px]">
                 {confirmedPlanLine}
               </p>
@@ -102,7 +102,7 @@ export function DailyStatusBriefingCard({
           ) : null}
           {/* 1. 상태 분석 */}
           <div className="mt-4 rounded-xl border border-violet-200/80 bg-white/85 px-3.5 py-3 dark:border-violet-900/45 dark:bg-zinc-900/45">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-700/85 dark:text-violet-300/85">상태 분석</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-700/85 dark:text-violet-300/85">지금 상태</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span
                 className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${fatigueTextClass(briefing.fatigue)} border-current/25 bg-white/90 dark:bg-zinc-900/70`}
@@ -155,7 +155,7 @@ export function DailyStatusBriefingCard({
               </div>
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-apple-subtle">오늘 목표 강도</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-apple-subtle">오늘 세기</p>
                   <p className="text-[12px] font-bold tabular-nums text-indigo-800 dark:text-indigo-200">
                     {briefing.decisionKind === "rest" ? "휴식" : `${briefing.recommendedIntensityPercent}%`}
                   </p>
@@ -168,8 +168,8 @@ export function DailyStatusBriefingCard({
                   aria-valuenow={briefing.decisionKind === "rest" ? 0 : briefing.recommendedIntensityPercent}
                   aria-label={
                     briefing.decisionKind === "rest"
-                      ? "오늘 목표 강도 휴식"
-                      : `오늘 목표 운동 강도 ${briefing.recommendedIntensityPercent}퍼센트`
+                      ? "오늘 세기 휴식"
+                      : `오늘 세기 ${briefing.recommendedIntensityPercent}퍼센트`
                   }
                 >
                   <div
@@ -181,8 +181,8 @@ export function DailyStatusBriefingCard({
                 </div>
                 <p className="mt-2 text-[11px] leading-snug text-apple-subtle">
                   {briefing.decisionKind === "rest"
-                    ? "무리한 볼륨 없이 회복에 집중하세요."
-                    : `중량·횟수는 평소의 ${briefing.recommendedIntensityPercent}%에 맞추면 됩니다.`}
+                    ? "오늘은 볼륨 줄이고 쉬는 쪽으로."
+                    : `중량·횟수는 평소의 ${briefing.recommendedIntensityPercent}%쯤이면 돼요.`}
                 </p>
               </div>
             </div>
@@ -190,7 +190,7 @@ export function DailyStatusBriefingCard({
 
           {/* 2. 오늘 결정 */}
           <div className="mt-4 rounded-xl border-2 border-violet-400/45 bg-gradient-to-br from-white to-violet-50/90 px-3.5 py-3.5 shadow-sm dark:border-violet-600/40 dark:from-zinc-900 dark:to-violet-950/35">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-violet-800 dark:text-violet-200">오늘 결정</p>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-violet-800 dark:text-violet-200">정리</p>
             {coachDecisionConfirmedLine ? (
               <p className="mt-2 text-[16px] font-extrabold leading-snug tracking-[-0.02em] text-apple-ink dark:text-zinc-50 sm:text-[17px]" aria-live="polite">
                 {coachDecisionConfirmedLine}
@@ -199,7 +199,7 @@ export function DailyStatusBriefingCard({
             {coachTrustPrimaryReason ? (
               <p className="mt-2 flex flex-wrap items-baseline gap-1.5 text-[12px] font-semibold leading-snug text-violet-900/90 dark:text-violet-200/95">
                 <span className="shrink-0 rounded border border-violet-400/60 bg-violet-100/80 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-violet-900 dark:border-violet-600/50 dark:bg-violet-950/60 dark:text-violet-100">
-                  이유
+                  근거
                 </span>
                 <span>{coachTrustPrimaryReason}</span>
               </p>

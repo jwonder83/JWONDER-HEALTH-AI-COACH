@@ -63,9 +63,9 @@ export function buildFailureReboundModel(workouts: WorkoutRow[], now = new Date(
   const timeReductionPercent = Math.round((1 - timeMultiplier) * 100);
   const intensityReductionPercent = Math.round((1 - intensityMultiplier) * 100);
 
-  const headlineLine = "어제 운동을 놓쳤습니다.";
-  const actionLine = "→ 오늘은 가벼운 루틴으로 조정했습니다.";
-  const detailLine = `예상 시간 약 ${timeReductionPercent}%·권장 강도 약 ${intensityReductionPercent}% 낮췄어요. 오늘 한 세트면 연속 흐름을 완화 규칙으로 이을 수 있어요.`;
+  const headlineLine = "어제는 비었네요.";
+  const actionLine = "→ 오늘은 가볍게 짜 뒀어요.";
+  const detailLine = `시간은 대충 ${timeReductionPercent}% 줄였고, 세기는 ${intensityReductionPercent}% 정도 낮춰 뒀어요. 오늘 한 줄만 넣어도 이어져요.`;
 
   return {
     consecutiveMissedDays,
@@ -110,8 +110,8 @@ export function applyFailureReboundToDailyBriefing(
 
   const aiMessage =
     decisionKind === "intensity_cap" || briefing.fatigue === "high"
-      ? `오늘은 강도를 ${recommendedIntensityPercent}%로 낮추세요.`
-      : `오늘 중량·횟수는 평소의 ${recommendedIntensityPercent}%에 맞추세요.`;
+      ? `오늘은 평소보다 ${recommendedIntensityPercent}%만 써도 돼요.`
+      : `오늘은 평소의 ${recommendedIntensityPercent}%쯤으로 맞춰 보세요.`;
 
   return {
     ...briefing,
@@ -120,7 +120,7 @@ export function applyFailureReboundToDailyBriefing(
     statusSummary: `${model.headlineLine} ${model.actionLine} ${briefing.statusSummary}`.trim(),
     interpretationLine: `${model.detailLine} ${briefing.interpretationLine}`,
     aiMessage,
-    reasonLine: `${briefing.reasonLine} · 복귀 자동 조정: 미완료 ${model.consecutiveMissedDays}일 반영.`,
+    reasonLine: `${briefing.reasonLine} · 어제 비운 날 ${model.consecutiveMissedDays}일 반영해서 살짝 낮췄어요.`,
   };
 }
 

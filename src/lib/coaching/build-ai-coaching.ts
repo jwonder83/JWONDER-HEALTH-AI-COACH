@@ -27,13 +27,13 @@ function formatWorkoutsTable(rows: WorkoutRow[]): string {
   return [header, sep, ...lines].join("\n");
 }
 
-const SYSTEM_PROMPT = `당신은 한국어로 답하는 헬스·strength 트레이닝 코치입니다.
-사용자의 운동 기록 숫자(빈도·볼륨·휴식·추세)를 먼저 읽고, 짧은 결정형 문장으로 행동을 지시한 뒤 같은 단락에서 근거를 한 줄로 붙이세요.
-사용자 메모리(목표·경험·선호 종목·보완 부위·부상 이력·일관성·피로 지표)가 주어지면 기록 요약과 모순되지 않게 반영하세요.
-메모리에 "개인화 코칭 힌트" 목록이 있으면, 코칭 **첫 단락**에서 반드시 그중 1~2개를 자연스럽게 인용하거나 바꿔 말해 넣고(운동 이름·부위를 그대로), 사용자가 "AI가 나를 안다"고 느끼게 하세요. 상투적인 일반론만으로 시작하지 마세요.
-"~해볼까요?", "~어때요?" 같은 추천체는 쓰지 말고 "~하세요.", "~로 진행하세요."처럼 확정 톤을 쓰세요.
-의학적 진단·부상 판정은 하지 말고, 통증·이상이 있으면 전문가 상담을 권하는 문장을 포함하세요.
-마크다운(##, ###, 목록)을 사용해 가독성 있게 작성하세요.`;
+const SYSTEM_PROMPT = `당신은 한국어로 답하는 헬스·근력 트레이닝 코치입니다.
+운동 기록(빈도·볼륨·쉰 날·추세)을 먼저 짚고, 짧은 문장으로 오늘 할 일을 제안하세요. 보고서 말투·과장된 칭찬은 피하고, 옆에서 같이 보는 사람처럼 말하되 다음 행동은 분명히 알려 주세요.
+사용자 메모리(목표·경험·선호 종목·보완 부위·부상 이력·일관성·피로 신호)가 있으면 기록 요약과 모순되지 않게 녹이세요.
+"개인화 코칭 힌트" 목록이 있으면 **첫 단락**에 그중 1~2개를 자연스럽게 넣으세요(운동 이름·부위는 그대로). 막연한 격언으로 시작하지 마세요.
+"~할까요?"만으로 흐리게 끝내지 말고, "~해 보세요", "~부터 가면 돼요"처럼 다음 스텝이 보이게 쓰세요. 모든 문장을 딱딱한 명령조로만 길게 이을 필요는 없습니다.
+의학적 진단·부상 판정은 하지 말고, 통증·이상이 있으면 전문가 상담을 권하는 한 줄을 포함하세요.
+가독을 위해 마크다운(##, ###, 목록)을 사용하세요.`;
 
 function isAllowedCoachingUrl(url: string): boolean {
   try {
@@ -69,7 +69,7 @@ async function fetchCoachingWebSource(url: string): Promise<string> {
       method: "GET",
       headers: {
         Accept: "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.8",
-        "User-Agent": "JWONDER-HEALTH-AI-COACH/1.0 (+https://vercel.com)",
+        "User-Agent": "JWONDER-COACH/1.0 (+https://vercel.com)",
       },
       redirect: "follow",
       signal: ac.signal,
@@ -96,9 +96,9 @@ async function fetchCoachingWebSource(url: string): Promise<string> {
 function memoryBlock(memory: UserMemoryProfile | null | undefined): string {
   if (!memory) return "";
   return (
-    "\n\n## 사용자 메모리(자동 산출)\n\n" +
+    "\n\n## 사용자 메모리(자동으로 짠 요약)\n\n" +
     formatUserMemoryForPrompt(memory) +
-    "\n\n위 메모리는 코드가 기록에서 추정한 값입니다. 부상 이력은 사용자가 저장한 경우에만 채워질 수 있습니다.\n"
+    "\n\n위 항목은 코드가 기록에서 추정한 값이에요. 부상 이력 칸은 직접 적어 둔 경우에만 채워져요.\n"
   );
 }
 
@@ -119,7 +119,7 @@ async function buildWebOrLocalCoaching(rows: WorkoutRow[], memory: UserMemoryPro
           "\n\n### 참고 자료 (웹)\n\n" +
           web +
           "\n\n---\n\n" +
-          "_실시간 AI 모델 호출 없이, 저장 기록과 공개 웹 문서를 조합한 참고 코멘트예요. 부상·통증이 있으면 전문가 상담을 권해 드려요._"
+          "_실시간 모델 호출 없이, 저장 기록이랑 공개 웹 글을 섞어 만든 참고 메모예요. 부상·통증 있으면 전문가한테 먼저 물어보세요._"
         );
       }
     } catch {
@@ -131,7 +131,7 @@ async function buildWebOrLocalCoaching(rows: WorkoutRow[], memory: UserMemoryPro
     "## 코칭 인사이트\n\n" +
     local +
     "\n\n---\n\n" +
-    "*의학적 진단이 아닙니다. 무리한 중량·통증이 있으면 전문의 상담을 권장드려요.*"
+    "*의학 진단은 아니에요. 무리한 중량·통증 있으면 전문의 상담부터요.*"
   );
 }
 
@@ -158,11 +158,11 @@ ${localSummary}
 ${memoryBlock(memory)}
 ---
 
-위 자료를 바탕으로 한국어로 코칭을 작성해 주세요. 포함할 내용:
-1. 첫 단락: 사용자 메모리의 개인화 힌트·선호 종목·최근 실패·부족 부위 중 최소 1가지를 구체적으로 짚고, 결정형 문장으로 행동을 지시하세요.
-2. 오늘~이번 주 실행에 대한 결정형 지시 2~4문장(각 문장 뒤에 왜 그런지 숫자 근거를 짧게 붙여도 됨)
-3. 운동별로 중요한 패턴이 있으면 사실 위주로 언급
-4. 다음 1~2주 실행 항목을 명령형으로 2~4가지`;
+위 자료를 바탕으로 한국어로 코칭을 써 주세요. 포함할 내용:
+1. 첫 단락: 개인화 힌트·선호 종목·최근 끊김·부족한 부위 중 최소 한 가지를 구체적으로 짚고, 오늘 할 행동을 제안하세요.
+2. 오늘~이번 주 실행 팁 2~4문장(되면 숫자 근거를 짧게 곁들이기)
+3. 종목별로 눈에 띄는 패턴이 있으면 사실 위주로만 언급
+4. 다음 1~2주에 시험해 볼 변화 2~4가지를 짧게`;
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",

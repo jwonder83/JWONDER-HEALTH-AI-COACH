@@ -68,7 +68,7 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
   return (
     <div className={scrim} role="dialog" aria-modal="true" aria-labelledby="checkin-title" aria-describedby="checkin-desc">
       <div className={card}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">데일리 체크인 · 필수</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">오늘 체크인</p>
         <h1
           id="checkin-title"
           className="font-display mt-3 text-[1.65rem] font-bold leading-tight tracking-[-0.03em] text-apple-ink sm:text-[1.85rem] dark:text-zinc-100"
@@ -77,8 +77,8 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
         </h1>
         <p id="checkin-desc" className="mt-2 text-[14px] leading-relaxed text-apple-subtle dark:text-zinc-400">
           {step === 1
-            ? "솔직하게 고르면 오늘 강도·시간 플랜이 맞춰져요. 스킵할 수 없어요."
-            : "가능한 범위만 선택하세요. 플랜 예상 시간에 반영됩니다."}
+            ? "대충이라도 맞춰 주면 오늘 운동 세기랑 시간 짜는 데 써요. 여기만 통과하면 돼요."
+            : "오늘 현실적으로 쓸 수 있는 시간만 골라 주세요. 루틴 길이에 반영돼요."}
         </p>
 
         {step === 1 ? (
@@ -133,7 +133,7 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
               onClick={submit}
               className="order-1 min-h-[48px] rounded-xl border border-black bg-black px-8 text-[15px] font-bold text-white transition enabled:hover:bg-neutral-800 disabled:opacity-40 sm:order-2 dark:border-white dark:bg-white dark:text-zinc-950 dark:enabled:hover:bg-zinc-200"
             >
-              확정 · 브리핑으로
+              이대로 쓰기
             </button>
           )}
         </div>

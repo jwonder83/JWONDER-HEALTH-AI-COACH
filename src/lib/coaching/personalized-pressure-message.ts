@@ -88,27 +88,27 @@ export function buildPersonalizedPressureMessage(workouts: WorkoutRow[], now = n
   let pastLine: string | null = null;
 
   if (consecutiveMiss >= 2) {
-    pastLine = `최근 ${consecutiveMiss}일 연속으로 운동 기록이 비어 있었습니다.`;
+    pastLine = `최근 ${consecutiveMiss}일은 줄이 없었어요.`;
   } else if (missLastWd1 && missLastWd2) {
-    pastLine = `지난주에도 ${wdLabel}요일 운동을 놓쳤습니다.`;
+    pastLine = `지난주 ${wdLabel}요일도 비었어요.`;
   } else if (missLastWd1) {
-    pastLine = `직전 ${wdLabel}요일에도 세트를 남기지 않았습니다.`;
+    pastLine = `저번 ${wdLabel}요일에도 안 적었어요.`;
   } else if (yMiss) {
-    pastLine = "어제도 운동 기록을 남기지 않았습니다.";
+    pastLine = "어제도 안 적었네요.";
   } else if (weak) {
-    pastLine = `최근 2주 기록을 보면 ${muscleGroupLabel(weak.id)} 쪽 볼륨 비중이 유독 낮았습니다.`;
+    pastLine = `지난 2주 보면 ${muscleGroupLabel(weak.id)} 쪽이 좀 비어 있어요.`;
   } else if (preferred.length > 0) {
-    pastLine = `최근 자주 하신 「${preferred[0]}」 위주로만 몸이 기울어 있습니다.`;
+    pastLine = `요즘 「${preferred[0]}」만 자꾸 하고 있어요.`;
   }
 
   if (!pastLine) return null;
 
   const presentLine =
     weak || consecutiveMiss >= 1
-      ? "같은 패턴이 반복되면 AI가 기억하는 ‘나’와 목표가 어긋납니다."
-      : "오늘까지 미루면 그 흐름이 또 고정됩니다.";
+      ? "이대로 가면 목표랑 살짝 엇나가요."
+      : "오늘도 비우면 그냥 습관이 돼 버려요.";
 
-  const actionLine = "→ 오늘은 반드시 진행하세요.";
+  const actionLine = "→ 오늘은 한 번만이라도 적어 볼까요.";
 
   const fullText = `${pastLine}\n\n${presentLine}\n${actionLine}`;
 

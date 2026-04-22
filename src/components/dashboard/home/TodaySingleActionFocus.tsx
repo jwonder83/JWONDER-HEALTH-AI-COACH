@@ -25,7 +25,7 @@ export function TodaySingleActionFocus({ model, routineFlowStatus, userWorkoutUi
   const done = model.todayWorkoutComplete;
   const planLocked = routineFlowStatus === "confirmed" || routineFlowStatus === "completed";
 
-  const eyebrow = done || planLocked ? "오늘 운동 (확정)" : "오늘 운동";
+  const eyebrow = done || planLocked ? "오늘 운동 (고정)" : "오늘 운동";
   const ctaLabel =
     userWorkoutUiState === "active" && !done ? "세션 이어가기" : done ? "추가로 기록하기" : "운동 시작하기";
 

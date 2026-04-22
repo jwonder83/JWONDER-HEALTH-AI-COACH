@@ -20,7 +20,7 @@ type Props = {
   omitCardHeader?: boolean;
   /** 직전 기록·PR 힌트용 전체 기록 */
   allWorkouts?: WorkoutRow[];
-  /** AI 코치 한 줄(세트·휴식·권장 강도) — 홈에서 주입 */
+  /** 홈에서 넣는 짧은 팁(세트·쉼·세기) */
   aiSessionCoachLine?: string | null;
 };
 
@@ -405,7 +405,7 @@ export function WorkoutForm({ onSaved, saveWorkout, copy, omitCardHeader = false
         </div>
         {aiSessionCoachLine ? (
           <div className="sm:col-span-2 rounded-xl border border-violet-200/90 bg-violet-50/90 px-3.5 py-3 text-[13px] font-semibold leading-snug text-violet-950 dark:border-violet-800/50 dark:bg-violet-950/35 dark:text-violet-50">
-            <span className="mr-1.5 text-[10px] font-extrabold uppercase tracking-wide text-violet-700/90 dark:text-violet-200/90">세션</span>
+            <span className="mr-1.5 text-[10px] font-extrabold uppercase tracking-wide text-violet-700/90 dark:text-violet-200/90">팁</span>
             {aiSessionCoachLine}
           </div>
         ) : null}

@@ -57,16 +57,16 @@ export function getNoWorkoutInterventionUrgency(
 
   let interventionHeadline: string;
   if (phase === "morning") {
-    interventionHeadline = "오늘 계획된 운동을 시작할 차례입니다.";
+    interventionHeadline = "오늘 운동, 이제 슬슬 시작할 때예요.";
   } else if (phase === "afternoon") {
-    interventionHeadline = "아직 오늘 운동이 기록되지 않았습니다.";
+    interventionHeadline = "오늘은 아직 운동 기록이 없어요.";
   } else if (phase === "evening") {
     interventionHeadline =
       streakDays > 0
-        ? "오늘 기록이 없으면 연속 일수가 초기화될 수 있습니다."
-        : "오늘 한 세트도 남기지 않으면 공백일이 됩니다.";
+        ? "오늘 안 찍으면 연속 일수 끊길 수 있어요."
+        : "오늘 한 세트도 없으면 그냥 비는 날이에요.";
   } else {
-    interventionHeadline = "가능하다면 10분 내외의 가벼운 루틴이라도 진행해 보세요.";
+    interventionHeadline = "10분만이라도 가볍게 돌려 보는 건 어때요.";
   }
 
   const urgency: NoWorkoutUrgencyLevel =

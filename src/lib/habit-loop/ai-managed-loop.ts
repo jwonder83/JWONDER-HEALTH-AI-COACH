@@ -30,12 +30,12 @@ export type AiManagedLoopSnapshot = {
 };
 
 const STEPS = [
-  { key: "checkin", label: "체크인" },
-  { key: "briefing", label: "브리핑" },
+  { key: "checkin", label: "컨디션" },
+  { key: "briefing", label: "오늘 정리" },
   { key: "cta", label: "기록" },
-  { key: "session", label: "세션" },
+  { key: "session", label: "운동 중" },
   { key: "close", label: "마감" },
-  { key: "nudge", label: "개입" },
+  { key: "nudge", label: "리마인드" },
   { key: "next", label: "내일" },
 ] as const;
 
@@ -109,40 +109,40 @@ export function buildAiManagedLoopSnapshot(input: {
 
   switch (phase) {
     case "hydrating":
-      headline = "앱을 준비하는 중이에요.";
-      nextActionLabel = "잠시만 기다려 주세요.";
+      headline = "불러오는 중이에요.";
+      nextActionLabel = "조금만 기다려 주세요.";
       nextActionHref = "#";
       break;
     case "checkin":
-      headline = "오늘 컨디션·가능 시간을 알려주세요.";
-      nextActionLabel = "데일리 체크인 완료";
+      headline = "오늘 몸 상태랑, 운동할 수 있는 시간만 골라 주세요.";
+      nextActionLabel = "체크인 하고 가기";
       nextActionHref = input.habitLoopHomeHref ?? "#";
       break;
     case "briefing":
-      headline = "체크인이 반영된 오늘 브리핑을 확인해요.";
-      nextActionLabel = "브리핑 확인 후 운동 시작";
+      headline = "방금 고른 내용으로 오늘 운동을 짜 뒀어요.";
+      nextActionLabel = "브리핑 보고 기록으로";
       nextActionHref = input.habitLoopHomeHref ?? "#";
       break;
     case "workout_cta":
       headline = timeBandNudge
-        ? `시간대 코치: ${intervention?.message ?? "오늘 세트를 남겨 주세요."}`
-        : "오늘 세트를 남기면 루프가 이어져요.";
-      nextActionLabel = "세트 기록하기";
+        ? `${intervention?.message ?? "오늘 한 줄이라도 남겨 볼까요."}`
+        : "이제 세트만 적으면 돼요.";
+      nextActionLabel = "기록하러 가기";
       nextActionHref = input.workoutEntryHref;
       break;
     case "workout_active":
-      headline = "운동 세션 진행 중 — 코치가 세트·휴식을 맞춰 드려요.";
-      nextActionLabel = "세션 이어하기";
+      headline = "지금 운동 중이에요. 쉬는 타이밍도 여기서 볼 수 있어요.";
+      nextActionLabel = "화면으로 돌아가기";
       nextActionHref = input.workoutEntryHref;
       break;
     case "closing":
-      headline = "오늘 마감 리포트로 하루를 정리해요.";
-      nextActionLabel = "마감 확인하기";
+      headline = "오늘은 여기까지 정리할게요.";
+      nextActionLabel = "마감 쪽지 열기";
       nextActionHref = input.habitLoopHomeHref ?? "#";
       break;
     case "day_closed":
-      headline = "오늘 루프 완료. 내일 아침 체크인 때 어제 결과가 반영돼요.";
-      nextActionLabel = "내일 할 일 미리 보기";
+      headline = "오늘은 여기까지. 내일 아침에 어제 기록이 브리핑에 섞여 들어가요.";
+      nextActionLabel = "내일 카드만 보기";
       nextActionHref = "/#today-single-action";
       break;
   }

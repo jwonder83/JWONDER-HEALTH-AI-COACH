@@ -44,7 +44,7 @@ export function PostCheckinBriefingModal({
   return (
     <div className={scrim} role="dialog" aria-modal="true" aria-labelledby="post-checkin-briefing-title">
       <div className={panel}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">AI 루프 · 체크인 다음</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">체크인 다음</p>
         <h2
           id="post-checkin-briefing-title"
           className="font-display mt-2 text-[1.45rem] font-bold leading-tight tracking-[-0.03em] text-apple-ink dark:text-zinc-50 sm:text-[1.6rem]"
@@ -52,7 +52,7 @@ export function PostCheckinBriefingModal({
           오늘 브리핑
         </h2>
         <p className="mt-2 text-[13px] leading-relaxed text-apple-subtle dark:text-zinc-400">
-          체크인이 반영됐어요. 데이터 기준으로 오늘 결정을 정리했습니다.
+          방금 고른 걸로 오늘 운동을 정리해 뒀어요.
         </p>
 
         {!ready ? (
@@ -65,17 +65,17 @@ export function PostCheckinBriefingModal({
           <>
             {model.confirmedPlanLine ? (
               <div className="mt-5 rounded-xl border border-violet-300/75 bg-white/95 px-3.5 py-3.5 shadow-sm dark:border-violet-800/50 dark:bg-zinc-900/60">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-violet-800 dark:text-violet-200">확정 플랜</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-violet-800 dark:text-violet-200">오늘 플랜</p>
                 <p className="mt-2 text-[15px] font-extrabold leading-snug text-apple-ink dark:text-zinc-50">{model.confirmedPlanLine}</p>
               </div>
             ) : null}
 
             <div className="mt-4 rounded-xl border-2 border-violet-400/40 bg-white/90 px-3.5 py-3.5 dark:border-violet-600/35 dark:bg-zinc-900/50">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-violet-800 dark:text-violet-200">오늘 결정</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-violet-800 dark:text-violet-200">정리</p>
                 {model.coachTrustConfidencePercent > 0 ? (
                   <span className="rounded-full border border-indigo-400/50 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-extrabold tabular-nums text-indigo-900 dark:border-indigo-500/40 dark:bg-indigo-950/50 dark:text-indigo-100">
-                    추천 신뢰도 {model.coachTrustConfidencePercent}%
+                    맞을 것 같음 {model.coachTrustConfidencePercent}%
                   </span>
                 ) : null}
               </div>
@@ -87,7 +87,7 @@ export function PostCheckinBriefingModal({
               {model.coachTrustPrimaryReason ? (
                 <p className="mt-2 text-[12px] font-semibold text-violet-900/90 dark:text-violet-200/95">
                   <span className="mr-1.5 rounded border border-violet-400/55 bg-violet-100/90 px-1 py-0.5 text-[9px] font-bold uppercase text-violet-900 dark:border-violet-600 dark:bg-violet-950 dark:text-violet-100">
-                    이유
+                    근거
                   </span>
                   {model.coachTrustPrimaryReason}
                 </p>
@@ -107,14 +107,14 @@ export function PostCheckinBriefingModal({
                     onClick={onContinueToWorkout}
                     className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 text-[14px] font-bold text-white shadow-md shadow-violet-500/20 transition hover:opacity-95 active:scale-[0.99]"
                   >
-                    짧게 기록 시작하기
+                    가볍게 한 줄 남기기
                   </button>
                   <Link
                     href="/program"
                     onClick={onDismiss}
                     className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-xl border-2 border-violet-300/80 bg-white/95 px-4 text-[14px] font-bold text-violet-900 transition hover:bg-violet-50 dark:border-violet-600 dark:bg-zinc-900 dark:text-violet-100 dark:hover:bg-zinc-800"
                   >
-                    회복·루틴 보기
+                    프로그램만 보기
                   </Link>
                 </>
               ) : (
@@ -123,7 +123,7 @@ export function PostCheckinBriefingModal({
                   onClick={onContinueToWorkout}
                   className="inline-flex min-h-[50px] w-full items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 text-[15px] font-bold text-white shadow-md shadow-violet-500/25 ring-2 ring-violet-400/25 transition hover:opacity-95 active:scale-[0.99] sm:flex-1"
                 >
-                  {model.todayWorkoutComplete ? "기록 섹션으로 이동" : "운동 시작하기"}
+                  {model.todayWorkoutComplete ? "기록 칸으로" : "기록하러 가기"}
                 </button>
               )}
               <button

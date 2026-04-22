@@ -110,9 +110,9 @@ function buildCoachLine(args: {
 }): string {
   if (args.todayDone) {
     if (args.streak >= 3) {
-      return `${args.streak}일 연속 기록입니다. 오늘은 여기까지 마무리하고 가벼운 스트레칭과 수분 보충을 권장합니다.`;
+      return `${args.streak}일째 이어가고 있어요. 오늘은 여기까지만 하고 가볍게 스트레칭이랑 물 좀 더 드세요.`;
     }
-    return "오늘 세션을 완료했습니다. 짧게 정리 스트레칭으로 마무리하세요.";
+    return "오늘 세션은 끝났어요. 짧게 스트레칭만 하고 마무리해도 돼요.";
   }
 
   if (args.memory.personalization_bullets.length > 0) {
@@ -121,12 +121,12 @@ function buildCoachLine(args: {
 
   const t = args.routineTitle;
   if (args.goalProgressPercent !== null && args.goalProgressPercent < 40) {
-    return `오늘은 「${t}」을(를) 지금 시작하세요. 주간 목표 진행률을 끌어올릴 수 있습니다.`;
+    return `오늘은 「${t}」부터 들어가 보죠. 주간 목표도 아직 따라잡을 수 있어요.`;
   }
   if (args.streak === 0) {
-    return `오늘은 「${t}」로 첫 세트를 남기세요.`;
+    return `오늘은 「${t}」로 첫 세트만 남겨 보세요.`;
   }
-  return `오늘은 「${t}」 루틴을 이어 가세요.`;
+  return `오늘은 「${t}」 그대로 밀어보죠.`;
 }
 
 function rowsLastNDays(workouts: WorkoutRow[], now: Date, days: number): number {
@@ -155,10 +155,10 @@ function buildCoachLineReason(args: {
   recoveryAfterMissedYesterday: boolean;
 }): string {
   if (args.todayDone) {
-    return "오늘 날짜에 저장된 세트가 있어 완료 상태로 표시했습니다.";
+    return "오늘 날짜로 세트가 이미 있어서 완료로 보여요.";
   }
   if (args.workouts.length === 0) {
-    return "저장된 운동 기록이 없어 오늘 루틴으로 첫 데이터를 쌓는 단계입니다.";
+    return "아직 저장된 운동이 없어요. 오늘 플랜이 첫 기록이에요.";
   }
   const mon = startOfWeekMonday(args.now);
   const sun = endOfWeekSunday(mon);
@@ -193,12 +193,12 @@ function buildCoachLineReason(args: {
     bits.push(`선호 종목 ${args.memory.preferred_exercises.slice(0, 3).join(", ")}`);
   }
   if (args.memory.personalization_bullets.length > 0) {
-    bits.push(`메모리 기반 개인화 ${args.memory.personalization_bullets.length}건`);
+    bits.push(`패턴에서 짠 맞춤 문장 ${args.memory.personalization_bullets.length}개`);
   }
   if (args.recoveryAfterMissedYesterday) {
-    bits.push("복귀 모드(어제 공백·가벼운 루틴·스트릭 유지 표시)");
+    bits.push("어제 비어 있어서 가볍게 이어가는 표시");
   }
-  return `${bits.join(" · ")}입니다.`;
+  return `${bits.join(" · ")} 기준이에요.`;
 }
 
 function buildConfirmedPlanLine(
@@ -209,10 +209,10 @@ function buildConfirmedPlanLine(
   if (!checkin) return null;
   const cond = conditionLabelKo(checkin.condition);
   if (briefing.decisionKind === "rest") {
-    return `오늘은 컨디션이 ${cond}입니다. 회복·가벼운 루틴을 우선하고, 무리한 볼륨은 피하세요.`;
+    return `컨디션은 ${cond} 쪽으로 봤어요. 회복이랑 가벼운 루틴 먼저 하고, 볼륨은 살짝만 줄여요.`;
   }
   const pct = briefing.recommendedIntensityPercent;
-  return `오늘은 컨디션이 ${cond}입니다. → 강도 ${pct}%로 「${routine.title}」을(를) 진행하세요.`;
+  return `컨디션은 ${cond}로 잡았어요. 세기 ${pct}%쯤으로 「${routine.title}」 가면 돼요.`;
 }
 
 export function buildHomeActionViewModel(

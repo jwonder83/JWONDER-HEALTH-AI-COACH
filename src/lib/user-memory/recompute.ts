@@ -51,15 +51,15 @@ function topPreferredExercises(workouts: WorkoutRow[], now: Date, windowDays: nu
 function computeWeakPoints(workouts: WorkoutRow[], now: Date): string[] {
   const volMap = volumeByBodyBucket(workouts, now, 21);
   const entries = [...volMap.values()].filter((e) => e.volume > 0);
-  if (entries.length === 0) return ["운동 기록이 쌓이면 부위별 볼륨 밸런스를 분석합니다."];
+  if (entries.length === 0) return ["기록이 좀 쌓이면 부위별 볼륨도 짚어 볼게요."];
   const maxV = Math.max(...entries.map((e) => e.volume));
-  if (maxV < 150) return ["누적 볼륨이 아직 적어 부위 편차 분석은 참고 수준입니다."];
+  if (maxV < 150) return ["아직 쌓인 볼륨이 적어서 부위 편차는 대충만 봐도 돼요."];
   const weak = entries
     .filter((e) => e.volume < maxV * 0.28)
     .sort((a, b) => a.volume - b.volume)
     .slice(0, 3)
-    .map((e) => `${e.label} 누적 볼륨이 상대적으로 부족합니다.`);
-  return weak.length ? weak : ["주요 부위 볼륨 밸런스는 무난한 편입니다."];
+    .map((e) => `${e.label} 쪽 볼륨이 다른 데보다 좀 적어요.`);
+  return weak.length ? weak : ["큰 부위들 볼륨은 대체로 고르게 가고 있어요."];
 }
 
 function sanitizeInjuries(raw: unknown): string[] {

@@ -149,7 +149,7 @@ export function RewardStatusCard({ userId, workouts, hydrated, lastXpFloat }: Pr
             <span className="ml-2 text-[13px] font-semibold text-apple-subtle dark:text-zinc-400">XP · 레벨</span>
           </p>
           <p className="mt-1 max-w-md text-[12px] leading-relaxed text-apple-subtle dark:text-zinc-400">
-            세트를 저장할 때마다 XP가 쌓입니다. 연속 일수로 3·7·30일 뱃지가 열려요.
+            세트 저장할 때마다 XP가 조금씩 붙어요. 연속 일수 채우면 3·7·30일 뱃지도 풀려요.
           </p>
         </div>
         <div className="flex flex-col items-end gap-1 rounded-2xl border border-amber-300/60 bg-white/90 px-4 py-3 text-right shadow-sm dark:border-amber-800/50 dark:bg-zinc-900/90">

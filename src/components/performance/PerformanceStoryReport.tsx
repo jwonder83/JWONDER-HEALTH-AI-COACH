@@ -19,7 +19,7 @@ export function PerformanceStoryReport({ rows }: Props) {
   return (
     <article className="rounded-[1.75rem] border border-neutral-200/90 bg-gradient-to-b from-white to-neutral-50/90 p-6 shadow-sm sm:p-8 dark:border-zinc-800 dark:from-zinc-950 dark:to-zinc-950/80">
       <header className="border-b border-neutral-200/80 pb-5 dark:border-zinc-800">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700/90 dark:text-amber-400/90">AI 톤 리포트</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700/90 dark:text-amber-400/90">한 줄 리포트</p>
         <h2 className="font-display mt-2 text-[1.5rem] font-bold leading-tight tracking-[-0.03em] text-apple-ink dark:text-zinc-100 sm:text-[1.75rem]">
           이번 주 운동 스토리
         </h2>

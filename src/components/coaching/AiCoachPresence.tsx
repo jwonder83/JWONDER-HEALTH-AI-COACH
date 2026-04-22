@@ -7,7 +7,7 @@ export type AiCoachPresenceProps = {
   /** 규칙 또는 API에서 조립한 메시지 페이로드 */
   message: CoachPresenceMessage;
   className?: string;
-  /** 스크린리더용 라벨 (기본: AI 코치) */
+  /** 스크린리더용 라벨 (기본: 코치) */
   label?: string;
 };
 
@@ -32,7 +32,7 @@ export function AiCoachPresence({ message, className = "", label = "코치" }: A
             className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/15 to-indigo-500/10 text-[11px] font-bold tracking-[-0.02em] text-violet-900 ring-1 ring-violet-200/80 dark:from-violet-400/20 dark:to-indigo-400/10 dark:text-violet-100 dark:ring-violet-500/30"
             aria-hidden
           >
-            AI
+            메모
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">

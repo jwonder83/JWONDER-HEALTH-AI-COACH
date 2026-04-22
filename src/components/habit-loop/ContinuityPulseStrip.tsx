@@ -66,9 +66,9 @@ export function ContinuityPulseStrip({
         ? "체크인 완료 · 이제 실행만 남았어요."
         : "체크인 후 플랜이 열려요."
       : phase === "active"
-        ? "코칭 모드로 세트를 이어가요."
+        ? "세트만 차곡차곡 채우면 돼요."
         : phase === "completed"
-          ? "오늘 루프 완주. 내일 체크인으로 다시 시작해요."
+          ? "오늘은 여기까지. 내일 체크인부터 다시 가요."
           : "스트릭이 위험해요. 짧게라도 복귀해요.";
 
   const eyebrowClass =

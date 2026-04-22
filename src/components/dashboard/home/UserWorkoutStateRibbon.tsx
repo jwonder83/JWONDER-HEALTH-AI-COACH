@@ -58,12 +58,12 @@ export function UserWorkoutStateRibbon({ state }: Props) {
           </span>
           {state === "idle" ? (
             <p className="min-w-0 text-[13px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">
-              오늘은 아직 기록 전이에요. 아래에서 <span className="text-amber-800 dark:text-amber-300">플랜 확정 → 운동 시작</span>만 이어가면 돼요.
+              오늘은 아직 기록 전이에요. 아래에서 <span className="text-amber-800 dark:text-amber-300">플랜 고르기 → 운동 들어가기</span>만 이어가면 돼요.
             </p>
           ) : null}
           {state === "active" ? (
             <p className="min-w-0 text-[13px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">
-              세션 진행 중이에요. 코치 휴식·세트 입력 화면으로 돌아가 이어서 저장하세요.
+              세션 진행 중이에요. 운동 화면으로 돌아가 휴식·세트만 이어서 저장하면 돼요.
             </p>
           ) : null}
           {state === "completed" ? (
@@ -73,7 +73,7 @@ export function UserWorkoutStateRibbon({ state }: Props) {
           ) : null}
           {state === "missed" ? (
             <p className="min-w-0 text-[13px] font-semibold leading-snug text-rose-950 dark:text-rose-50">
-              오늘은 아직 세트가 없어요. 짧게라도 루틴을 돌리면 스트릭·기록이 살아납니다.
+              오늘은 아직 세트가 없어요. 짧게라도 한 번 돌리면 스트릭이랑 기록이 이어져요.
             </p>
           ) : null}
         </div>

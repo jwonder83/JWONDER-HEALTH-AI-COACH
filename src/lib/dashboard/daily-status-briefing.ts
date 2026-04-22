@@ -183,7 +183,7 @@ function buildReasonLine(m: DailyStatusBriefing["metrics"]): string {
     const sign = p > 0 ? "+" : "";
     parts.push(`전주 동기간 대비 볼륨 ${sign}${p}%`);
   }
-  return `${parts.join(" · ")}입니다.`;
+  return `${parts.join(" · ")} 기준이에요.`;
 }
 
 function buildStatusSummary(fatigue: FatigueLevel, m: DailyStatusBriefing["metrics"]): string {
@@ -199,23 +199,23 @@ function buildInterpretationLine(
 ): string {
   if (restDayRecommended) {
     return m.consecutiveHighLoadDays >= 4
-      ? `최근 ${m.consecutiveHighLoadDays}일 연속으로 일일 세트·볼륨이 고강도 구간이었습니다.`
-      : "최근 3일 연속 고강도 운동을 수행했습니다.";
+      ? `최근 ${m.consecutiveHighLoadDays}일은 세트랑 볼륨이 꽤 빡셌어요.`
+      : "사흘째 부담이 큰 날이에요.";
   }
   const bits: string[] = [];
   if (m.consecutiveHighLoadDays >= 2 && fatigue === "high") {
-    bits.push(`어제까지 ${m.consecutiveHighLoadDays}일 연속 고부하가 이어졌습니다`);
+    bits.push(`어제까지 ${m.consecutiveHighLoadDays}일 연속으로 꽤 밀었어요`);
   }
   if (volumeDeltaPercent !== null && volumeDeltaPercent >= 12) {
-    bits.push(`전주 대비 7일 볼륨이 약 ${volumeDeltaPercent}% 올랐습니다`);
+    bits.push(`지난주 같은 기간보다 볼륨이 ${volumeDeltaPercent}%쯤 올랐어요`);
   }
   if (m.activeDaysLast7 >= 5 && fatigue !== "low") {
-    bits.push(`최근 7일 중 ${m.activeDaysLast7}일에 운동했습니다`);
+    bits.push(`일주일 중 ${m.activeDaysLast7}일은 움직였어요`);
   }
   if (bits.length === 0) {
-    if (fatigue === "high") return "누적 피로 신호가 높게 잡혔습니다.";
-    if (fatigue === "medium") return "피로·빈도는 무난한 구간입니다.";
-    return "회복 여력이 충분해 보입니다.";
+    if (fatigue === "high") return "피로가 꽤 쌓인 편으로 잡혔어요.";
+    if (fatigue === "medium") return "피로는 보통이에요.";
+    return "쉴 힘은 아직 넉넉해 보여요.";
   }
   return `${bits.join(" · ")}.`;
 }
@@ -228,18 +228,18 @@ function buildAiMessage(
   restDayRecommended: boolean,
 ): string {
   if (restDayRecommended) {
-    return "오늘은 휴식하세요.";
+    return "오늘은 그냥 쉬어도 돼요.";
   }
   if (level === "high") {
-    return `오늘은 강도를 ${pct}%로 낮추세요.`;
+    return `오늘은 평소보다 ${pct}%만 써도 돼요.`;
   }
   if (level === "medium") {
-    return `오늘 중량·횟수는 평소의 ${pct}%에 맞추세요.`;
+    return `오늘은 평소의 ${pct}%쯤으로 맞춰 보세요.`;
   }
   if (m.daysSinceLastWorkout !== null && m.daysSinceLastWorkout >= 2) {
-    return `오늘 중량·횟수는 평소의 ${pct}%까지 쓰세요.`;
+    return `오늘은 평소의 ${pct}%까지 써도 괜찮아요.`;
   }
-  return `오늘 중량·횟수는 평소의 ${pct}%로 진행하세요.`;
+  return `오늘은 평소의 ${pct}% 정도로 가 볼까요.`;
 }
 
 /**
@@ -277,10 +277,10 @@ export function buildDailyStatusBriefing(
       fatigueScore: 12,
       recommendedIntensityPercent: recEmpty,
       decisionKind: "standard",
-      statusSummary: "저장된 운동 기록이 없습니다.",
-      aiMessage: "첫 세트를 기록해 보세요.",
-      interpretationLine: "세트·볼륨 데이터가 없어 피로도는 ‘낮음’으로 가정했습니다.",
-      reasonLine: "피로·강도 산출에 사용할 데이터가 없어 기본값(피로 낮음, 권장 강도 100%)으로 표시합니다.",
+      statusSummary: "아직 줄이 없어요.",
+      aiMessage: "첫 줄부터 적어 볼까요.",
+      interpretationLine: "데이터가 없어서 피로는 낮다고 두었어요.",
+      reasonLine: "기록이 없어서 피로·세기는 기본값으로 보여요.",
       metrics: emptyMetrics,
     };
   }

@@ -71,17 +71,17 @@ export function buildPersonalizationBullets(
   const desc = routine?.description ?? "";
 
   if (workouts.length >= 6 && prevLeg < 180 && lastLeg < 180 && prevLeg + lastLeg > 0) {
-    out.push("지난주에도 하체 쪽 기록이 많이 부족했습니다. 오늘은 하체를 반드시 진행하세요.");
+    out.push("지난주에도 하체 줄이 별로 없었어요. 오늘은 하체 한 판만 넣어도 좋아요.");
   } else if (workouts.length >= 5 && prevLeg > 220 && lastLeg < prevLeg * 0.35) {
-    out.push("지난주에 하체 볼륨이 한 주 새에 크게 줄었습니다. 이번 주는 일정부터 다시 잡으세요.");
+    out.push("지난주에 하체가 확 줄었네요. 이번 주 일정만 다시 맞춰 볼까요.");
   }
 
   if (failTop && failCount >= 3) {
     out.push(
-      `「${failTop.name}」에서 최근 실패 세트가 반복됐습니다. 오늘은 중량을 낮추고 완수부터 맞추세요.`,
+      `「${failTop.name}」에서 실패가 자꾸 나와요. 오늘은 무게만 조금 낮춰도 돼요.`,
     );
   } else if (failCount >= 4) {
-    out.push(`최근 2주 안에 실패로 찍힌 세트가 ${failCount}건입니다. 오늘은 무리한 중량 대신 기술과 템포를 우선하세요.`);
+    out.push(`지난 2주에 실패로 찍힌 게 ${failCount}번이에요. 오늘은 무게보다 동작이랑 템포부터 맞춰 보세요.`);
   }
 
   if (pref) {

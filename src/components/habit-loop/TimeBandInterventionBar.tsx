@@ -67,7 +67,7 @@ export function TimeBandInterventionBar({ hydrated, todayWorkoutComplete, primar
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] opacity-80">AI 개입 · {intervention.label}</p>
+          <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] opacity-80">오늘 안내 · {intervention.label}</p>
           <p className="mt-0.5 text-[0.95rem] font-bold leading-snug tracking-[-0.02em] sm:text-[1.02rem]">{intervention.message}</p>
         </div>
         <Link
@@ -80,7 +80,7 @@ export function TimeBandInterventionBar({ hydrated, todayWorkoutComplete, primar
                 : "bg-indigo-700 text-white shadow hover:bg-indigo-800 dark:bg-indigo-600 dark:hover:bg-indigo-500"
           }`}
         >
-          운동 시작하기
+          기록하러 가기
         </Link>
       </div>
     </div>

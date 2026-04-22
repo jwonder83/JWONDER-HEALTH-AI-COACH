@@ -45,12 +45,12 @@ export function AiPresenceStickyBar({ model, hydrated, weekProgressPercent, work
     <div
       className={`rounded-xl border px-3 py-2.5 shadow-sm sm:px-4 sm:py-3 ${shell}`}
       role="region"
-      aria-label="AI 상태 추적"
+      aria-label="오늘 상태"
       data-ai-presence-tone={model.tone}
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-apple-subtle dark:text-zinc-500">AI 추적</p>
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-apple-subtle dark:text-zinc-500">상태</p>
           <p className="font-display mt-0.5 text-[0.95rem] font-bold leading-tight tracking-[-0.02em] text-apple-ink dark:text-zinc-100 sm:text-[1.05rem]">
             {model.headline}
           </p>

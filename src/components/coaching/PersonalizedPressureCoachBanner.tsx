@@ -7,7 +7,7 @@ type Props = {
   pressure: PersonalizedPressureMessage;
 };
 
-/** AI 코치 영역 — 히스토리 기반 개인화 압박 */
+/** 히스토리 기반으로 살짝 독촉하는 배너 */
 export function PersonalizedPressureCoachBanner({ pressure }: Props) {
   return (
     <div
@@ -15,7 +15,7 @@ export function PersonalizedPressureCoachBanner({ pressure }: Props) {
       role="region"
       aria-label="개인화 압박 코치 메시지"
     >
-      <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-rose-800/90 dark:text-rose-200/90">AI 기억 · 개인화 압박</p>
+      <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-rose-800/90 dark:text-rose-200/90">지난 기록 기준</p>
       <p className="mt-3 text-[15px] font-bold leading-relaxed text-rose-950 dark:text-rose-50 sm:text-[16px]">{pressure.pastLine}</p>
       <p className="mt-3 text-[14px] font-semibold leading-relaxed text-apple-ink dark:text-zinc-200">{pressure.presentLine}</p>
       <p className="mt-3 text-[16px] font-extrabold leading-snug tracking-[-0.02em] text-rose-800 dark:text-rose-100 sm:text-[17px]">{pressure.actionLine}</p>

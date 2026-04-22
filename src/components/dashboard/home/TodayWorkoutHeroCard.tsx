@@ -131,12 +131,12 @@ export function TodayWorkoutHeroCard({
         </h2>
         {routineFlowStatus === "confirmed" && !done ? (
           <p className="mt-2 inline-flex rounded-lg border border-amber-300/40 bg-amber-400/15 px-3 py-1.5 text-[12px] font-semibold text-amber-100">
-            오늘 운동 · 확정됨 — 지금 실행만 하면 돼요
+            오늘 운동 · 고정됨 — 이제 몸만 움직이면 돼요
           </p>
         ) : null}
         {userWorkoutUiState === "active" && !done ? (
           <p className="mt-2 inline-flex rounded-lg border border-indigo-300/45 bg-indigo-500/25 px-3 py-1.5 text-[12px] font-semibold text-indigo-50">
-            세션 진행 중 — 운동 화면에서 세트를 이어 저장하세요
+            세션 진행 중 — 운동 화면에서 세트만 이어서 저장하면 돼요
           </p>
         ) : null}
         <p className="mt-2 max-w-prose whitespace-pre-line text-[14px] leading-relaxed text-white/75 sm:text-[15px]">
@@ -144,7 +144,7 @@ export function TodayWorkoutHeroCard({
         </p>
         {userWorkoutUiState === "missed" && !done ? (
           <p className="mt-2 text-[13px] font-semibold leading-snug text-rose-200">
-            오늘은 아직 미완 상태예요. 한 세트만 저장하면 완료 UI로 전환돼요.
+            오늘은 아직 미완이에요. 세트 하나만 저장하면 완료로 바뀌어요.
           </p>
         ) : null}
 
@@ -185,10 +185,10 @@ export function TodayWorkoutHeroCard({
             대충 {model.estimatedDurationLabel}
           </span>
           {routineFlowStatus === "confirmed" && !done ? (
-            <span className="rounded-full border border-emerald-400/45 bg-emerald-500/20 px-3 py-1 text-emerald-100">플랜 확정 완료</span>
+            <span className="rounded-full border border-emerald-400/45 bg-emerald-500/20 px-3 py-1 text-emerald-100">오늘 플랜 고정됨</span>
           ) : null}
           {routineFlowStatus === "suggested" && !done ? (
-            <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-white/80">아래에서 플랜 확정 필요</span>
+            <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-white/80">아래에서 플랜만 골라 주세요</span>
           ) : null}
           {done ? (
             <span className="rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-emerald-200">오늘 세션은 찍혔어요</span>
@@ -236,7 +236,7 @@ export function TodayWorkoutHeroCard({
                 onClick={scrollToTodayPlan}
                 className="inline-flex min-h-[58px] w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-white/45 bg-white/5 px-6 text-[16px] font-bold tracking-[-0.01em] text-white/90 backdrop-blur-sm transition hover:border-white/70 hover:bg-white/10 active:scale-[0.99] sm:min-h-[60px] sm:max-w-md sm:flex-1 sm:text-[17px]"
               >
-                먼저 오늘 플랜 확정하기
+                먼저 아래에서 플랜 정하기
               </button>
             )}
             <Link

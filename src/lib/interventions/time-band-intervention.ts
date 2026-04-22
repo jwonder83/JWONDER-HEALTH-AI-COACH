@@ -15,22 +15,22 @@ export type TimeBandIntervention = {
 
 const MESSAGES: Record<TimeBand, { message: string; urgency: 0 | 1 | 2 | 3; label: string }> = {
   morning: {
-    message: "오늘 운동 플랜이 준비되었습니다.",
+    message: "오늘은 뭐 할지 정해 두었어요.",
     urgency: 0,
     label: "오전",
   },
   afternoon: {
-    message: "아직 운동을 시작하지 않았습니다.",
+    message: "아직 한 줄도 없네요.",
     urgency: 1,
     label: "오후",
   },
   evening: {
-    message: "오늘 놓치면 목표 달성에 실패합니다.",
+    message: "오늘은 이대로 가면 주간 목표가 빠질 수 있어요.",
     urgency: 2,
     label: "저녁",
   },
   night: {
-    message: "10분이라도 간단 루틴을 진행하세요.",
+    message: "10분만이라도 가볍게 한 판 어때요.",
     urgency: 3,
     label: "밤",
   },

@@ -160,7 +160,7 @@ export function MainScreen() {
       <View style={styles.header}>
         <View style={styles.titleWrap}>
           <Text style={styles.title} numberOfLines={1}>
-            Jwonder AI Coach
+            Jwonder Coach
           </Text>
         </View>
         <View style={styles.headerActions}>

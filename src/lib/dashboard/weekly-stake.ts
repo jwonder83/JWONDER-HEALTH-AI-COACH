@@ -57,12 +57,12 @@ export function computeWeeklyStake(
 
   const lossHeadline = todayWorkoutComplete
     ? `오늘은 주간 목표 진행에 반영됐어요. (${progressPercent}%)`
-    : `오늘 운동을 하지 않으면 주간 목표 달성 여지가 약 ${opportunityLossPercent}% 줄어듭니다.`;
+    : `오늘 안 하면 주간 목표 여지가 한 ${opportunityLossPercent}%쯤 줄어요.`;
 
   const lossSubline = todayWorkoutComplete
     ? "내일도 이 리듬을 이어가면 손해 없이 주간표를 채울 수 있어요."
     : behindPace
-      ? `페이스 기준으로는 이번 주 ${expectedByToday}세트 부근까지 와 있어야 해요. 지금 ${currentRows}세트입니다.`
+      ? `페이스 맞추려면 이번 주 ${expectedByToday}세트쯤은 와 있어야 하는데, 지금은 ${currentRows}세트예요.`
       : `지금 달성률 ${progressPercent}% · 오늘 한 세트만 남겨도 여지를 지킬 수 있어요.`;
 
   const routineTimeFactor = !todayWorkoutComplete && behindPace ? 0.94 : 1;

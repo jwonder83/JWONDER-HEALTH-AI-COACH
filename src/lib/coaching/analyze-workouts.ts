@@ -18,7 +18,7 @@ export function buildLocalCoachingText(rows: WorkoutRow[], memory?: UserMemoryPr
   lines.push("## 기록 기반 피드백");
   lines.push("");
   if (memory?.personalization_bullets?.length) {
-    lines.push("### 사용자 메모리 기반 개인 멘트(우선 반영)");
+    lines.push("### 기록에서 뽑은 맞춤 멘트(우선 반영)");
     lines.push("");
     for (const b of memory.personalization_bullets.slice(0, 5)) {
       lines.push(`- ${b}`);
@@ -67,18 +67,18 @@ export function buildLocalCoachingText(rows: WorkoutRow[], memory?: UserMemoryPr
   }
 
   lines.push("");
-  lines.push("## 다음 운동 제안 (일반 원칙)");
+  lines.push("## 다음에 이렇게 해 볼 만한 것");
   lines.push("");
   const last = sorted[0];
   if (last) {
     const w = Number(last.weight_kg);
     if (!last.success) {
       lines.push(
-        `- 마지막이 실패였다면: 같은 운동에서 중량을 약 5~10% 낮추거나, 세트 수를 1줄이고 레프는 1~2회 줄여서 **기술과 속도를 우선**해 보세요.`,
+        `- 마지막이 실패였다면: 같은 동작에서 중량을 한 5~10%만 낮추거나, 세트 하나 줄이고 횟수는 1~2회 덜 잡아서 **폼이랑 속도**부터 맞춰 보세요.`,
       );
     } else {
       lines.push(
-        `- 마지막이 성공이었다면: 같은 레프·세트를 유지한 채 **2.5~5% 정도만** 중량을 올려 보거나, 중량은 유지하고 레프를 1회 늘려 보는 식으로 소폭 진행해 보세요.`,
+        `- 마지막이 성공이었다면: 횟수·세트는 그대로 두고 중량만 **2.5~5%** 정도 올려 보거나, 중량은 그대로 두고 횟수만 한 번 늘려 보는 식으로 아주 조금만 밀어 보세요.`,
       );
       lines.push(`- 참고로 마지막 기록은 ${last.exercise_name} ${w}kg × ${last.reps} × ${last.sets}세트예요.`);
     }

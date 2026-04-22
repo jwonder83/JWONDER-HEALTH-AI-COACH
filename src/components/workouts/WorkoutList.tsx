@@ -123,7 +123,7 @@ function PerformanceOverview({
     <div className="border-b border-neutral-200 bg-gradient-to-b from-neutral-50/90 to-white px-4 py-5 dark:border-zinc-800 dark:from-zinc-900/80 dark:to-zinc-950 sm:px-6 sm:py-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-apple-subtle">한눈에 스탯</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-apple-subtle">짧게 요약</p>
           <h3 className="font-display mt-1 text-[1.25rem] font-bold tracking-[-0.02em] text-apple-ink dark:text-zinc-100 sm:text-[1.4rem]">기록 들여다보기</h3>
           <p className="mt-1 max-w-md text-[13px] leading-relaxed text-apple-subtle">볼륨·PR·부위 비중은 저장된 세트를 알아서 묶어서 보여줘요.</p>
         </div>

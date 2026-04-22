@@ -72,30 +72,30 @@ export function buildAiPresenceModel(args: {
 
   let headline: string;
   if (workouts.length === 0) {
-    headline = "아직 추적할 기록이 없어요";
+    headline = "아직 줄이 없어요";
   } else if (miss >= 2) {
-    headline = `${miss}일 미운동`;
+    headline = `${miss}일째 쉼`;
   } else if (miss === 1 && !todayWorkoutComplete) {
-    headline = "오늘 아직 미운동";
+    headline = "오늘은 아직 안 썼어요";
   } else if (streakMerged >= 2) {
-    headline = `${streakMerged}일 연속 운동 중`;
+    headline = `${streakMerged}일째 이어가는 중`;
   } else if (streakMerged === 1 && todayWorkoutComplete) {
-    headline = "연속 1일 — 내일 이어가면 2일차";
+    headline = "하루 채움 — 내일도 하면 이틀째";
   } else {
-    headline = "오늘 한 세트로 리듬 시작";
+    headline = "오늘 한 줄로 시작";
   }
 
   const weeklyLine =
-    target !== null && target > 0 ? `이번 주 ${Math.min(cur, target)}/${target} 완료` : null;
+    target !== null && target > 0 ? `이번 주 ${Math.min(cur, target)}/${target}` : null;
   const weeklyRemainLine =
     target !== null && target > 0
       ? cur >= target
-        ? "주간 목표 달성"
-        : `목표까지 ${target - cur}회 남음`
+        ? "이번 주 목표 채움"
+        : `아직 ${target - cur}번 남음`
       : null;
 
   let tone: AiPresenceTone = "neutral";
-  let coachLine = "오늘 상태를 보고 있어요. 체크인 후 플랜만 따라가도 돼요.";
+  let coachLine = "오늘은 체크인만 해도 반이에요. 플랜대로 가면 돼요.";
 
   const behindWeekly =
     target !== null &&
@@ -104,22 +104,22 @@ export function buildAiPresenceModel(args: {
     cur < Math.max(1, Math.ceil((target * (((now.getDay() + 6) % 7) + 1)) / 7) - 1);
 
   if (workouts.length === 0) {
-    coachLine = "첫 세트를 남기면 AI가 연속·주간 리듬을 자동으로 추적해요.";
+    coachLine = "첫 줄만 적어 보면 여기서 쭉 이어져요.";
   } else if (miss >= 2 || userWorkoutUiState === "missed") {
     tone = "warning";
-    coachLine = "공백이 길어지면 회복 비용이 커져요. 지금 짧게라도 세트를 남겨 주세요.";
+    coachLine = "너무 오래 비우면 다시 시작이 힘들어져요. 짧게라도 한 줄 남겨 볼까요.";
   } else if (behindWeekly) {
     tone = "warning";
-    coachLine = "이번 주 페이스가 뒤처져 있어요. 오늘 한 건만으로도 궤도를 되찾을 수 있어요.";
+    coachLine = "이번 주는 조금 뒤처졌어요. 오늘 하나만 넣어도 괜찮아져요.";
   } else if (todayWorkoutComplete && streakMerged >= 3) {
     tone = "success";
-    coachLine = "연속 리듬이 안정적이에요. 내일도 같은 밀도만 유지해도 충분해요.";
+    coachLine = "요즘 잘 이어가고 있어요. 내일도 비슷하게만 가도 돼요.";
   } else if (todayWorkoutComplete) {
     tone = "success";
-    coachLine = "오늘 목표에 반영됐어요. 수분·스트레칭으로 마무리하면 더 좋아요.";
+    coachLine = "오늘 줄은 올라갔어요. 물 한잔이랑 스트레칭만 해도 좋아요.";
   } else if (streakMerged >= 2) {
     tone = "success";
-    coachLine = "연속 기록이 이어지고 있어요. 오늘도 한 세트만 지키면 손해 없이 갑니다.";
+    coachLine = "연속으로 잘 오고 있어요. 오늘도 한 줄만 채우면 그대로 가요.";
   }
 
   return {

@@ -122,7 +122,7 @@ export function NoWorkoutCoachIntervention({
                   : "text-amber-900/85 dark:text-amber-200/90"
             }`}
           >
-            관리 알림
+            오늘 한 줄
           </p>
           <span
             className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
@@ -148,7 +148,7 @@ export function NoWorkoutCoachIntervention({
 
         <p className={`mt-1.5 text-[13px] font-semibold leading-snug sm:text-[14px] ${subInk}`}>
           「{routineTitle}」 · 대략 {estimatedDurationLabel}
-          {planConfirmed ? " · 플랜 확정됨" : " · 아래에서 플랜 확정 필요"}
+          {planConfirmed ? " · 플랜 고정됨" : " · 아래에서 플랜만 정하면 됨"}
         </p>
 
         <p className={`mt-3 flex flex-wrap items-baseline gap-1.5 text-[12px] leading-relaxed opacity-95 ${subInk}`}>
@@ -189,7 +189,7 @@ export function NoWorkoutCoachIntervention({
         </div>
 
         {phase === "night" && streakDays > 0 ? (
-          <p className={`mt-3 text-center text-[12px] font-semibold ${subInk}`}>한 종목·한 세트만 넣어도 연속이 이어집니다.</p>
+          <p className={`mt-3 text-center text-[12px] font-semibold ${subInk}`}>한 종목·한 세트만 넣어도 연속은 이어져요.</p>
         ) : null}
 
         <div className="mt-3 flex justify-center sm:justify-start">

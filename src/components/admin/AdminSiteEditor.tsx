@@ -18,7 +18,7 @@ const imageLabels: Record<keyof SiteImagesConfig, string> = {
   dashTile1: "대시 타일 1",
   dashTile2: "대시 타일 2",
   dashTile3: "대시 타일 3",
-  coaching: "AI 코칭 영역",
+  coaching: "코칭 영역",
   listEmpty: "목록 비었을 때",
 };
 
@@ -603,7 +603,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         </section>
 
         <section className="mb-10 space-y-4">
-          <h2 className="text-[15px] font-semibold text-apple-ink">AI 코칭 블록</h2>
+          <h2 className="text-[15px] font-semibold text-apple-ink">코칭 블록</h2>
           <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
             <label className="block text-[12px] font-medium text-apple-subtle">
               eyebrow
@@ -791,7 +791,7 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         </section>
 
         <section className="mb-10 space-y-4">
-          <h2 className="text-[15px] font-semibold text-apple-ink">AI 코칭 히스토리 블록</h2>
+          <h2 className="text-[15px] font-semibold text-apple-ink">코칭 히스토리 블록</h2>
           <label className="block rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
             <span className="text-[12px] font-medium text-apple-subtle">메인 화면에서 최근 코칭 목록 위에 붙는 제목</span>
             <input

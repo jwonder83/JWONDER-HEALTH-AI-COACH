@@ -85,25 +85,25 @@ export function TodayStatusCard({ model, uiState }: Props) {
 
       {model.hydrated && uiState === "idle" && !model.todayWorkoutComplete ? (
         <p className="mt-3 rounded-xl border border-amber-300/70 bg-amber-50/90 px-3 py-2 text-[12px] font-semibold leading-relaxed text-amber-950 dark:border-amber-700/50 dark:bg-amber-950/35 dark:text-amber-100">
-          운동 전 단계예요. 플랜 확정 후 <span className="font-bold">운동 시작하기</span>로 바로 들어가면 돼요.
+          아직 시작 전이에요. 플랜만 정한 뒤 <span className="font-bold">운동 시작하기</span>로 들어가면 돼요.
         </p>
       ) : null}
 
       {model.hydrated && uiState === "active" ? (
         <p className="mt-3 rounded-xl border border-indigo-300/70 bg-indigo-50/90 px-3 py-2 text-[12px] font-semibold leading-relaxed text-indigo-950 dark:border-indigo-700/50 dark:bg-indigo-950/35 dark:text-indigo-100">
-          코칭 UI는 운동 화면에 있어요. 세트 저장 후 휴식 {model.workoutRestTargetSeconds}초 → 다음 세트 흐름을 이어가세요.
+          타이머랑 입력은 운동 화면에 있어요. 세트 저장하고 휴식 {model.workoutRestTargetSeconds}초 쉬었다가 다음 세트로 가면 돼요.
         </p>
       ) : null}
 
       {model.hydrated && uiState === "missed" ? (
         <p className="mt-3 rounded-xl border border-rose-300/80 bg-rose-50/95 px-3 py-2 text-[12px] font-bold leading-relaxed text-rose-950 dark:border-rose-700/50 dark:bg-rose-950/40 dark:text-rose-50">
-          오늘은 아직 세트가 없습니다. 위 리본에서 빠른 루틴을 시작하거나, 아래 플랜으로 바로 들어가세요.
+          아직 세트가 없어요. 위 리본에서 빠르게 시작하거나, 아래 플랜으로 바로 들어가도 돼요.
         </p>
       ) : null}
 
       {model.hydrated && uiState === "completed" ? (
         <p className="mt-3 rounded-xl border border-emerald-300/60 bg-emerald-50/85 px-3 py-2 text-[12px] font-semibold leading-relaxed text-emerald-950 dark:border-emerald-800/45 dark:bg-emerald-950/35 dark:text-emerald-100">
-          성취 모드: 주간 목표·스트릭이 갱신됐을 수 있어요. 성과 탭에서 분석을 확인해 보세요.
+          주간 목표랑 스트릭 숫자도 갱신됐을 거예요. 성과 탭에서 한번 볼까요.
         </p>
       ) : null}
 

@@ -51,31 +51,31 @@ export function buildCoachDecisionConfirmedLine(args: {
   decisionKind: DailyStatusBriefing["decisionKind"];
 }): string {
   if (args.todayDone) {
-    return "오늘 세션은 완료 상태입니다 (확정)";
+    return "오늘 줄은 다 채웠어요.";
   }
   if (args.decisionKind === "rest") {
-    return "오늘은 회복·가벼운 활동을 우선하세요 (확정)";
+    return "오늘은 쉬거나 가볍게만 가도 돼요.";
   }
   const t = args.routineTitle.trim();
-  return `오늘은 「${t}」 루틴을 진행하세요 (확정)`;
+  return `오늘은 「${t}」 위주로 가면 돼요.`;
 }
 
 export function buildCoachTrustPrimaryReason(workouts: WorkoutRow[], now: Date, briefing: DailyStatusBriefing): string {
   const weak = detectWeakMuscleGap(workouts, now);
   if (weak) {
-    return `최근 ${weak.label} 볼륨 비중 부족(약 ${weak.sharePct}%)`;
+    return `${weak.label} 쪽이 ${weak.sharePct}%밖에 안 돼요`;
   }
   if (briefing.metrics.daysSinceLastWorkout !== null && briefing.metrics.daysSinceLastWorkout >= 2) {
-    return `마지막 기록 후 ${briefing.metrics.daysSinceLastWorkout}일 경과`;
+    return `마지막 줄 이후 ${briefing.metrics.daysSinceLastWorkout}일`;
   }
   if (briefing.metrics.consecutiveHighLoadDays >= 2) {
-    return `연속 고부하 ${briefing.metrics.consecutiveHighLoadDays}일`;
+    return `부담 큰 날이 ${briefing.metrics.consecutiveHighLoadDays}일 연속`;
   }
   if (briefing.decisionKind === "intensity_cap") {
-    return "피로도 기준으로 강도 상한 적용";
+    return "피로 보고 세기만 깎았어요";
   }
   if (briefing.decisionKind === "rest") {
-    return "부하·휴식 밸런스상 휴식 권장";
+    return "쉬는 쪽이 맞아 보여요";
   }
   const line = briefing.reasonLine.trim();
   return line.length > 72 ? `${line.slice(0, 69)}…` : line;

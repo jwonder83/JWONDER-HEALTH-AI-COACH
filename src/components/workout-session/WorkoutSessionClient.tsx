@@ -331,7 +331,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
   function resumeAfterRest() {
     setCoachBetween("lifting");
     setRestStartedAt(null);
-    showCoachCue("다음 세트 진행하세요.", 7000);
+    showCoachCue("이제 다음 세트 가도 돼요.", 7000);
   }
 
   async function saveSet() {
@@ -387,7 +387,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
           : `+${grant.gainedXp} XP · 저장 완료`,
     );
     if (coachModeRef.current) {
-      showCoachCue(`휴식 ${restTargetSec}초. 준비되면 다음 세트 진행하세요.`, 5000);
+      showCoachCue(`휴식 ${restTargetSec}초. 됐으면 다음 세트 가요.`, 5000);
       setCoachBetween("rest");
       setRestStartedAt(Date.now());
     }
@@ -458,7 +458,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
       >
       <header className="mb-6 shrink-0 border-b border-neutral-200 pb-4 dark:border-zinc-800 sm:mb-8 lg:mb-10">
         <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">
-          시작 → 진행 → 완료 한 흐름
+          시작 → 하다 → 끝
         </p>
         <SessionFlowStepper phase={phase} />
         <div className="mt-4 flex items-center justify-between gap-3">
@@ -496,7 +496,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
           role="status"
           aria-live="polite"
         >
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">AI 코치</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">알림</p>
           <p className="mt-1 font-display text-[1.2rem] font-bold text-emerald-950 dark:text-emerald-100">{coachCue}</p>
         </div>
       ) : null}
@@ -565,9 +565,9 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
               <div
                 className="mb-6 rounded-2xl border-2 border-sky-500/50 bg-gradient-to-br from-sky-50 via-indigo-50/80 to-violet-50 p-5 shadow-lg ring-2 ring-sky-400/20 dark:border-sky-700/50 dark:from-sky-950/40 dark:via-indigo-950/30 dark:to-violet-950/30 dark:ring-sky-500/15"
                 role="region"
-                aria-label="AI 코치 · 세트 간 휴식"
+                aria-label="세트 사이 쉬는 시간"
               >
-                <p className="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sky-800 dark:text-sky-300/90">AI 코치</p>
+                <p className="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sky-800 dark:text-sky-300/90">쉬는 시간</p>
                 <p className="mt-2 text-center font-display text-[1.35rem] font-bold text-sky-950 dark:text-sky-50" aria-live="polite">
                   휴식 {restTargetSec}초
                 </p>
@@ -579,11 +579,11 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
                   {restElapsedLabel}
                 </p>
                 {restReadyForNext && !longRestNudge ? (
-                  <p className="mt-3 text-center text-[13px] font-bold text-indigo-900 dark:text-indigo-100">다음 세트 진행하세요.</p>
+                  <p className="mt-3 text-center text-[13px] font-bold text-indigo-900 dark:text-indigo-100">다음 세트 가도 돼요.</p>
                 ) : null}
                 {longRestNudge ? (
                   <p className="mt-3 text-center text-[12px] font-semibold text-indigo-800 dark:text-indigo-200/90">
-                    1분 30초 넘게 쉬었어요. 다음 세트 진행하세요.
+                    1분 30초 넘게 쉬었어요. 이제 다음 세트 가 볼까요.
                   </p>
                 ) : null}
                 <button
@@ -591,7 +591,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
                   onClick={resumeAfterRest}
                   className="mt-5 w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 text-[16px] font-bold text-white shadow-md transition hover:opacity-95 active:scale-[0.99]"
                 >
-                  다음 세트 진행하기
+                  다음 세트 가기
                 </button>
               </div>
             ) : null}

@@ -19,9 +19,7 @@ function stepDotClass(i: number, current: number, timeBandOnStep2: boolean): str
   return `${base} border-neutral-300 bg-white dark:border-zinc-600 dark:bg-zinc-800`;
 }
 
-/**
- * 홈 상단 — AI가 끝까지 이어주는 하루 루프(단계 + 다음 행동).
- */
+/** 홈 상단 — 하루 순서랑 다음에 뭘 하면 되는지 */
 export function AiManagedLoopRibbon({ loop }: Props) {
   const { steps, stepIndex, headline, nextActionLabel, nextActionHref, timeBandNudge, phase } = loop;
 
@@ -29,12 +27,12 @@ export function AiManagedLoopRibbon({ loop }: Props) {
     <div
       className="mb-2 rounded-xl border border-violet-200/80 bg-gradient-to-r from-violet-50/95 via-white to-indigo-50/75 px-3 py-2.5 shadow-sm dark:border-violet-900/45 dark:from-violet-950/35 dark:via-zinc-950 dark:to-indigo-950/25"
       role="region"
-      aria-label="AI 관리 루프"
+      aria-label="오늘 순서"
       data-ai-loop-phase={phase}
     >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-violet-800/90 dark:text-violet-200/90">AI 루프</p>
-        <span className="hidden text-[10px] text-apple-subtle sm:inline dark:text-zinc-500">끊김 없이 다음 행동</span>
+        <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-violet-800/90 dark:text-violet-200/90">오늘 순서</p>
+        <span className="hidden text-[10px] text-apple-subtle sm:inline dark:text-zinc-500">다음은 이거예요</span>
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:gap-2" aria-hidden={phase === "hydrating"}>
         {steps.map((s, i) => (

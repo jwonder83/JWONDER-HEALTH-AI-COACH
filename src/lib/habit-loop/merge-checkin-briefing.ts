@@ -55,19 +55,19 @@ export function mergeDailyCheckinIntoBriefing(base: DailyStatusBriefing, checkin
 
   const aiMessage =
     decisionKind === "rest"
-      ? "오늘은 휴식하세요."
+      ? "오늘은 그냥 쉬어도 돼요."
       : fatigue === "high"
-        ? `오늘은 강도를 ${recommendedIntensityPercent}%로 낮추세요.`
+        ? `오늘은 평소보다 ${recommendedIntensityPercent}%만 써도 돼요.`
         : fatigue === "medium"
-          ? `오늘 중량·횟수는 평소의 ${recommendedIntensityPercent}%에 맞추세요.`
-          : `오늘 중량·횟수는 평소의 ${recommendedIntensityPercent}%로 진행하세요.`;
+          ? `오늘은 평소의 ${recommendedIntensityPercent}%쯤으로 맞춰 보세요.`
+          : `오늘은 평소의 ${recommendedIntensityPercent}% 정도로 가 볼까요.`;
 
   const interpretationLine =
     checkin.condition === "bad"
-      ? `${base.interpretationLine} (체크인) 컨디션이 낮다고 해서 강도 상한을 조금 더 낮췄어요.`
+      ? `${base.interpretationLine} 체크인에서 컨디션 나쁨이라 세기를 조금 더 깎았어요.`
       : checkin.condition === "good"
-        ? `${base.interpretationLine} (체크인) 컨디션이 좋아 안전 범위 안에서 강도 여유를 조금 열어뒀어요.`
-        : `${base.interpretationLine} (체크인) 컨디션은 보통으로 반영했어요.`;
+        ? `${base.interpretationLine} 체크인에서 컨디션 좋다고 해서 세기 여유를 조금 열어 뒀어요.`
+        : `${base.interpretationLine} 체크인은 보통으로 넣었어요.`;
 
   return {
     ...base,

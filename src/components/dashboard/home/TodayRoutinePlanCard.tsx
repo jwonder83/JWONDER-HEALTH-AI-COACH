@@ -24,7 +24,7 @@ function StatusBadge({ status }: { status: RoutineFlowStatus }) {
   if (status === "confirmed") {
     return (
       <span className="inline-flex items-center rounded-full border border-emerald-500/60 bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-semibold tracking-[-0.02em] text-emerald-900 dark:border-emerald-400/50 dark:bg-emerald-950/50 dark:text-emerald-100">
-        확정됨
+        고정됨
       </span>
     );
   }
@@ -105,7 +105,7 @@ export function TodayRoutinePlanCard({ model, status, onConfirm, onRequestPlanCh
 
           {status === "confirmed" && !done ? (
             <p className="mt-2 inline-flex flex-wrap items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-[13px] font-semibold tracking-[-0.02em] text-emerald-950 dark:border-emerald-500/35 dark:bg-emerald-950/40 dark:text-emerald-50">
-              오늘 운동 (확정됨)
+              오늘 운동 (고정됨)
               <span className="text-[12px] font-medium text-emerald-800/90 dark:text-emerald-200/90">— 이대로 가면 돼요</span>
             </p>
           ) : null}
@@ -128,7 +128,7 @@ export function TodayRoutinePlanCard({ model, status, onConfirm, onRequestPlanCh
               onClick={onConfirm}
               className="rounded-xl border border-black bg-black px-4 py-3 text-[13px] font-bold tracking-[-0.02em] text-white transition hover:bg-neutral-800 active:scale-[0.99] dark:border-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 sm:min-w-[13rem]"
             >
-              오늘 플랜 확정하기
+              오늘 플랜 이대로 쓰기
             </button>
           ) : null}
           {status === "confirmed" && !done && onRequestPlanChange ? (
@@ -182,13 +182,14 @@ export function TodayRoutinePlanCard({ model, status, onConfirm, onRequestPlanCh
           </tbody>
         </table>
         {status === "confirmed" && !done ? (
-          <p className="mt-2 px-2 text-[11px] text-apple-subtle sm:px-3 dark:text-zinc-500">확정된 플랜은 기본적으로 고정이에요. 바꾸려면 위의 「플랜 바꾸기」를 눌러 주세요.</p>
+          <p className="mt-2 px-2 text-[11px] text-apple-subtle sm:px-3 dark:text-zinc-500">고정된 플랜은 그대로 두고 가요. 바꾸고 싶으면 위 「플랜 바꾸기」만 누르면 돼요.</p>
         ) : null}
       </div>
 
       <p className="border-t border-neutral-200/80 px-4 py-3 text-[11px] leading-relaxed text-apple-subtle sm:px-5 dark:border-zinc-800 dark:text-zinc-500">
-        {status === "suggested" && "AI가 오늘 할 일을 정해 뒀어요. 확정하면 ‘추천’이 아니라 ‘오늘의 결정’으로 고정돼요."}
-        {status === "confirmed" && !done && "확정됐어요. 아래에서 운동을 시작하면 돼요."}
+        {status === "suggested" &&
+          "오늘 할 거 대충 짜 뒀어요. 누르면 ‘추천’ 말고 그냥 오늘 플랜으로 박아 둘게요."}
+        {status === "confirmed" && !done && "고정됐어요. 아래에서 운동만 시작하면 돼요."}
         {status === "completed" && (
           <>
             오늘 플랜 완료! 수고했어요.
