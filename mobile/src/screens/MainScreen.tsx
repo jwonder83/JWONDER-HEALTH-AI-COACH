@@ -165,10 +165,10 @@ export function MainScreen() {
         </View>
         <View style={styles.headerActions}>
           <Pressable onPress={handleNativeRefresh} style={styles.iconBtn} accessibilityLabel="새로고침">
-            <Ionicons name="refresh" size={22} color="#047857" />
+            <Ionicons name="refresh" size={22} color="#5b21b6" />
           </Pressable>
           <Pressable onPress={() => setSettingsOpen(true)} style={styles.iconBtn} accessibilityLabel="알림 설정">
-            <Ionicons name="notifications-outline" size={22} color="#047857" />
+            <Ionicons name="notifications-outline" size={22} color="#5b21b6" />
           </Pressable>
         </View>
       </View>
@@ -198,15 +198,16 @@ export function MainScreen() {
       <Modal visible={settingsOpen} transparent animationType="fade" onRequestClose={() => setSettingsOpen(false)}>
         <Pressable style={styles.modalScrim} onPress={() => setSettingsOpen(false)}>
           <Pressable style={styles.modalCard} onPress={(ev) => ev.stopPropagation()}>
-            <Text style={styles.modalTitle}>알림</Text>
+            <Text style={styles.modalEyebrow}>알림</Text>
+            <Text style={styles.modalTitle}>리마인더</Text>
             <Text style={styles.modalBody}>매일 오전 9시, 오후 6시, 오후 9시 운동 리마인더를 받습니다.</Text>
             <View style={styles.switchRow}>
               <Text style={styles.switchLabel}>리마인더 켜기</Text>
               <Switch
                 value={notifEnabled}
                 onValueChange={(v) => void toggleNotifications(v)}
-                trackColor={{ false: '#cbd5e1', true: '#6ee7b7' }}
-                thumbColor={notifEnabled ? '#047857' : '#f1f5f9'}
+                trackColor={{ false: '#cbd5e1', true: '#c4b5fd' }}
+                thumbColor={notifEnabled ? '#5b21b6' : '#f1f5f9'}
               />
             </View>
             <Pressable style={styles.modalClose} onPress={() => setSettingsOpen(false)}>
@@ -273,6 +274,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 8,
+  },
+  modalEyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    color: '#5b21b6',
+    textTransform: 'uppercase',
+    marginBottom: 6,
   },
   modalTitle: {
     fontSize: 18,
@@ -298,13 +314,17 @@ const styles = StyleSheet.create({
     color: '#0f172a',
   },
   modalClose: {
-    alignSelf: 'flex-end',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    alignSelf: 'stretch',
+    marginTop: 4,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: '#0f172a',
   },
   modalCloseText: {
-    color: '#047857',
+    color: '#fff',
     fontWeight: '700',
     fontSize: 15,
+    textAlign: 'center',
   },
 });

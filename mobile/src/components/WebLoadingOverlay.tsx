@@ -27,7 +27,7 @@ export function WebLoadingOverlay({ visible, message = '불러오는 중…' }: 
           <View style={styles.skelLine} />
           <View style={styles.skelLineShort} />
         </View>
-        <ActivityIndicator size="large" color="#047857" style={styles.spinner} />
+        <ActivityIndicator size="large" color="#5b21b6" style={styles.spinner} />
         <Text style={styles.caption}>{message}</Text>
       </View>
     </Animated.View>
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     backgroundColor: '#fff',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(15,118,110,0.2)',
+    borderColor: 'rgba(91,33,182,0.18)',
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -64,18 +64,18 @@ const styles = StyleSheet.create({
   skelBlock: {
     height: 72,
     borderRadius: 12,
-    backgroundColor: 'rgba(4,120,87,0.08)',
+    backgroundColor: 'rgba(91,33,182,0.07)',
   },
   skelLine: {
     height: 12,
     borderRadius: 6,
-    backgroundColor: 'rgba(4,120,87,0.1)',
+    backgroundColor: 'rgba(91,33,182,0.1)',
   },
   skelLineShort: {
     height: 12,
     width: '55%',
     borderRadius: 6,
-    backgroundColor: 'rgba(4,120,87,0.07)',
+    backgroundColor: 'rgba(91,33,182,0.06)',
   },
   spinner: {
     marginBottom: 8,

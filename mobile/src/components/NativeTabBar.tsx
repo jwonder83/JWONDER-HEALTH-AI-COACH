@@ -30,7 +30,7 @@ export function NativeTabBar({ active, onChange }: Props) {
             onPress={() => onChange(t.id)}
             style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
           >
-            <Ionicons name={selected ? t.iconActive : t.icon} size={22} color={selected ? '#047857' : '#64748b'} />
+            <Ionicons name={selected ? t.iconActive : t.icon} size={22} color={selected ? '#5b21b6' : '#64748b'} />
             <Text style={[styles.label, selected && styles.labelActive]}>{t.label}</Text>
           </Pressable>
         );
@@ -62,6 +62,6 @@ const styles = StyleSheet.create({
     color: '#64748b',
   },
   labelActive: {
-    color: '#047857',
+    color: '#5b21b6',
   },
 });
