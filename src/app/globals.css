@@ -97,3 +97,48 @@ a:focus-visible {
   transform-origin: left center;
   animation: weekly-stake-dip-once 1.35s cubic-bezier(0.4, 0, 0.2, 1) 1 both;
 }
+
+/* 시간대별 AI 개입 바 — 단계별 강조 */
+@keyframes jws-time-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.25);
+  }
+  50% {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px -4px rgba(245, 158, 11, 0.35);
+  }
+}
+
+@keyframes jws-time-urgent {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  45% {
+    transform: scale(1.01);
+    filter: brightness(1.06);
+  }
+}
+
+.time-band-intervention--1 {
+  animation: jws-time-nudge 3s ease-in-out infinite;
+}
+
+.time-band-intervention--2 {
+  animation: jws-time-nudge 2.4s ease-in-out infinite;
+}
+
+.time-band-intervention--3 {
+  animation: jws-time-urgent 1.75s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .time-band-intervention--1,
+  .time-band-intervention--2,
+  .time-band-intervention--3 {
+    animation: none;
+  }
+}

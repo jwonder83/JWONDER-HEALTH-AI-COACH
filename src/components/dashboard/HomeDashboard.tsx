@@ -5,6 +5,7 @@ import { DailyCheckinModal } from "@/components/habit-loop/DailyCheckinModal";
 import { PostCheckinBriefingModal } from "@/components/habit-loop/PostCheckinBriefingModal";
 import { DailyClosingReportModal } from "@/components/habit-loop/DailyClosingReportModal";
 import { AiPresenceStickyBar } from "@/components/dashboard/home/AiPresenceStickyBar";
+import { TimeBandInterventionBar } from "@/components/habit-loop/TimeBandInterventionBar";
 import { HomeActionHub } from "@/components/dashboard/home/HomeActionHub";
 import { useUserWorkoutUiState } from "@/components/dashboard/home/use-user-workout-ui-state";
 import { OnboardingBanner } from "@/components/dashboard/OnboardingBanner";
@@ -347,6 +348,7 @@ export function HomeDashboard({ userId, site }: Props) {
       <div className={`pointer-events-none absolute inset-0 -z-10 ${pageTint}`} aria-hidden />
       <div className="sticky top-0 z-40 border-b border-neutral-200/80 bg-[color-mix(in_srgb,var(--color-apple-surface)_88%,white)] backdrop-blur-md dark:border-zinc-800/90 dark:bg-zinc-950/85">
         <div className="mx-auto max-w-5xl px-5 py-2 sm:px-8 sm:py-2.5">
+          <TimeBandInterventionBar hydrated={hydrated} todayWorkoutComplete={todayWorkoutComplete} />
           <AiPresenceStickyBar model={aiPresence} hydrated={hydrated} weekProgressPercent={weekProgressPercent} />
         </div>
       </div>
