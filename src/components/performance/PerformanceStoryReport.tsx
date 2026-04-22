@@ -24,7 +24,7 @@ export function PerformanceStoryReport({ rows }: Props) {
           이번 주 운동 스토리
         </h2>
         <p className="mt-2 text-[13px] leading-relaxed text-apple-subtle dark:text-zinc-400">
-          숫자를 말로 풀어 준 요약이에요. 지금은 규칙 엔진이고, GPT 붙여도 이 레이아웃 그대로 쓸 수 있어요.
+          이번 주 기록을 짧게 풀어 쓴 거예요.
         </p>
       </header>
 

@@ -37,7 +37,7 @@ export function BodyWeightPanel() {
     }
     setRows(upsertBodyWeight(day, n));
     setKg("");
-    setMsg("저장했습니다. (이 기기에만 저장)");
+    setMsg("이 브라우저에만 저장했어요.");
   }
 
   function removeDay(d: string) {
@@ -50,7 +50,7 @@ export function BodyWeightPanel() {
     <div className="mt-6 rounded-2xl border border-neutral-200/90 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:p-5">
       <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">체중 추적</p>
       <p className="mt-1 text-[12px] leading-relaxed text-apple-subtle dark:text-zinc-400">
-        브라우저에만 저장됩니다. 서버·AI와 연동되지 않습니다.
+        이 브라우저에만 남아요.
       </p>
 
       {spark.length > 0 ? (
