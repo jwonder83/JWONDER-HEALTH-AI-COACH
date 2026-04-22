@@ -5,7 +5,7 @@ export type AppTabId = 'home' | 'routine' | 'records' | 'profile';
 export const TAB_PATHS: Record<AppTabId, string> = {
   home: '/',
   routine: '/program',
-  records: '/records',
+  records: '/performance',
   profile: '/settings',
 };
 
@@ -19,7 +19,7 @@ export function tabFromPathname(pathname: string): AppTabId | null {
   const p = pathname.split('?')[0] ?? '/';
   if (p === '/' || p === '') return 'home';
   if (p.startsWith('/program') || p.startsWith('/workout')) return 'routine';
-  if (p.startsWith('/records')) return 'records';
+  if (p.startsWith('/records') || p.startsWith('/performance')) return 'records';
   if (p.startsWith('/settings')) return 'profile';
   return null;
 }

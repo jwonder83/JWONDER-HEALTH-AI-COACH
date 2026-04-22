@@ -10,9 +10,9 @@ type Props = {
 
 const TABS: { id: AppTabId; label: string; icon: keyof typeof Ionicons.glyphMap; iconActive: keyof typeof Ionicons.glyphMap }[] = [
   { id: 'home', label: '홈', icon: 'home-outline', iconActive: 'home' },
-  { id: 'routine', label: '루틴', icon: 'calendar-outline', iconActive: 'calendar' },
-  { id: 'records', label: '기록', icon: 'bar-chart-outline', iconActive: 'bar-chart' },
-  { id: 'profile', label: '프로필', icon: 'person-outline', iconActive: 'person' },
+  { id: 'routine', label: '프로그램', icon: 'calendar-outline', iconActive: 'calendar' },
+  { id: 'records', label: '성과', icon: 'bar-chart-outline', iconActive: 'bar-chart' },
+  { id: 'profile', label: '설정', icon: 'person-outline', iconActive: 'person' },
 ];
 
 export function NativeTabBar({ active, onChange }: Props) {

@@ -57,7 +57,7 @@ export async function scheduleEngagementNotifications(): Promise<void> {
     identifier: IDS.afternoon,
     content: {
       title: 'Jwonder Coach',
-      body: '이틀 넘게 비면 가볍게 다시 열면 돼요. 운동 탭에서 빠른 루틴 열어 보세요.',
+      body: '이틀 넘게 비면 가볍게 다시 열면 돼요. 운동 화면에서 이어 보세요.',
       data: { url: `${WEB_BASE_URL}/workout` },
       sound: 'default',
     },
@@ -74,7 +74,7 @@ export async function scheduleEngagementNotifications(): Promise<void> {
     content: {
       title: 'Jwonder Coach',
       body: '오늘 안 하면 연속 일수 끊겨요.',
-      data: { url: `${WEB_BASE_URL}/records` },
+      data: { url: `${WEB_BASE_URL}/performance` },
       sound: 'default',
     },
     trigger: {
