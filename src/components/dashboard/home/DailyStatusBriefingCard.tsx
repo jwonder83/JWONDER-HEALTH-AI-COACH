@@ -73,9 +73,9 @@ export function DailyStatusBriefingCard({ briefing, hydrated, confirmedPlanLine 
       ) : !briefing ? null : (
         <>
           {confirmedPlanLine ? (
-            <div className="mt-4 rounded-xl border-2 border-emerald-500/35 bg-gradient-to-br from-emerald-50/95 to-teal-50/70 px-3.5 py-3.5 dark:border-emerald-600/40 dark:from-emerald-950/40 dark:to-teal-950/25">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-800 dark:text-emerald-200/90">확정 플랜</p>
-              <p className="mt-2 text-[15px] font-extrabold leading-snug tracking-[-0.02em] text-emerald-950 dark:text-emerald-50 sm:text-[16px]">
+            <div className="mt-4 rounded-xl border border-violet-300/80 bg-white/90 px-3.5 py-3.5 shadow-sm dark:border-violet-800/50 dark:bg-zinc-900/50">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-800/90 dark:text-violet-300/90">확정 플랜</p>
+              <p className="mt-2 text-[15px] font-extrabold leading-snug tracking-[-0.02em] text-apple-ink dark:text-zinc-50 sm:text-[16px]">
                 {confirmedPlanLine}
               </p>
             </div>

@@ -10,10 +10,12 @@ type Props = {
   onCompleted: () => void;
 };
 
-const scrim = "fixed inset-0 z-[120] flex flex-col bg-slate-950 text-white";
-const card = "mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-6 py-10 sm:px-10";
-const qTitle = "font-display text-2xl font-bold tracking-[-0.03em] sm:text-[1.75rem]";
-const sub = "mt-2 text-[14px] leading-relaxed text-white/75";
+const scrim =
+  "fixed inset-0 z-[120] flex items-center justify-center bg-[rgba(15,23,42,0.45)] p-5 sm:p-8 dark:bg-black/50";
+
+const card =
+  "w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.12)] sm:p-8 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)]";
+
 const grid = "mt-8 grid gap-3 sm:grid-cols-3";
 
 function Choice({
@@ -29,10 +31,10 @@ function Choice({
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-[52px] rounded-2xl border-2 px-4 text-[15px] font-bold transition active:scale-[0.98] ${
+      className={`min-h-[52px] rounded-xl border-2 px-4 text-[15px] font-bold transition active:scale-[0.98] ${
         selected
-          ? "border-emerald-300 bg-emerald-400/20 text-white ring-2 ring-emerald-400/50"
-          : "border-white/20 bg-white/5 text-white/90 hover:border-white/40 hover:bg-white/10"
+          ? "border-black bg-black text-white shadow-sm ring-2 ring-black/10 dark:border-white dark:bg-white dark:text-zinc-950 dark:ring-white/20"
+          : "border-neutral-200 bg-neutral-50 text-apple-ink hover:border-neutral-400 hover:bg-white dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-500 dark:hover:bg-zinc-800"
       }`}
     >
       {children}
@@ -66,11 +68,14 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
   return (
     <div className={scrim} role="dialog" aria-modal="true" aria-labelledby="checkin-title" aria-describedby="checkin-desc">
       <div className={card}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-300/90">데일리 체크인 · 필수</p>
-        <h1 id="checkin-title" className={`${qTitle} mt-3`}>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">데일리 체크인 · 필수</p>
+        <h1
+          id="checkin-title"
+          className="font-display mt-3 text-[1.65rem] font-bold leading-tight tracking-[-0.03em] text-apple-ink sm:text-[1.85rem] dark:text-zinc-100"
+        >
           {step === 1 ? "오늘 컨디션은 어떤가요?" : "오늘 운동 가능 시간은?"}
         </h1>
-        <p id="checkin-desc" className={sub}>
+        <p id="checkin-desc" className="mt-2 text-[14px] leading-relaxed text-apple-subtle dark:text-zinc-400">
           {step === 1
             ? "솔직하게 고르면 오늘 강도·시간 플랜이 맞춰져요. 스킵할 수 없어요."
             : "가능한 범위만 선택하세요. 플랜 예상 시간에 반영됩니다."}
@@ -107,7 +112,7 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="order-2 min-h-[52px] rounded-2xl border border-white/25 px-6 text-[14px] font-semibold text-white/85 hover:bg-white/10 sm:order-1"
+              className="order-2 min-h-[48px] rounded-xl border border-neutral-200 bg-white px-6 text-[14px] font-semibold text-apple-ink transition hover:border-black hover:bg-neutral-50 sm:order-1 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-400"
             >
               이전
             </button>
@@ -117,7 +122,7 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
               type="button"
               disabled={!condition}
               onClick={() => setStep(2)}
-              className="min-h-[52px] rounded-2xl bg-emerald-400 px-8 text-[15px] font-bold text-slate-950 shadow-lg shadow-emerald-500/25 transition enabled:hover:bg-emerald-300 disabled:opacity-40"
+              className="min-h-[48px] rounded-xl border border-black bg-black px-8 text-[15px] font-bold text-white transition enabled:hover:bg-neutral-800 disabled:opacity-40 dark:border-white dark:bg-white dark:text-zinc-950 dark:enabled:hover:bg-zinc-200"
             >
               다음
             </button>
@@ -126,7 +131,7 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
               type="button"
               disabled={!timeBudget}
               onClick={submit}
-              className="order-1 min-h-[52px] rounded-2xl bg-white px-8 text-[15px] font-bold text-slate-950 transition enabled:hover:bg-emerald-100 disabled:opacity-40 sm:order-2"
+              className="order-1 min-h-[48px] rounded-xl border border-black bg-black px-8 text-[15px] font-bold text-white transition enabled:hover:bg-neutral-800 disabled:opacity-40 sm:order-2 dark:border-white dark:bg-white dark:text-zinc-950 dark:enabled:hover:bg-zinc-200"
             >
               오늘 플랜 확정
             </button>

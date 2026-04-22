@@ -28,8 +28,13 @@ type Props = {
   onDismiss: () => void;
 };
 
-const shell =
-  "fixed inset-0 z-[110] flex items-end justify-center bg-black/55 p-4 pb-8 sm:items-center sm:p-6 sm:pb-6";
+const scrim =
+  "fixed inset-0 z-[110] flex items-end justify-center bg-[rgba(15,23,42,0.45)] p-4 pb-8 sm:items-center sm:p-6 sm:pb-6 dark:bg-black/50";
+
+const panel =
+  "w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.14)] sm:p-8 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.5)]";
+
+const innerBlock = "rounded-xl border border-neutral-200 bg-neutral-50/90 px-4 py-3.5 dark:border-zinc-700 dark:bg-zinc-900/60";
 
 export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Props) {
   const now = useMemo(() => new Date(), []);
@@ -73,34 +78,37 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
       : "내일은 20분 가벼운 루틴으로 다시 시작하세요.";
 
   return (
-    <div className={shell} role="dialog" aria-modal="true" aria-labelledby="close-report-title">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-900 to-slate-950 p-6 text-white shadow-2xl sm:p-8">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300/90">루프 마감</p>
-        <h2 id="close-report-title" className="font-display mt-2 text-2xl font-bold tracking-[-0.03em]">
+    <div className={scrim} role="dialog" aria-modal="true" aria-labelledby="close-report-title">
+      <div className={panel}>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">루프 마감</p>
+        <h2
+          id="close-report-title"
+          className="font-display mt-2 text-[1.65rem] font-bold tracking-[-0.03em] text-apple-ink sm:text-[1.85rem] dark:text-zinc-100"
+        >
           {title}
         </h2>
 
-        <div className="mt-6 space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-wide text-white/50">수행 결과</p>
-            <p className="mt-1 text-[15px] font-semibold leading-snug">
+        <div className="mt-6 space-y-3">
+          <div className={innerBlock}>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-apple-subtle dark:text-zinc-500">수행 결과</p>
+            <p className="mt-1 text-[15px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">
               {kind === "completed"
                 ? `완료 · 수행률 약 ${completionPct}% · 볼륨 합 ${volumeToday}`
                 : "미완료 · 수행률 0%"}
             </p>
           </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-wide text-white/50">AI 평가</p>
-            <p className="mt-1 text-[15px] font-medium leading-relaxed text-white/90">{aiEval}</p>
+          <div className={innerBlock}>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-apple-subtle dark:text-zinc-500">AI 평가</p>
+            <p className="mt-1 text-[15px] font-medium leading-relaxed text-apple-ink dark:text-zinc-200">{aiEval}</p>
           </div>
           {growthLine ? (
-            <p className="text-[14px] font-bold text-amber-300">
+            <p className="rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-[14px] font-bold text-amber-950 dark:border-amber-800/50 dark:bg-amber-950/35 dark:text-amber-100">
               {growthLine} 성장 🔥
             </p>
           ) : null}
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-wide text-white/50">다음 행동</p>
-            <p className="mt-1 text-[15px] font-semibold leading-snug text-emerald-200/95">{nextLine}</p>
+          <div className={innerBlock}>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-apple-subtle dark:text-zinc-500">다음 행동</p>
+            <p className="mt-1 text-[15px] font-semibold leading-snug text-emerald-800 dark:text-emerald-300">{nextLine}</p>
           </div>
         </div>
 
@@ -109,7 +117,7 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
             <Link
               href="/workout"
               onClick={onDismiss}
-              className="inline-flex min-h-[50px] items-center justify-center rounded-2xl bg-emerald-400 px-6 text-[14px] font-bold text-slate-950 transition hover:bg-emerald-300"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-black px-6 text-[14px] font-bold text-white transition hover:bg-neutral-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
             >
               빠른 루틴 시작
             </Link>
@@ -117,12 +125,12 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
           <button
             type="button"
             onClick={onDismiss}
-            className="inline-flex min-h-[50px] items-center justify-center rounded-2xl border border-white/25 px-6 text-[14px] font-bold text-white hover:bg-white/10"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-xl border border-neutral-200 bg-white px-6 text-[14px] font-bold text-apple-ink transition hover:border-black dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-400"
           >
             닫기
           </button>
         </div>
-        <p className="mt-4 text-center text-[10px] text-white/40">오늘은 한 번만 뜹니다. 내일 아침 다시 체크인해요.</p>
+        <p className="mt-4 text-center text-[11px] text-apple-subtle dark:text-zinc-500">오늘은 한 번만 뜹니다. 내일 아침 다시 체크인해요.</p>
       </div>
     </div>
   );
