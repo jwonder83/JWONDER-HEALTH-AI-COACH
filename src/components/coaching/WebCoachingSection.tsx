@@ -1,6 +1,8 @@
 "use client";
 
+import { PersonalizedPressureCoachBanner } from "@/components/coaching/PersonalizedPressureCoachBanner";
 import { SiteFillImage } from "@/components/site/SiteFillImage";
+import { buildPersonalizedPressureMessage } from "@/lib/coaching/personalized-pressure-message";
 import { mapCoachingLogRow } from "@/lib/coaching/map-db-row";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
@@ -10,7 +12,7 @@ import type { CoachingLogRow } from "@/types/coaching";
 import type { UserMemoryProfile } from "@/types/user-memory";
 import type { ImageSlot } from "@/types/site-settings";
 import type { WorkoutRow } from "@/types/workout";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Props = {
   userId: string;
@@ -51,6 +53,11 @@ export function WebCoachingSection({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<CoachingLogRow[]>([]);
+
+  const pressureMessage = useMemo(
+    () => buildPersonalizedPressureMessage(workoutsSnapshot, new Date()),
+    [workoutsSnapshot],
+  );
 
   const loadLogs = useCallback(async () => {
     const supabase = createClient();
@@ -127,6 +134,7 @@ export function WebCoachingSection({
     <div className={shell} role="region" aria-label={title}>
       <div className="grid gap-0 lg:grid-cols-[1fr_min(38%,300px)]">
         <div className="border-b border-neutral-200 p-8 sm:border-b-0 sm:border-r sm:p-10">
+          {pressureMessage ? <PersonalizedPressureCoachBanner pressure={pressureMessage} /> : null}
           {omitInnerTitle ? null : (
             <>
               <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-apple-subtle">{eyebrow}</p>
