@@ -246,7 +246,7 @@ export function buildPerformanceStoryReport(rows: WorkoutRow[], now = new Date()
 
   const summaryParts: string[] = [];
   if (rows.length === 0) {
-    summaryParts.push("아직 기록이 없어서 주간 스토리는 대기 중이에요. 홈에서 세트만 박아도 바로 채워져요.");
+    summaryParts.push("아직 기록이 없어서 주간 스토리는 대기 중이에요. 홈에서 세트만 하나 남겨도 바로 채워져요.");
   } else if (thisRoll.rowCount === 0 && lastRoll.rowCount === 0) {
     summaryParts.push("이번 주·지난주 둘 다 비어 있어요. 오늘부터 쌓으면 추세 바로 읽어줄게요.");
   } else if (wow === null && thisV > 0) {

@@ -35,7 +35,7 @@ export function RecentActivitySummaryCard({ items, hydrated }: Props) {
       {!hydrated ? (
         <p className="mt-4 text-[13px] text-apple-subtle">불러오는 중…</p>
       ) : items.length === 0 ? (
-        <p className="mt-4 text-[13px] leading-relaxed text-apple-subtle">아직 기록판이 조용해요. 위에서 한 세트만 박아도 바로 채워져요.</p>
+        <p className="mt-4 text-[13px] leading-relaxed text-apple-subtle">아직 기록판이 조용해요. 위에서 한 세트만 남겨도 바로 채워져요.</p>
       ) : (
         <ul className="mt-3 space-y-3">
           {items.map((w) => (

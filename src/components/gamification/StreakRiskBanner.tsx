@@ -44,7 +44,7 @@ export function StreakRiskBanner({ streakDays, visible, recoveryDay = false }: P
       <p className="mt-1 text-[15px] font-semibold leading-snug text-amber-950 dark:text-amber-50">
         오늘 0세트면 내일부터 <span className="tabular-nums">{streakDays}일</span> 연속이 리셋될 수 있어요.
       </p>
-      <p className="mt-1 text-[13px] text-amber-900/85 dark:text-amber-100/85">세트 하나만 박아도 스택은 그대로예요.</p>
+      <p className="mt-1 text-[13px] text-amber-900/85 dark:text-amber-100/85">세트 하나만 남겨도 스택은 그대로예요.</p>
       <Link
         href="/workout"
         className="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-xl bg-amber-600 px-4 text-[13px] font-bold text-white transition hover:bg-amber-500 dark:bg-amber-500 dark:hover:bg-amber-400"

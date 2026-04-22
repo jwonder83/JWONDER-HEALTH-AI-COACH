@@ -292,7 +292,7 @@ export function planTodayRoutine(profile: OnboardingProfile | null, now = new Da
 
         title: "상체 밀기 · 유산소 마무리",
 
-        description: "근력 먼저 박고, 끝에 걷기/사이클 10~15분만 얹어요.",
+        description: "근력 구간을 먼저 하고, 끝에 걷기/사이클 10~15분만 얹어요.",
 
         estimatedMinutesMin: 40,
 

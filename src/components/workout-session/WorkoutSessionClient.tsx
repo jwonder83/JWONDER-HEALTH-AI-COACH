@@ -508,7 +508,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
                   </div>
                 ) : hydrated && exercise.trim() ? (
                   <div className={`${cardMuted} text-[14px] text-apple-subtle dark:text-zinc-400`}>
-                    이 종목 기록 아직 없어요. 첫 세트부터 박아봐요.
+                    이 종목 기록 아직 없어요. 첫 세트부터 남겨 보세요.
                   </div>
                 ) : null}
 
