@@ -43,9 +43,19 @@ type Props = {
   hydrated: boolean;
   /** 체크인 후 확정 플랜 한 줄(상태→결정→실행) */
   confirmedPlanLine?: string | null;
+  coachTrustConfidencePercent?: number;
+  coachDecisionConfirmedLine?: string;
+  coachTrustPrimaryReason?: string;
 };
 
-export function DailyStatusBriefingCard({ briefing, hydrated, confirmedPlanLine }: Props) {
+export function DailyStatusBriefingCard({
+  briefing,
+  hydrated,
+  confirmedPlanLine,
+  coachTrustConfidencePercent = 0,
+  coachDecisionConfirmedLine = "",
+  coachTrustPrimaryReason = "",
+}: Props) {
   return (
     <section className={shell} aria-labelledby="daily-briefing-heading" aria-busy={!hydrated}>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -55,13 +65,23 @@ export function DailyStatusBriefingCard({ briefing, hydrated, confirmedPlanLine 
           </h2>
           <p className="mt-1 text-[11px] font-medium text-apple-subtle">데이터 → 해석 → 결정</p>
         </div>
-        {!hydrated || !briefing ? null : (
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${decisionKindBadgeClass(briefing.decisionKind)}`}
-          >
-            {decisionKindLabel(briefing.decisionKind)}
-          </span>
-        )}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {hydrated && briefing && coachTrustConfidencePercent > 0 ? (
+            <span
+              className="rounded-full border border-indigo-400/50 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-extrabold tabular-nums tracking-wide text-indigo-900 dark:border-indigo-500/40 dark:bg-indigo-950/50 dark:text-indigo-100"
+              title="최근 기록 양·패턴·체크인 반영도를 합친 규칙 기반 지표입니다."
+            >
+              추천 신뢰도: {coachTrustConfidencePercent}%
+            </span>
+          ) : null}
+          {!hydrated || !briefing ? null : (
+            <span
+              className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${decisionKindBadgeClass(briefing.decisionKind)}`}
+            >
+              {decisionKindLabel(briefing.decisionKind)}
+            </span>
+          )}
+        </div>
       </div>
 
       {!hydrated ? (
@@ -171,7 +191,23 @@ export function DailyStatusBriefingCard({ briefing, hydrated, confirmedPlanLine 
           {/* 2. 오늘 결정 */}
           <div className="mt-4 rounded-xl border-2 border-violet-400/45 bg-gradient-to-br from-white to-violet-50/90 px-3.5 py-3.5 shadow-sm dark:border-violet-600/40 dark:from-zinc-900 dark:to-violet-950/35">
             <p className="text-[10px] font-bold uppercase tracking-wide text-violet-800 dark:text-violet-200">오늘 결정</p>
-            <p className="mt-2 text-[16px] font-extrabold leading-snug tracking-[-0.02em] text-apple-ink dark:text-zinc-50 sm:text-[17px]" aria-live="polite">
+            {coachDecisionConfirmedLine ? (
+              <p className="mt-2 text-[16px] font-extrabold leading-snug tracking-[-0.02em] text-apple-ink dark:text-zinc-50 sm:text-[17px]" aria-live="polite">
+                {coachDecisionConfirmedLine}
+              </p>
+            ) : null}
+            {coachTrustPrimaryReason ? (
+              <p className="mt-2 flex flex-wrap items-baseline gap-1.5 text-[12px] font-semibold leading-snug text-violet-900/90 dark:text-violet-200/95">
+                <span className="shrink-0 rounded border border-violet-400/60 bg-violet-100/80 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-violet-900 dark:border-violet-600/50 dark:bg-violet-950/60 dark:text-violet-100">
+                  이유
+                </span>
+                <span>{coachTrustPrimaryReason}</span>
+              </p>
+            ) : null}
+            <p
+              className={`text-[14px] font-bold leading-snug text-apple-ink/95 dark:text-zinc-200 ${coachDecisionConfirmedLine ? "mt-2 border-t border-violet-200/70 pt-2.5 dark:border-violet-800/50" : "mt-2"}`}
+              aria-live="polite"
+            >
               {briefing.aiMessage}
             </p>
           </div>

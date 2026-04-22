@@ -1,4 +1,5 @@
 import { buildDailyStatusBriefing } from "@/lib/dashboard/daily-status-briefing";
+import { applyFailureReboundToDailyBriefing } from "@/lib/habit-loop/failure-rebound";
 import type { OnboardingProfile } from "@/lib/onboarding/types";
 import type { UserMemoryProfile } from "@/types/user-memory";
 import type { WorkoutRow } from "@/types/workout";
@@ -114,7 +115,7 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
     };
   }
 
-  const briefing = buildDailyStatusBriefing(workouts, now);
+  const briefing = applyFailureReboundToDailyBriefing(buildDailyStatusBriefing(workouts, now), workouts, now);
   const active7 = briefing.metrics.activeDaysLast7;
   const consistency_score = Math.min(100, Math.max(0, Math.round((active7 / 7) * 100)));
   const checkFatigue = input.dailyCheckinFatigue;

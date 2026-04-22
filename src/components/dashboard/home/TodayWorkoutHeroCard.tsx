@@ -14,11 +14,20 @@ const shellNudge =
 type Props = {
   model: Pick<
     HomeActionViewModel,
-    "todayWorkoutComplete" | "routine" | "estimatedDurationLabel" | "coachLine" | "coachLineReason"
+    | "todayWorkoutComplete"
+    | "routine"
+    | "estimatedDurationLabel"
+    | "coachLine"
+    | "coachLineReason"
+    | "coachTrustConfidencePercent"
+    | "coachDecisionConfirmedLine"
+    | "coachTrustPrimaryReason"
   >;
   workoutSectionId: string;
   routineFlowStatus: RoutineFlowStatus;
   userWorkoutUiState: UserWorkoutUiState;
+  /** 홈 상단 단일 CTA와 겹치지 않도록 하단 주 버튼 숨김 */
+  hidePrimaryCta?: boolean;
 };
 
 function LiveRoutineFeed({ routine }: { routine: HomeActionViewModel["routine"] }) {
@@ -87,10 +96,15 @@ const shellMissedRing =
 const shellActiveRing =
   "ring-4 ring-indigo-400/35 shadow-[0_24px_56px_-18px_rgba(99,102,241,0.28)] dark:ring-indigo-400/30";
 
-export function TodayWorkoutHeroCard({ model, workoutSectionId, routineFlowStatus, userWorkoutUiState }: Props) {
+export function TodayWorkoutHeroCard({
+  model,
+  workoutSectionId,
+  routineFlowStatus,
+  userWorkoutUiState,
+  hidePrimaryCta = false,
+}: Props) {
   const done = model.todayWorkoutComplete;
   const planLocked = routineFlowStatus === "confirmed" || routineFlowStatus === "completed";
-  const canStartWorkout = done || planLocked;
 
   const shellRing =
     done || userWorkoutUiState === "completed"
@@ -135,11 +149,29 @@ export function TodayWorkoutHeroCard({ model, workoutSectionId, routineFlowStatu
         ) : null}
 
         <div className="mt-4 rounded-xl border border-white/12 bg-white/[0.07] px-3 py-3 sm:px-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/85">오늘 결정</p>
-          <p className="mt-1.5 text-[15px] font-bold leading-relaxed text-white sm:text-[16px]">{model.coachLine}</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/85">오늘 결정</p>
+            {model.coachTrustConfidencePercent > 0 ? (
+              <span className="rounded-full border border-emerald-400/35 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-extrabold tabular-nums text-emerald-50">
+                신뢰도 {model.coachTrustConfidencePercent}%
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-1.5 text-[15px] font-bold leading-relaxed text-white sm:text-[16px]">
+            {model.coachDecisionConfirmedLine || model.coachLine}
+          </p>
+          {model.coachTrustPrimaryReason ? (
+            <p className="mt-2 flex flex-wrap items-baseline gap-1.5 text-[11px] leading-relaxed text-emerald-100/90">
+              <span className="shrink-0 rounded border border-white/25 bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-white/70">
+                핵심 근거
+              </span>
+              <span>{model.coachTrustPrimaryReason}</span>
+            </p>
+          ) : null}
+          <p className="mt-2 border-t border-white/10 pt-2 text-[13px] font-semibold leading-snug text-white/85">{model.coachLine}</p>
           <p className="mt-2 flex flex-wrap items-baseline gap-1.5 text-[11px] leading-relaxed text-white/55">
             <span className="shrink-0 rounded border border-emerald-400/35 bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-emerald-100/90">
-              이유
+              데이터
             </span>
             <span>{model.coachLineReason}</span>
           </p>
@@ -163,45 +195,62 @@ export function TodayWorkoutHeroCard({ model, workoutSectionId, routineFlowStatu
           ) : null}
         </div>
 
-        <div className={`mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 ${done ? "" : "sm:justify-center"}`}>
-          {done ? (
+        {hidePrimaryCta ? (
+          <div className="mt-5 flex flex-wrap gap-2">
             <Link
               href="/workout"
-              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-xl bg-white px-6 text-[15px] font-bold tracking-[-0.01em] text-black shadow-lg transition hover:bg-neutral-100 active:scale-[0.99] sm:min-h-[56px] sm:max-w-xs sm:text-[16px]"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/35 bg-white/10 px-4 text-[12px] font-bold text-white transition hover:bg-white/15"
             >
-              추가로 한 세트 더
+              운동 화면 바로가기
             </Link>
-          ) : canStartWorkout ? (
             <Link
-              href="/workout"
-              className={`inline-flex min-h-[58px] w-full items-center justify-center rounded-xl bg-gradient-to-b px-6 text-[17px] font-bold tracking-[-0.01em] text-amber-950 shadow-[0_10px_36px_-8px_rgba(251,191,36,0.65)] transition hover:shadow-lg active:scale-[0.99] sm:min-h-[60px] sm:max-w-md sm:flex-1 sm:text-[18px] ${
-                userWorkoutUiState === "idle" || userWorkoutUiState === "missed"
-                  ? "from-amber-200 to-amber-400 ring-4 ring-amber-200/90 hover:from-amber-100 hover:to-amber-300 dark:from-amber-300 dark:to-amber-500 dark:ring-amber-300/70"
-                  : "from-amber-300 to-amber-400 ring-2 ring-amber-200/80 hover:from-amber-200 hover:to-amber-300 dark:from-amber-400 dark:to-amber-500 dark:ring-amber-300/50"
-              }`}
+              href="/program"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/25 px-4 text-[12px] font-semibold text-white/85 transition hover:bg-white/10"
             >
-              {userWorkoutUiState === "active" ? "세션 이어가기" : "운동 시작하기"}
+              프로그램
             </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={scrollToTodayPlan}
-              className="inline-flex min-h-[58px] w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-white/45 bg-white/5 px-6 text-[16px] font-bold tracking-[-0.01em] text-white/90 backdrop-blur-sm transition hover:border-white/70 hover:bg-white/10 active:scale-[0.99] sm:min-h-[60px] sm:max-w-md sm:flex-1 sm:text-[17px]"
+          </div>
+        ) : (
+          <div className={`mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 ${done ? "" : "sm:justify-center"}`}>
+            {done ? (
+              <Link
+                href="/workout"
+                className="inline-flex min-h-[52px] w-full items-center justify-center rounded-xl bg-white px-6 text-[15px] font-bold tracking-[-0.01em] text-black shadow-lg transition hover:bg-neutral-100 active:scale-[0.99] sm:min-h-[56px] sm:max-w-xs sm:text-[16px]"
+              >
+                추가로 한 세트 더
+              </Link>
+            ) : done || planLocked ? (
+              <Link
+                href="/workout"
+                className={`inline-flex min-h-[58px] w-full items-center justify-center rounded-xl bg-gradient-to-b px-6 text-[17px] font-bold tracking-[-0.01em] text-amber-950 shadow-[0_10px_36px_-8px_rgba(251,191,36,0.65)] transition hover:shadow-lg active:scale-[0.99] sm:min-h-[60px] sm:max-w-md sm:flex-1 sm:text-[18px] ${
+                  userWorkoutUiState === "idle" || userWorkoutUiState === "missed"
+                    ? "from-amber-200 to-amber-400 ring-4 ring-amber-200/90 hover:from-amber-100 hover:to-amber-300 dark:from-amber-300 dark:to-amber-500 dark:ring-amber-300/70"
+                    : "from-amber-300 to-amber-400 ring-2 ring-amber-200/80 hover:from-amber-200 hover:to-amber-300 dark:from-amber-400 dark:to-amber-500 dark:ring-amber-300/50"
+                }`}
+              >
+                {userWorkoutUiState === "active" ? "세션 이어가기" : "운동 시작하기"}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={scrollToTodayPlan}
+                className="inline-flex min-h-[58px] w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-white/45 bg-white/5 px-6 text-[16px] font-bold tracking-[-0.01em] text-white/90 backdrop-blur-sm transition hover:border-white/70 hover:bg-white/10 active:scale-[0.99] sm:min-h-[60px] sm:max-w-md sm:flex-1 sm:text-[17px]"
+              >
+                먼저 오늘 플랜 확정하기
+              </button>
+            )}
+            <Link
+              href="/program"
+              className={
+                done
+                  ? "inline-flex min-h-[48px] items-center justify-center rounded-xl border border-white/35 bg-transparent px-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white/90 transition hover:bg-white/10 sm:min-h-[56px]"
+                  : "inline-flex min-h-[50px] w-full items-center justify-center rounded-xl border-2 border-white/40 bg-white/10 px-5 text-[12px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/15 sm:min-h-[56px] sm:w-auto sm:min-w-[11rem]"
+              }
             >
-              먼저 오늘 플랜 확정하기
-            </button>
-          )}
-          <Link
-            href="/program"
-            className={
-              done
-                ? "inline-flex min-h-[48px] items-center justify-center rounded-xl border border-white/35 bg-transparent px-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white/90 transition hover:bg-white/10 sm:min-h-[56px]"
-                : "inline-flex min-h-[50px] w-full items-center justify-center rounded-xl border-2 border-white/40 bg-white/10 px-5 text-[12px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/15 sm:min-h-[56px] sm:w-auto sm:min-w-[11rem]"
-            }
-          >
-            {done ? "프로그램 훑기" : "참고만 보기"}
-          </Link>
-        </div>
+              {done ? "프로그램 훑기" : "참고만 보기"}
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

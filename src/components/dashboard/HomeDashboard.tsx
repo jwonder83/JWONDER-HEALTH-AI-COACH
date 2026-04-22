@@ -2,7 +2,9 @@
 
 import { WebCoachingSection } from "@/components/coaching/WebCoachingSection";
 import { DailyCheckinModal } from "@/components/habit-loop/DailyCheckinModal";
+import { PostCheckinBriefingModal } from "@/components/habit-loop/PostCheckinBriefingModal";
 import { DailyClosingReportModal } from "@/components/habit-loop/DailyClosingReportModal";
+import { AiPresenceStickyBar } from "@/components/dashboard/home/AiPresenceStickyBar";
 import { HomeActionHub } from "@/components/dashboard/home/HomeActionHub";
 import { useUserWorkoutUiState } from "@/components/dashboard/home/use-user-workout-ui-state";
 import { OnboardingBanner } from "@/components/dashboard/OnboardingBanner";
@@ -19,7 +21,9 @@ import { WorkoutList } from "@/components/workouts/WorkoutList";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
+import { buildAiPresenceModel } from "@/lib/dashboard/ai-presence-track";
 import { hasWorkoutToday, isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
+import { LS_GOALS, loadLocalGoals } from "@/lib/dashboard/local-goals";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { loadUserMemoryFromBrowser, saveUserMemoryToBrowser } from "@/lib/user-memory/browser-storage";
 import { recomputeUserMemoryProfile } from "@/lib/user-memory/recompute";
@@ -32,6 +36,7 @@ import {
   type DailyCloseReportKind,
 } from "@/lib/habit-loop/daily-closing-report";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
+import { computeLoggingStreakMerged, STREAK_PREFERENCE_CHANGED_EVENT } from "@/lib/workouts/streak";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
 import type { SiteSettingsMerged } from "@/types/site-settings";
 import type { WorkoutInput, WorkoutRow } from "@/types/workout";
@@ -96,9 +101,33 @@ export function HomeDashboard({ userId, site }: Props) {
   const [toast, setToast] = useState<{ message: string; variant: "default" | "achievement" } | null>(null);
   const [lastXpFloat, setLastXpFloat] = useState<LastXpFloat | null>(null);
   const [checkinOpen, setCheckinOpen] = useState(false);
+  const [postCheckinBriefingOpen, setPostCheckinBriefingOpen] = useState(false);
   const [habitLoopTick, setHabitLoopTick] = useState(0);
   const [closeReport, setCloseReport] = useState<{ open: boolean; kind: DailyCloseReportKind }>({ open: false, kind: "completed" });
+  const [goalsVersion, setGoalsVersion] = useState(0);
+  const [streakPreferenceTick, setStreakPreferenceTick] = useState(0);
   const userWorkoutUiState = useUserWorkoutUiState(workouts, hydrated, site.experience.missedDayHourLocal);
+
+  useEffect(() => {
+    const bump = () => setStreakPreferenceTick((n) => n + 1);
+    window.addEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+    return () => window.removeEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+  }, []);
+
+  useEffect(() => {
+    const bump = () => setGoalsVersion((v) => v + 1);
+    window.addEventListener("jws-goals-changed", bump);
+    window.addEventListener("focus", bump);
+    function onStorage(e: StorageEvent) {
+      if (e.key === LS_GOALS || e.key === null) bump();
+    }
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("jws-goals-changed", bump);
+      window.removeEventListener("focus", bump);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
 
   const navItems = useMemo(
     () =>
@@ -130,6 +159,35 @@ export function HomeDashboard({ userId, site }: Props) {
     [workouts, weekBounds.mon, weekBounds.sun],
   );
 
+  const weeklySessionTarget = useMemo(() => {
+    const g = loadLocalGoals();
+    return g.weeklySessionTarget && g.weeklySessionTarget > 0 ? g.weeklySessionTarget : null;
+  }, [goalsVersion, hydrated]);
+
+  const streakMerged = useMemo(() => computeLoggingStreakMerged(workouts, new Date()), [workouts, streakPreferenceTick]);
+
+  const todayWorkoutComplete = useMemo(() => hasWorkoutToday(workouts, new Date()), [workouts]);
+
+  const weekProgressPercent = useMemo(() => {
+    if (!weeklySessionTarget) return null;
+    return Math.min(100, Math.round((weekRollup.rowCount / weeklySessionTarget) * 100));
+  }, [weekRollup.rowCount, weeklySessionTarget]);
+
+  const aiPresence = useMemo(
+    () =>
+      buildAiPresenceModel({
+        workouts,
+        hydrated,
+        now: new Date(),
+        weeklySessionTarget,
+        weeklySessionCurrent: weekRollup.rowCount,
+        streakMerged,
+        userWorkoutUiState,
+        todayWorkoutComplete,
+      }),
+    [workouts, hydrated, weeklySessionTarget, weekRollup.rowCount, streakMerged, userWorkoutUiState, todayWorkoutComplete, streakPreferenceTick],
+  );
+
   const refresh = useCallback(async () => {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -156,14 +214,23 @@ export function HomeDashboard({ userId, site }: Props) {
     if (!hydrated || typeof window === "undefined") return;
     if (!loadDailyCheckin(userId)) {
       setCheckinOpen(true);
+      setPostCheckinBriefingOpen(false);
     } else {
       setCheckinOpen(false);
     }
   }, [hydrated, userId]);
 
+  const continueMorningFlowToWorkout = useCallback(() => {
+    setPostCheckinBriefingOpen(false);
+    window.requestAnimationFrame(() => {
+      document.getElementById("section-input")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
+
   useEffect(() => {
     if (!hydrated || typeof window === "undefined") return;
     if (!loadDailyCheckin(userId)) return;
+    if (postCheckinBriefingOpen) return;
 
     const todayDone = hasWorkoutToday(workouts, new Date());
     const h = new Date().getHours();
@@ -176,7 +243,7 @@ export function HomeDashboard({ userId, site }: Props) {
     if (!todayDone && evening && workouts.length > 0 && !wasDailyCloseReportShown(userId, "missed_evening")) {
       setCloseReport({ open: true, kind: "missed_evening" });
     }
-  }, [hydrated, userId, workouts, habitLoopTick]);
+  }, [hydrated, userId, workouts, habitLoopTick, postCheckinBriefingOpen]);
 
   useEffect(() => {
     if (!hydrated || typeof window === "undefined") return;
@@ -278,6 +345,11 @@ export function HomeDashboard({ userId, site }: Props) {
       data-user-workout-state={hydrated ? userWorkoutUiState : undefined}
     >
       <div className={`pointer-events-none absolute inset-0 -z-10 ${pageTint}`} aria-hidden />
+      <div className="sticky top-0 z-40 border-b border-neutral-200/80 bg-[color-mix(in_srgb,var(--color-apple-surface)_88%,white)] backdrop-blur-md dark:border-zinc-800/90 dark:bg-zinc-950/85">
+        <div className="mx-auto max-w-5xl px-5 py-2 sm:px-8 sm:py-2.5">
+          <AiPresenceStickyBar model={aiPresence} hydrated={hydrated} weekProgressPercent={weekProgressPercent} />
+        </div>
+      </div>
       <div className="mx-auto max-w-5xl px-5 pt-6 sm:px-8 sm:pt-8">
         {/* 히어로 */}
         <div className={`relative overflow-hidden sm:rounded-sm ${cardRing}`}>
@@ -301,29 +373,24 @@ export function HomeDashboard({ userId, site }: Props) {
               <p className="mt-4 max-w-lg text-[15px] font-medium leading-snug tracking-[-0.01em] text-white/80 sm:mt-5 sm:text-[16px]">
                 {site.copy.mainHero.subtitle}
               </p>
-              <div className="pointer-events-auto mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
+              <div className="pointer-events-auto mt-6 flex flex-col gap-3 sm:mt-8">
                 <Link
-                  href="/workout"
-                  className={`inline-flex items-center justify-center rounded-lg border border-white px-5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-black transition hover:bg-white/90 active:scale-[0.98] sm:py-3 sm:text-[14px] ${
-                    hydrated && (userWorkoutUiState === "idle" || userWorkoutUiState === "missed")
-                      ? "bg-amber-200 font-bold ring-2 ring-white/80 hover:bg-amber-100"
-                      : "bg-white"
-                  }`}
+                  href="#today-single-action"
+                  className="inline-flex w-full max-w-sm items-center justify-center rounded-xl border-2 border-white bg-white/95 px-6 py-3.5 text-[14px] font-bold tracking-[-0.02em] text-black shadow-lg transition hover:bg-white active:scale-[0.98] sm:py-4 sm:text-[15px]"
                 >
-                  {hydrated && userWorkoutUiState === "active" ? "세션 이어가기" : "운동 시작하기"}
+                  오늘 할 일로 이동
                 </Link>
-                <Link
-                  href="/program"
-                  className="inline-flex items-center justify-center rounded-lg border border-white/45 bg-white/10 px-5 py-2.5 text-[13px] font-medium tracking-[-0.02em] text-white backdrop-blur-sm transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[14px]"
-                >
-                  {site.program.navLabel}
-                </Link>
-                <Link
-                  href="/performance"
-                  className="inline-flex items-center justify-center rounded-lg border border-white/45 bg-white/10 px-5 py-2.5 text-[13px] font-medium tracking-[-0.02em] text-white backdrop-blur-sm transition hover:bg-white hover:text-black active:scale-[0.98] sm:py-3 sm:text-[14px]"
-                >
-                  성과 보기
-                </Link>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] font-medium text-white/75">
+                  <Link href="/program" className="underline decoration-white/40 underline-offset-4 transition hover:text-white">
+                    {site.program.navLabel}
+                  </Link>
+                  <span className="text-white/35" aria-hidden>
+                    ·
+                  </span>
+                  <Link href="/performance" className="underline decoration-white/40 underline-offset-4 transition hover:text-white">
+                    성과
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -569,7 +636,20 @@ export function HomeDashboard({ userId, site }: Props) {
         onCompleted={() => {
           setCheckinOpen(false);
           setHabitLoopTick((t) => t + 1);
+          window.requestAnimationFrame(() => {
+            setPostCheckinBriefingOpen(true);
+          });
         }}
+      />
+
+      <PostCheckinBriefingModal
+        userId={userId}
+        workouts={workouts}
+        hydrated={hydrated}
+        experience={site.experience}
+        open={hydrated && postCheckinBriefingOpen}
+        onDismiss={() => setPostCheckinBriefingOpen(false)}
+        onContinueToWorkout={continueMorningFlowToWorkout}
       />
 
       <DailyClosingReportModal

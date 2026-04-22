@@ -3,7 +3,7 @@
 import { computeLevelProgress } from "@/lib/gamification/xp-level";
 import { loadRewardProfile } from "@/lib/gamification/reward-storage";
 import { STREAK_MILESTONE_DAYS } from "@/lib/workouts/streak-engagement";
-import { computeLoggingStreakMerged } from "@/lib/workouts/streak";
+import { computeLoggingStreakMerged, STREAK_PREFERENCE_CHANGED_EVENT } from "@/lib/workouts/streak";
 import type { WorkoutRow } from "@/types/workout";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -19,6 +19,7 @@ type Props = {
 export function RewardStatusCard({ userId, workouts, hydrated, lastXpFloat }: Props) {
   const [totalXp, setTotalXp] = useState(0);
   const [milestoneFlash, setMilestoneFlash] = useState(false);
+  const [streakPreferenceTick, setStreakPreferenceTick] = useState(0);
   const prevStreakRef = useRef<number | null>(null);
 
   const reload = useCallback(() => {
@@ -38,7 +39,16 @@ export function RewardStatusCard({ userId, workouts, hydrated, lastXpFloat }: Pr
     return () => window.removeEventListener("jws-reward-changed", onReward);
   }, [reload]);
 
-  const streak = useMemo(() => (hydrated ? computeLoggingStreakMerged(workouts, new Date()) : 0), [workouts, hydrated]);
+  useEffect(() => {
+    const bump = () => setStreakPreferenceTick((n) => n + 1);
+    window.addEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+    return () => window.removeEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+  }, []);
+
+  const streak = useMemo(
+    () => (hydrated ? computeLoggingStreakMerged(workouts, new Date()) : 0),
+    [workouts, hydrated, streakPreferenceTick],
+  );
   const level = useMemo(() => computeLevelProgress(totalXp), [totalXp]);
 
   useEffect(() => {

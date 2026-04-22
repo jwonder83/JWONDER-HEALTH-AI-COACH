@@ -7,6 +7,12 @@ import { applyDailyCheckinToRoutinePlan } from "@/lib/habit-loop/apply-checkin-t
 import type { DailyCheckinRecord } from "@/lib/habit-loop/daily-checkin";
 import { conditionLabelKo, conditionToFatigueSignal } from "@/lib/habit-loop/daily-checkin";
 import { applyWeeklyStakeToRoutine } from "@/lib/habit-loop/apply-weekly-stake-to-routine";
+import { buildCoachTrustFields } from "@/lib/coaching/coach-trust-ui";
+import {
+  applyFailureReboundToDailyBriefing,
+  buildFailureReboundModel,
+  type FailureReboundModel,
+} from "@/lib/habit-loop/failure-rebound";
 import { mergeDailyCheckinIntoBriefing } from "@/lib/habit-loop/merge-checkin-briefing";
 import { computeWeeklyStake, type WeeklyStakeModel } from "@/lib/dashboard/weekly-stake";
 import type { OnboardingProfile } from "@/lib/onboarding/types";
@@ -78,6 +84,14 @@ export type HomeActionViewModel = {
   daysSinceLastWorkout: number | null;
   /** 주간 목표 “손해” 압박 모델(목표 미설정 시 null) */
   weeklyStake: WeeklyStakeModel | null;
+  /** 어제 미완료 등 복귀일 자동 난이도(없으면 null) */
+  failureRebound: FailureReboundModel | null;
+  /** AI 코치 추천 신뢰도 0–100 (0이면 미표시) */
+  coachTrustConfidencePercent: number;
+  /** 루틴 중심 확정 한 줄 */
+  coachDecisionConfirmedLine: string;
+  /** 신뢰 근거 한 줄 */
+  coachTrustPrimaryReason: string;
 };
 
 export type BuildHomeActionViewModelOpts = {
@@ -274,12 +288,26 @@ export function buildHomeActionViewModel(
         highLoadDayMinVolume: exp.briefingHighLoadDayMinVolume,
       })
     : null;
-  const dailyBriefing =
+  const dailyBriefingMerged =
     baseDailyBriefing && checkin ? mergeDailyCheckinIntoBriefing(baseDailyBriefing, checkin) : baseDailyBriefing;
+  const failureRebound = hydrated ? buildFailureReboundModel(workouts, now) : null;
+  const dailyBriefing = dailyBriefingMerged
+    ? applyFailureReboundToDailyBriefing(dailyBriefingMerged, workouts, now, failureRebound)
+    : null;
   const actionSuggestions = hydrated ? buildWorkoutActionSuggestions(workouts, now) : [];
 
   const sinceLast = calendarDaysSinceLastWorkout(workouts, now);
   const confirmedPlanLine = dailyBriefing ? buildConfirmedPlanLine(dailyBriefing, routine, checkin) : null;
+
+  const trust = buildCoachTrustFields({
+    hydrated,
+    todayDone: todayDone,
+    routineTitle: routine.title,
+    briefing: dailyBriefing,
+    hasDailyCheckin: Boolean(checkin),
+    workouts,
+    now,
+  });
 
   return {
     hydrated,
@@ -304,5 +332,9 @@ export function buildHomeActionViewModel(
     hasDailyCheckin: Boolean(checkin),
     daysSinceLastWorkout: sinceLast,
     weeklyStake,
+    failureRebound,
+    coachTrustConfidencePercent: trust.coachTrustConfidencePercent,
+    coachDecisionConfirmedLine: trust.coachDecisionConfirmedLine,
+    coachTrustPrimaryReason: trust.coachTrustPrimaryReason,
   };
 }

@@ -7,6 +7,7 @@ import {
 } from "@/lib/workouts/exercise-muscle-group";
 import type { WorkoutRow } from "@/types/workout";
 import { isRecoveryEaseRoutineDay } from "@/lib/dashboard/recovery-workout-ux";
+import { buildFailureReboundModel, getRecoveryEaseTimeMultiplier } from "@/lib/habit-loop/failure-rebound";
 import {
   buildWeekdayBehaviorAdjustments,
   computeBehaviorTimeScale,
@@ -225,7 +226,7 @@ export function buildOptimizedTodayRoutine(
     timeAdjustNote = " 상급·벌크 프로필이라 예상 시간 상·하한을 각각 5분 늘렸어요.";
   }
 
-  const recoveryFactor = recoveryEase ? 0.78 : 1;
+  const recoveryFactor = recoveryEase ? getRecoveryEaseTimeMultiplier(workouts, now) : 1;
 
   const behaviorScale = computeBehaviorTimeScale(workouts, now);
   const combinedTimeFactor = behaviorScale.factor * recoveryFactor;
@@ -243,14 +244,19 @@ export function buildOptimizedTodayRoutine(
   }
 
   if (recoveryEase) {
+    const rebound = buildFailureReboundModel(workouts, now);
+    const pctT = rebound?.timeReductionPercent ?? 14;
+    const pctI = rebound?.intensityReductionPercent ?? 10;
     adjustments.unshift({
       type: "recovery_return",
-      message: "어제 운동을 놓쳤습니다. 오늘은 가벼운 루틴으로 다시 시작하세요.",
-      reason: "로컬 캘린더 기준 어제 세트 없음 + 최근 45일 내 기록이 있어 복귀 모드로 분류했어요.",
-      problemLine: "어제 운동을 놓쳤습니다.",
-      solutionLine: "오늘은 가벼운 루틴으로 다시 시작하세요.",
+      message: `${rebound?.headlineLine ?? "어제 운동을 놓쳤습니다."} ${rebound?.actionLine ?? "→ 오늘은 가벼운 루틴으로 조정했습니다."}`,
+      reason: "로컬 캘린더 기준 어제 세트 없음 + 최근 기록이 있어 복귀 모드로 분류했어요. 연속 미완료 일수에 따라 시간·강도를 자동 낮췄습니다.",
+      problemLine: rebound?.headlineLine ?? "어제 운동을 놓쳤습니다.",
+      solutionLine: `${rebound?.actionLine ?? "→ 오늘은 가벼운 루틴으로 조정했습니다."} (예상 시간 약 ${pctT}%·권장 강도 약 ${pctI}% 감소)`,
     });
-    liveMessages.unshift("어제는 쉬었어도 괜찮아요. 오늘은 짧게라도 이어가세요.");
+    liveMessages.unshift(
+      rebound?.detailLine ?? "어제는 쉬었어도 괜찮아요. 오늘은 짧게라도 이어가세요.",
+    );
   }
 
   const weekdayAdjustments = buildWeekdayBehaviorAdjustments(

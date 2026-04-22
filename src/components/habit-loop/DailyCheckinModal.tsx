@@ -133,7 +133,7 @@ export function DailyCheckinModal({ userId, open, onCompleted }: Props) {
               onClick={submit}
               className="order-1 min-h-[48px] rounded-xl border border-black bg-black px-8 text-[15px] font-bold text-white transition enabled:hover:bg-neutral-800 disabled:opacity-40 sm:order-2 dark:border-white dark:bg-white dark:text-zinc-950 dark:enabled:hover:bg-zinc-200"
             >
-              오늘 플랜 확정
+              확정 · 브리핑으로
             </button>
           )}
         </div>

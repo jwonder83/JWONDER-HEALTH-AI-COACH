@@ -5,6 +5,7 @@ import { LS_GOALS } from "@/lib/dashboard/local-goals";
 import { DAILY_CHECKIN_CHANGED_EVENT, loadDailyCheckin, type DailyCheckinRecord } from "@/lib/habit-loop/daily-checkin";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import type { SiteExperienceConfig } from "@/types/site-settings";
+import { STREAK_PREFERENCE_CHANGED_EVENT } from "@/lib/workouts/streak";
 import type { WorkoutRow } from "@/types/workout";
 import { useEffect, useMemo, useState } from "react";
 
@@ -49,6 +50,13 @@ export function useHomeActionViewModel({ userId, workouts, hydrated, experience 
   const [goals, setGoals] = useState<LocalWeeklyGoal>({});
   const [profile, setProfile] = useState<OnboardingProfile | null>(null);
   const [dailyCheckin, setDailyCheckin] = useState<DailyCheckinRecord | null>(null);
+  const [streakPreferenceTick, setStreakPreferenceTick] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setStreakPreferenceTick((n) => n + 1);
+    window.addEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+    return () => window.removeEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+  }, []);
 
   useEffect(() => {
     function reloadLocal() {
@@ -79,7 +87,7 @@ export function useHomeActionViewModel({ userId, workouts, hydrated, experience 
 
   const model = useMemo(
     () => buildHomeActionViewModel(workouts, profile, goals, hydrated, { experience, dailyCheckin }),
-    [workouts, profile, goals, hydrated, experience, dailyCheckin],
+    [workouts, profile, goals, hydrated, experience, dailyCheckin, streakPreferenceTick],
   );
 
   return model;
