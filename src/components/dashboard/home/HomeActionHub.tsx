@@ -1,5 +1,7 @@
 "use client";
 
+import { ContinuityPulseStrip } from "@/components/habit-loop/ContinuityPulseStrip";
+import { InactiveCoachBanner } from "@/components/habit-loop/InactiveCoachBanner";
 import { DailyStatusBriefingCard } from "@/components/dashboard/home/DailyStatusBriefingCard";
 import { WorkoutActionSuggestionsCard } from "@/components/dashboard/home/WorkoutActionSuggestionsCard";
 import { StreakRiskBanner } from "@/components/gamification/StreakRiskBanner";
@@ -20,6 +22,7 @@ import type { WorkoutRow } from "@/types/workout";
 const grid = "mt-6 flex flex-col gap-4 sm:mt-8 sm:gap-5";
 
 type Props = {
+  userId: string;
   workouts: WorkoutRow[];
   hydrated: boolean;
   userWorkoutUiState: UserWorkoutUiState;
@@ -27,8 +30,8 @@ type Props = {
 };
 
 /** 홈 상단 — 오늘 운동 시작을 최우선으로 하는 카드 묶음 */
-export function HomeActionHub({ workouts, hydrated, userWorkoutUiState, experience }: Props) {
-  const model = useHomeActionViewModel({ workouts, hydrated, experience });
+export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, experience }: Props) {
+  const model = useHomeActionViewModel({ userId, workouts, hydrated, experience });
   const routineFlow = useTodayRoutineConfirmation({
     routine: model.routine,
     todayWorkoutComplete: model.todayWorkoutComplete,
@@ -37,6 +40,21 @@ export function HomeActionHub({ workouts, hydrated, userWorkoutUiState, experien
   return (
     <div className={grid} data-user-workout-state={userWorkoutUiState}>
       <UserWorkoutStateRibbon state={userWorkoutUiState} />
+      <ContinuityPulseStrip
+        hydrated={model.hydrated}
+        streakDays={model.streakDays}
+        weeklySessionCurrent={model.weeklySessionCurrent}
+        weeklySessionTarget={model.weeklySessionTarget}
+        streakMotivationLine={model.streakMotivationLine}
+        userWorkoutUiState={userWorkoutUiState}
+        hasDailyCheckin={model.hasDailyCheckin}
+      />
+      {model.hydrated &&
+      !model.todayWorkoutComplete &&
+      model.daysSinceLastWorkout !== null &&
+      model.daysSinceLastWorkout >= 2 ? (
+        <InactiveCoachBanner daysSinceLast={model.daysSinceLastWorkout} />
+      ) : null}
       {model.hydrated && !model.todayWorkoutComplete && model.recoveryAfterMissedYesterday ? <RecoveryReturnBanner /> : null}
       <StreakRiskBanner
         visible={model.streakAtRisk}
@@ -44,7 +62,11 @@ export function HomeActionHub({ workouts, hydrated, userWorkoutUiState, experien
         recoveryDay={model.recoveryAfterMissedYesterday}
       />
       <TodayStatusCard model={model} uiState={userWorkoutUiState} />
-      <DailyStatusBriefingCard briefing={model.dailyBriefing} hydrated={model.hydrated} />
+      <DailyStatusBriefingCard
+        briefing={model.dailyBriefing}
+        hydrated={model.hydrated}
+        confirmedPlanLine={model.confirmedPlanLine}
+      />
       <WorkoutActionSuggestionsCard
         suggestions={model.actionSuggestions}
         hydrated={model.hydrated}

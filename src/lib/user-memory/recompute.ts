@@ -77,6 +77,8 @@ export type RecomputeUserMemoryInput = {
   injuryPatch?: unknown;
   /** 있으면 선호 종목이 오늘 플랜에 담겼는지 등 문구를 맞춤 */
   todayRoutine?: { title: string; description: string } | null;
+  /** 데일리 체크인 기반 피로 신호(0–100). 있으면 브리핑 점수와 블렌딩 */
+  dailyCheckinFatigue?: number | null;
 };
 
 /**
@@ -93,6 +95,11 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
   const experience_level = experienceLabel(onboarding, prev);
 
   if (workouts.length === 0) {
+    const check = input.dailyCheckinFatigue;
+    const fatigue_level =
+      typeof check === "number" && Number.isFinite(check)
+        ? Math.min(100, Math.max(0, Math.round(check)))
+        : prev?.fatigue_level ?? 12;
     return {
       schemaVersion: 2,
       updatedAt: now.toISOString(),
@@ -102,7 +109,7 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
       weak_points: ["운동 기록이 쌓이면 선호 종목·부족 부위를 자동으로 채웁니다."],
       injury_history: injuries,
       consistency_score: 0,
-      fatigue_level: prev?.fatigue_level ?? 12,
+      fatigue_level,
       personalization_bullets: [],
     };
   }
@@ -110,7 +117,14 @@ export function recomputeUserMemoryProfile(workouts: WorkoutRow[], input: Recomp
   const briefing = buildDailyStatusBriefing(workouts, now);
   const active7 = briefing.metrics.activeDaysLast7;
   const consistency_score = Math.min(100, Math.max(0, Math.round((active7 / 7) * 100)));
-  const fatigue_level = Math.min(100, Math.max(0, Math.round(briefing.fatigueScore)));
+  const checkFatigue = input.dailyCheckinFatigue;
+  const fatigue_level =
+    typeof checkFatigue === "number" && Number.isFinite(checkFatigue)
+      ? Math.min(
+          100,
+          Math.max(0, Math.round(0.5 * checkFatigue + 0.5 * Math.round(briefing.fatigueScore))),
+        )
+      : Math.min(100, Math.max(0, Math.round(briefing.fatigueScore)));
 
   const preferred_exercises = topPreferredExercises(workouts, now, 30, 2, 8);
   const weak_points = computeWeakPoints(workouts, now);

@@ -2,6 +2,7 @@
 
 import { buildHomeActionViewModel, type LocalWeeklyGoal } from "@/lib/dashboard/home-action-state";
 import { LS_GOALS } from "@/lib/dashboard/local-goals";
+import { DAILY_CHECKIN_CHANGED_EVENT, loadDailyCheckin, type DailyCheckinRecord } from "@/lib/habit-loop/daily-checkin";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import type { SiteExperienceConfig } from "@/types/site-settings";
 import type { WorkoutRow } from "@/types/workout";
@@ -34,6 +35,7 @@ function loadOnboarding(): OnboardingProfile | null {
 }
 
 type Args = {
+  userId: string;
   workouts: WorkoutRow[];
   hydrated: boolean;
   experience: SiteExperienceConfig;
@@ -43,16 +45,22 @@ type Args = {
  * 홈 상단 행동 유도 카드들에 필요한 파생 상태.
  * 목표/온보딩은 localStorage와 동기화(다른 카드에서 저장 시 storage 이벤트로 갱신).
  */
-export function useHomeActionViewModel({ workouts, hydrated, experience }: Args) {
+export function useHomeActionViewModel({ userId, workouts, hydrated, experience }: Args) {
   const [goals, setGoals] = useState<LocalWeeklyGoal>({});
   const [profile, setProfile] = useState<OnboardingProfile | null>(null);
+  const [dailyCheckin, setDailyCheckin] = useState<DailyCheckinRecord | null>(null);
 
   useEffect(() => {
     function reloadLocal() {
       setGoals(loadGoals());
       setProfile(loadOnboarding());
+      setDailyCheckin(userId ? loadDailyCheckin(userId) : null);
     }
     reloadLocal();
+
+    function onCheckin() {
+      if (userId) setDailyCheckin(loadDailyCheckin(userId));
+    }
 
     function onStorage(e: StorageEvent) {
       if (e.key === LS_GOALS || e.key === ONBOARDING_LS_KEY || e.key === null) {
@@ -61,15 +69,17 @@ export function useHomeActionViewModel({ workouts, hydrated, experience }: Args)
     }
     window.addEventListener("storage", onStorage);
     window.addEventListener("focus", reloadLocal);
+    window.addEventListener(DAILY_CHECKIN_CHANGED_EVENT, onCheckin);
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("focus", reloadLocal);
+      window.removeEventListener(DAILY_CHECKIN_CHANGED_EVENT, onCheckin);
     };
-  }, []);
+  }, [userId]);
 
   const model = useMemo(
-    () => buildHomeActionViewModel(workouts, profile, goals, hydrated, { experience }),
-    [workouts, profile, goals, hydrated, experience],
+    () => buildHomeActionViewModel(workouts, profile, goals, hydrated, { experience, dailyCheckin }),
+    [workouts, profile, goals, hydrated, experience, dailyCheckin],
   );
 
   return model;

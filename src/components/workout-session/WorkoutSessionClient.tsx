@@ -559,6 +559,23 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
                 <div className="grid grid-cols-2 gap-4 md:gap-5 lg:gap-6">
                   <div>
                     <label className="text-[11px] font-bold uppercase tracking-[0.16em] text-apple-subtle dark:text-zinc-500">횟수</label>
+                    <p className="mt-1 text-[11px] font-semibold text-apple-subtle dark:text-zinc-500">빠른 입력</p>
+                    <div className="mt-2 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setReps((x) => Math.max(1, x - 5))}
+                        className={`${btnGhost} min-h-[48px] flex-1 text-[15px] font-bold tabular-nums text-emerald-800 dark:text-emerald-400`}
+                      >
+                        −5
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReps((x) => x + 5)}
+                        className={`${btnGhost} min-h-[48px] flex-1 text-[15px] font-bold tabular-nums text-emerald-800 dark:text-emerald-400`}
+                      >
+                        +5
+                      </button>
+                    </div>
                     <div className="mt-2 flex gap-2">
                       <button type="button" onClick={() => setReps((x) => Math.max(1, x - 1))} className={`${btnGhost} min-h-[52px] flex-1 text-lg`}>
                         −

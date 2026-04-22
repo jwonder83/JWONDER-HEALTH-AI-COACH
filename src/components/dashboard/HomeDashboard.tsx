@@ -1,6 +1,8 @@
 "use client";
 
 import { WebCoachingSection } from "@/components/coaching/WebCoachingSection";
+import { DailyCheckinModal } from "@/components/habit-loop/DailyCheckinModal";
+import { DailyClosingReportModal } from "@/components/habit-loop/DailyClosingReportModal";
 import { HomeActionHub } from "@/components/dashboard/home/HomeActionHub";
 import { useUserWorkoutUiState } from "@/components/dashboard/home/use-user-workout-ui-state";
 import { OnboardingBanner } from "@/components/dashboard/OnboardingBanner";
@@ -17,10 +19,18 @@ import { WorkoutList } from "@/components/workouts/WorkoutList";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
-import { isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
+import { hasWorkoutToday, isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { loadUserMemoryFromBrowser, saveUserMemoryToBrowser } from "@/lib/user-memory/browser-storage";
 import { recomputeUserMemoryProfile } from "@/lib/user-memory/recompute";
+import { applyDailyCheckinToRoutinePlan } from "@/lib/habit-loop/apply-checkin-to-routine";
+import { conditionToFatigueSignal, loadDailyCheckin } from "@/lib/habit-loop/daily-checkin";
+import {
+  DAILY_CLOSE_REPORT_CHANGED_EVENT,
+  markDailyCloseReportShown,
+  wasDailyCloseReportShown,
+  type DailyCloseReportKind,
+} from "@/lib/habit-loop/daily-closing-report";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
 import type { SiteSettingsMerged } from "@/types/site-settings";
@@ -85,6 +95,9 @@ export function HomeDashboard({ userId, site }: Props) {
   const [hydrated, setHydrated] = useState(false);
   const [toast, setToast] = useState<{ message: string; variant: "default" | "achievement" } | null>(null);
   const [lastXpFloat, setLastXpFloat] = useState<LastXpFloat | null>(null);
+  const [checkinOpen, setCheckinOpen] = useState(false);
+  const [habitLoopTick, setHabitLoopTick] = useState(0);
+  const [closeReport, setCloseReport] = useState<{ open: boolean; kind: DailyCloseReportKind }>({ open: false, kind: "completed" });
   const userWorkoutUiState = useUserWorkoutUiState(workouts, hydrated, site.experience.missedDayHourLocal);
 
   const navItems = useMemo(
@@ -141,6 +154,32 @@ export function HomeDashboard({ userId, site }: Props) {
 
   useEffect(() => {
     if (!hydrated || typeof window === "undefined") return;
+    if (!loadDailyCheckin(userId)) {
+      setCheckinOpen(true);
+    } else {
+      setCheckinOpen(false);
+    }
+  }, [hydrated, userId]);
+
+  useEffect(() => {
+    if (!hydrated || typeof window === "undefined") return;
+    if (!loadDailyCheckin(userId)) return;
+
+    const todayDone = hasWorkoutToday(workouts, new Date());
+    const h = new Date().getHours();
+    const evening = h >= 21;
+
+    if (todayDone && !wasDailyCloseReportShown(userId, "completed")) {
+      setCloseReport({ open: true, kind: "completed" });
+      return;
+    }
+    if (!todayDone && evening && workouts.length > 0 && !wasDailyCloseReportShown(userId, "missed_evening")) {
+      setCloseReport({ open: true, kind: "missed_evening" });
+    }
+  }, [hydrated, userId, workouts, habitLoopTick]);
+
+  useEffect(() => {
+    if (!hydrated || typeof window === "undefined") return;
     let onboarding: OnboardingProfile | null = null;
     try {
       const raw = window.localStorage.getItem(ONBOARDING_LS_KEY);
@@ -149,12 +188,18 @@ export function HomeDashboard({ userId, site }: Props) {
       onboarding = null;
     }
     const prev = loadUserMemoryFromBrowser(userId);
-    const routine = buildOptimizedTodayRoutine(onboarding, workouts, new Date());
+    const checkin = loadDailyCheckin(userId);
+    const signal = checkin ? conditionToFatigueSignal(checkin.condition) : null;
+    const routine = applyDailyCheckinToRoutinePlan(
+      buildOptimizedTodayRoutine(onboarding, workouts, new Date()),
+      checkin,
+    );
     const next = recomputeUserMemoryProfile(workouts, {
       onboarding,
       previous: prev,
       injuryPatch: prev?.injury_history,
       todayRoutine: { title: routine.title, description: routine.description },
+      dailyCheckinFatigue: signal,
     });
     saveUserMemoryToBrowser(userId, next);
   }, [hydrated, workouts, userId]);
@@ -285,6 +330,7 @@ export function HomeDashboard({ userId, site }: Props) {
         </div>
 
         <HomeActionHub
+          userId={userId}
           workouts={workouts}
           hydrated={hydrated}
           userWorkoutUiState={userWorkoutUiState}
@@ -516,6 +562,28 @@ export function HomeDashboard({ userId, site }: Props) {
       </main>
 
       <Toast message={toast?.message ?? null} variant={toast?.variant ?? "default"} onDismiss={() => setToast(null)} durationMs={toast?.variant === "achievement" ? 5200 : 4200} />
+
+      <DailyCheckinModal
+        userId={userId}
+        open={hydrated && checkinOpen}
+        onCompleted={() => {
+          setCheckinOpen(false);
+          setHabitLoopTick((t) => t + 1);
+        }}
+      />
+
+      <DailyClosingReportModal
+        open={closeReport.open}
+        kind={closeReport.kind}
+        workouts={workouts}
+        onDismiss={() => {
+          markDailyCloseReportShown(userId, closeReport.kind);
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event(DAILY_CLOSE_REPORT_CHANGED_EVENT));
+          }
+          setCloseReport((s) => ({ ...s, open: false }));
+        }}
+      />
     </div>
   );
 }

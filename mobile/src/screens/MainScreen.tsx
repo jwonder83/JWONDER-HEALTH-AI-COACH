@@ -158,7 +158,11 @@ export function MainScreen() {
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.title}>JWonder</Text>
+        <View style={styles.titleWrap}>
+          <Text style={styles.title} numberOfLines={1}>
+            Jwonder AI Coach
+          </Text>
+        </View>
         <View style={styles.headerActions}>
           <Pressable onPress={handleNativeRefresh} style={styles.iconBtn} accessibilityLabel="새로고침">
             <Ionicons name="refresh" size={22} color="#047857" />
@@ -229,6 +233,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: 'rgba(15,23,42,0.08)',
     backgroundColor: '#fff',
+  },
+  titleWrap: {
+    flex: 1,
+    minWidth: 0,
+    marginRight: 8,
   },
   title: {
     fontSize: 18,

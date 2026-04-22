@@ -41,9 +41,11 @@ function decisionKindBadgeClass(kind: BriefingDecisionKind): string {
 type Props = {
   briefing: DailyStatusBriefing | null;
   hydrated: boolean;
+  /** 체크인 후 확정 플랜 한 줄(상태→결정→실행) */
+  confirmedPlanLine?: string | null;
 };
 
-export function DailyStatusBriefingCard({ briefing, hydrated }: Props) {
+export function DailyStatusBriefingCard({ briefing, hydrated, confirmedPlanLine }: Props) {
   return (
     <section className={shell} aria-labelledby="daily-briefing-heading" aria-busy={!hydrated}>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -70,6 +72,14 @@ export function DailyStatusBriefingCard({ briefing, hydrated }: Props) {
         </div>
       ) : !briefing ? null : (
         <>
+          {confirmedPlanLine ? (
+            <div className="mt-4 rounded-xl border-2 border-emerald-500/35 bg-gradient-to-br from-emerald-50/95 to-teal-50/70 px-3.5 py-3.5 dark:border-emerald-600/40 dark:from-emerald-950/40 dark:to-teal-950/25">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-800 dark:text-emerald-200/90">확정 플랜</p>
+              <p className="mt-2 text-[15px] font-extrabold leading-snug tracking-[-0.02em] text-emerald-950 dark:text-emerald-50 sm:text-[16px]">
+                {confirmedPlanLine}
+              </p>
+            </div>
+          ) : null}
           {/* 1. 상태 분석 */}
           <div className="mt-4 rounded-xl border border-violet-200/80 bg-white/85 px-3.5 py-3 dark:border-violet-900/45 dark:bg-zinc-900/45">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-700/85 dark:text-violet-300/85">상태 분석</p>

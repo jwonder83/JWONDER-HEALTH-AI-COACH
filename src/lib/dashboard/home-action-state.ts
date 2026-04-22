@@ -3,6 +3,10 @@ import { buildWorkoutActionSuggestions, type WorkoutActionSuggestion } from "@/l
 import { hasWorkoutToday, recentWorkouts } from "@/lib/dashboard/insights";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { formatEstimatedLabel, type TodayRoutinePlan } from "@/lib/routine/today-routine-plan";
+import { applyDailyCheckinToRoutinePlan } from "@/lib/habit-loop/apply-checkin-to-routine";
+import type { DailyCheckinRecord } from "@/lib/habit-loop/daily-checkin";
+import { conditionLabelKo, conditionToFatigueSignal } from "@/lib/habit-loop/daily-checkin";
+import { mergeDailyCheckinIntoBriefing } from "@/lib/habit-loop/merge-checkin-briefing";
 import type { OnboardingProfile } from "@/lib/onboarding/types";
 import { DEFAULT_SITE_SETTINGS } from "@/lib/site-settings/defaults";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
@@ -63,11 +67,19 @@ export type HomeActionViewModel = {
   actionSuggestions: WorkoutActionSuggestion[];
   /** 운동 세션 코치 권장 휴식(초) — 홈 카피와 동기화 */
   workoutRestTargetSeconds: number;
+  /** 체크인 완료 후 표시하는 확정 플랜 한 줄(상태→결정) */
+  confirmedPlanLine: string | null;
+  /** 오늘 데일리 체크인 제출 여부 */
+  hasDailyCheckin: boolean;
+  /** 마지막 운동 이후 캘린더 일수(null이면 기록 없음) */
+  daysSinceLastWorkout: number | null;
 };
 
 export type BuildHomeActionViewModelOpts = {
   now?: Date;
   experience?: SiteExperienceConfig;
+  /** 오늘 제출된 데일리 체크인(로컬). 없으면 브리핑·루틴은 기록 기준만 사용 */
+  dailyCheckin?: DailyCheckinRecord | null;
 };
 
 function buildCoachLine(args: {
@@ -170,6 +182,20 @@ function buildCoachLineReason(args: {
   return `${bits.join(" · ")}입니다.`;
 }
 
+function buildConfirmedPlanLine(
+  briefing: DailyStatusBriefing,
+  routine: TodayRoutinePlan,
+  checkin: DailyCheckinRecord | null,
+): string | null {
+  if (!checkin) return null;
+  const cond = conditionLabelKo(checkin.condition);
+  if (briefing.decisionKind === "rest") {
+    return `오늘은 컨디션이 ${cond}입니다. 회복·가벼운 루틴을 우선하고, 무리한 볼륨은 피하세요.`;
+  }
+  const pct = briefing.recommendedIntensityPercent;
+  return `오늘은 컨디션이 ${cond}입니다. → 강도 ${pct}%로 「${routine.title}」을(를) 진행하세요.`;
+}
+
 export function buildHomeActionViewModel(
   workouts: WorkoutRow[],
   profile: OnboardingProfile | null,
@@ -179,6 +205,7 @@ export function buildHomeActionViewModel(
 ): HomeActionViewModel {
   const now = opts?.now ?? new Date();
   const exp = opts?.experience ?? DEFAULT_SITE_SETTINGS.experience;
+  const checkin = opts?.dailyCheckin ?? null;
   const todayDone = hasWorkoutToday(workouts, now);
   const recoveryAfterMissedYesterday = isRecoveryEaseRoutineDay(workouts, now);
   const streak = computeLoggingStreakMerged(workouts, now);
@@ -197,11 +224,14 @@ export function buildHomeActionViewModel(
   const goalPct =
     target !== null ? Math.min(100, Math.round((week.rowCount / target) * 100)) : null;
 
-  const routine = buildOptimizedTodayRoutine(profile, workouts, now);
+  let routine = buildOptimizedTodayRoutine(profile, workouts, now);
+  routine = applyDailyCheckinToRoutinePlan(routine, checkin);
+  const checkinFatigueSignal = checkin ? conditionToFatigueSignal(checkin.condition) : null;
   const userMemory = recomputeUserMemoryProfile(workouts, {
     now,
     onboarding: profile,
     todayRoutine: { title: routine.title, description: routine.description },
+    dailyCheckinFatigue: checkinFatigueSignal,
   });
   const estimatedDurationLabel = formatEstimatedLabel(routine.estimatedMinutesMin, routine.estimatedMinutesMax);
   const coachLine = buildCoachLine({
@@ -230,13 +260,18 @@ export function buildHomeActionViewModel(
     createdAt: w.created_at,
   }));
 
-  const dailyBriefing = hydrated
+  const baseDailyBriefing = hydrated
     ? buildDailyStatusBriefing(workouts, now, {
         highLoadDayMinRows: exp.briefingHighLoadDayMinRows,
         highLoadDayMinVolume: exp.briefingHighLoadDayMinVolume,
       })
     : null;
+  const dailyBriefing =
+    baseDailyBriefing && checkin ? mergeDailyCheckinIntoBriefing(baseDailyBriefing, checkin) : baseDailyBriefing;
   const actionSuggestions = hydrated ? buildWorkoutActionSuggestions(workouts, now) : [];
+
+  const sinceLast = calendarDaysSinceLastWorkout(workouts, now);
+  const confirmedPlanLine = dailyBriefing ? buildConfirmedPlanLine(dailyBriefing, routine, checkin) : null;
 
   return {
     hydrated,
@@ -257,5 +292,8 @@ export function buildHomeActionViewModel(
     dailyBriefing,
     actionSuggestions,
     workoutRestTargetSeconds: exp.workoutRestTargetSeconds,
+    confirmedPlanLine,
+    hasDailyCheckin: Boolean(checkin),
+    daysSinceLastWorkout: sinceLast,
   };
 }

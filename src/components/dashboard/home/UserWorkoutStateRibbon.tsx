@@ -14,6 +14,13 @@ function stateLabel(s: UserWorkoutUiState): string {
   return "운동 미완";
 }
 
+function habitPhase(s: UserWorkoutUiState): "pre" | "active" | "completed" | "missed" {
+  if (s === "idle") return "pre";
+  if (s === "active") return "active";
+  if (s === "completed") return "completed";
+  return "missed";
+}
+
 export function UserWorkoutStateRibbon({ state }: Props) {
   const shell =
     state === "completed"
@@ -38,6 +45,7 @@ export function UserWorkoutStateRibbon({ state }: Props) {
       className={`rounded-2xl border-2 px-4 py-3.5 shadow-sm sm:px-5 sm:py-4 ${shell}`}
       aria-label={`오늘 운동 상태: ${stateLabel(state)}`}
       data-user-workout-state={state}
+      data-habit-phase={habitPhase(state)}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">

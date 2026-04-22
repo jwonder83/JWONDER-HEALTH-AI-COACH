@@ -40,7 +40,7 @@ export async function scheduleEngagementNotifications(): Promise<void> {
   await Notifications.scheduleNotificationAsync({
     identifier: IDS.morning,
     content: {
-      title: 'JWonder',
+      title: 'Jwonder AI Coach',
       body: '오늘 운동 플랜이 준비되었습니다.',
       data: { url: `${WEB_BASE_URL}/` },
       sound: 'default',
@@ -56,8 +56,8 @@ export async function scheduleEngagementNotifications(): Promise<void> {
   await Notifications.scheduleNotificationAsync({
     identifier: IDS.afternoon,
     content: {
-      title: 'JWonder',
-      body: '아직 운동을 시작하지 않았습니다.',
+      title: 'Jwonder AI Coach',
+      body: '2일 이상 공백이면 가볍게 다시 시작해요. 빠른 루틴을 열어볼까요?',
       data: { url: `${WEB_BASE_URL}/workout` },
       sound: 'default',
     },
@@ -72,7 +72,7 @@ export async function scheduleEngagementNotifications(): Promise<void> {
   await Notifications.scheduleNotificationAsync({
     identifier: IDS.evening,
     content: {
-      title: 'JWonder',
+      title: 'Jwonder AI Coach',
       body: '오늘 놓치면 streak가 끊깁니다.',
       data: { url: `${WEB_BASE_URL}/records` },
       sound: 'default',
