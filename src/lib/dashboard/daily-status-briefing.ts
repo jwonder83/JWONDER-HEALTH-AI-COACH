@@ -1,3 +1,4 @@
+import { loadPlanIntensityBias } from "@/lib/plan-feedback/closing-report-plan-feedback";
 import { volumeForRow } from "@/lib/workouts/period-stats";
 import type { WorkoutRow } from "@/types/workout";
 
@@ -269,10 +270,12 @@ export function buildDailyStatusBriefing(
       daysSinceLastWorkout: null,
       consecutiveHighLoadDays: 0,
     };
+    const biasEmpty = loadPlanIntensityBias();
+    const recEmpty = clamp(Math.round(100 + biasEmpty), 5, 100);
     return {
       fatigue: "low",
       fatigueScore: 12,
-      recommendedIntensityPercent: 100,
+      recommendedIntensityPercent: recEmpty,
       decisionKind: "standard",
       statusSummary: "저장된 운동 기록이 없습니다.",
       aiMessage: "첫 세트를 기록해 보세요.",
@@ -322,7 +325,11 @@ export function buildDailyStatusBriefing(
   const fatigue = mapScoreToLevel(score);
 
   const restDayRecommended = consecutiveHighLoadDays >= 3 && fatigue === "high";
-  const recommendedIntensityPercent = restDayRecommended ? 0 : intensityForLevel(fatigue);
+  const bias = loadPlanIntensityBias();
+  let recommendedIntensityPercent = restDayRecommended ? 0 : intensityForLevel(fatigue);
+  if (!restDayRecommended) {
+    recommendedIntensityPercent = clamp(Math.round(recommendedIntensityPercent + bias), 5, 100);
+  }
 
   const decisionKind: BriefingDecisionKind = restDayRecommended
     ? "rest"

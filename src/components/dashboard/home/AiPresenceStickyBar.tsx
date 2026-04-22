@@ -8,6 +8,8 @@ type Props = {
   hydrated: boolean;
   /** 주간 목표 대비 0–100 */
   weekProgressPercent: number | null;
+  /** 홈 루프 CTA — 기본 /workout */
+  workoutCtaHref?: string;
 };
 
 function milestoneClass(streak: number, n: number): string {
@@ -18,7 +20,7 @@ function milestoneClass(streak: number, n: number): string {
   return "border-neutral-200 bg-white/80 text-apple-subtle dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500";
 }
 
-export function AiPresenceStickyBar({ model, hydrated, weekProgressPercent }: Props) {
+export function AiPresenceStickyBar({ model, hydrated, weekProgressPercent, workoutCtaHref = "/workout" }: Props) {
   if (!hydrated) {
     return (
       <div className="flex items-center gap-3 py-1" aria-busy="true">
@@ -83,7 +85,7 @@ export function AiPresenceStickyBar({ model, hydrated, weekProgressPercent }: Pr
             ))}
           </div>
           <Link
-            href="/workout"
+            href={workoutCtaHref}
             className="inline-flex min-h-[36px] items-center justify-center rounded-lg border border-black bg-black px-3 text-[12px] font-bold text-white transition hover:bg-neutral-800 dark:border-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
           >
             운동

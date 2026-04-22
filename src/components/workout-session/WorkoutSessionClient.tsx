@@ -1,10 +1,21 @@
 "use client";
 
-import { getLastSameExercise, isNewVolumePr, rowVolume, volumeFromNumbers } from "@/lib/dashboard/insights";
+import { AiPresenceStickyBar } from "@/components/dashboard/home/AiPresenceStickyBar";
+import { useUserWorkoutUiState } from "@/components/dashboard/home/use-user-workout-ui-state";
+import { AiManagedLoopRibbon } from "@/components/habit-loop/AiManagedLoopRibbon";
+import { TimeBandInterventionBar } from "@/components/habit-loop/TimeBandInterventionBar";
+import { buildAiPresenceModel } from "@/lib/dashboard/ai-presence-track";
+import { getLastSameExercise, hasWorkoutToday, isNewVolumePr, rowVolume, volumeFromNumbers } from "@/lib/dashboard/insights";
+import { loadLocalGoals } from "@/lib/dashboard/local-goals";
+import { MISSED_DAY_HOUR_LOCAL } from "@/lib/dashboard/user-workout-ui-state";
+import { DAILY_CHECKIN_CHANGED_EVENT, loadDailyCheckin } from "@/lib/habit-loop/daily-checkin";
+import { buildAiManagedLoopSnapshot } from "@/lib/habit-loop/ai-managed-loop";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
 import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
+import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
+import { computeLoggingStreakMerged, STREAK_PREFERENCE_CHANGED_EVENT } from "@/lib/workouts/streak";
 import { recordWorkoutXp } from "@/lib/gamification/reward-storage";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
 import { postToNativeApp } from "@/lib/native-app-bridge";
@@ -90,7 +101,7 @@ function SessionFlowStepper({ phase }: { phase: Phase }) {
   );
 }
 
-type Props = { userId: string; restTargetSeconds?: number };
+type Props = { userId: string; restTargetSeconds?: number; missedDayHourLocal?: number };
 
 const fieldBase =
   "w-full rounded-xl border border-neutral-200 bg-white px-4 py-3.5 text-apple-ink shadow-sm outline-none transition focus:border-black focus:ring-2 focus:ring-black/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-400 dark:focus:ring-zinc-500/30";
@@ -106,7 +117,8 @@ const btnPrimary = `${btnPrimaryBase} w-full`;
 const cardMuted =
   "rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900/80";
 
-export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
+export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourLocal }: Props) {
+  const missedThresh = missedDayHourLocal ?? MISSED_DAY_HOUR_LOCAL;
   const restTargetSec = useMemo(
     () => Math.min(600, Math.max(15, Math.round(restTargetSeconds ?? 60))),
     [restTargetSeconds],
@@ -134,6 +146,9 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
   const [coachBetween, setCoachBetween] = useState<CoachBetweenPhase>("lifting");
   const [restStartedAt, setRestStartedAt] = useState<number | null>(null);
   const [coachCue, setCoachCue] = useState<string | null>(null);
+  const [goalsVersion, setGoalsVersion] = useState(0);
+  const [streakPreferenceTick, setStreakPreferenceTick] = useState(0);
+  const [loopTick, setLoopTick] = useState(0);
   const coachModeRef = useRef(coachMode);
   coachModeRef.current = coachMode;
   const coachCueTimerRef = useRef<number | null>(null);
@@ -178,6 +193,27 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
   }, [refresh]);
 
   useEffect(() => {
+    const bumpGoals = () => setGoalsVersion((v) => v + 1);
+    window.addEventListener("jws-goals-changed", bumpGoals);
+    return () => window.removeEventListener("jws-goals-changed", bumpGoals);
+  }, []);
+
+  useEffect(() => {
+    const bump = () => setStreakPreferenceTick((n) => n + 1);
+    window.addEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+    return () => window.removeEventListener(STREAK_PREFERENCE_CHANGED_EVENT, bump);
+  }, []);
+
+  useEffect(() => {
+    const onCheckin = (e: Event) => {
+      const d = (e as CustomEvent<{ userId?: string }>).detail;
+      if (!d?.userId || d.userId === userId) setLoopTick((n) => n + 1);
+    };
+    window.addEventListener(DAILY_CHECKIN_CHANGED_EVENT, onCheckin);
+    return () => window.removeEventListener(DAILY_CHECKIN_CHANGED_EVENT, onCheckin);
+  }, [userId]);
+
+  useEffect(() => {
     writeWorkoutSessionActive(phase === "active");
   }, [phase]);
 
@@ -193,6 +229,63 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
   const routine: TodayRoutinePlan = useMemo(
     () => buildOptimizedTodayRoutine(profile, workouts, new Date()),
     [profile, workouts],
+  );
+
+  const userWorkoutUiState = useUserWorkoutUiState(workouts, hydrated, missedThresh);
+  const todayWorkoutComplete = useMemo(() => hasWorkoutToday(workouts, new Date()), [workouts]);
+
+  const weekBounds = useMemo(() => {
+    const mon = startOfWeekMonday();
+    return { mon, sun: endOfWeekSunday(mon) };
+  }, []);
+
+  const weekRollup = useMemo(
+    () => rollupPeriod(workouts, weekBounds.mon, weekBounds.sun),
+    [workouts, weekBounds.mon, weekBounds.sun],
+  );
+
+  const weeklySessionTarget = useMemo(() => {
+    const g = loadLocalGoals();
+    return g.weeklySessionTarget && g.weeklySessionTarget > 0 ? g.weeklySessionTarget : null;
+  }, [goalsVersion, hydrated]);
+
+  const streakMerged = useMemo(() => computeLoggingStreakMerged(workouts, new Date()), [workouts, streakPreferenceTick]);
+
+  const weekProgressPercent = useMemo(() => {
+    if (!weeklySessionTarget) return null;
+    return Math.min(100, Math.round((weekRollup.rowCount / weeklySessionTarget) * 100));
+  }, [weekRollup.rowCount, weeklySessionTarget]);
+
+  const aiPresence = useMemo(
+    () =>
+      buildAiPresenceModel({
+        workouts,
+        hydrated,
+        now: new Date(),
+        weeklySessionTarget,
+        weeklySessionCurrent: weekRollup.rowCount,
+        streakMerged,
+        userWorkoutUiState,
+        todayWorkoutComplete,
+      }),
+    [workouts, hydrated, weeklySessionTarget, weekRollup.rowCount, streakMerged, userWorkoutUiState, todayWorkoutComplete, streakPreferenceTick],
+  );
+
+  const aiLoop = useMemo(
+    () =>
+      buildAiManagedLoopSnapshot({
+        hydrated,
+        hasDailyCheckin: Boolean(loadDailyCheckin(userId)),
+        checkinModalOpen: false,
+        postBriefingOpen: false,
+        closingReportOpen: false,
+        todayWorkoutComplete,
+        userWorkoutUiState,
+        now: new Date(),
+        workoutEntryHref: "#workout-session-loop",
+        habitLoopHomeHref: "/",
+      }),
+    [hydrated, userId, todayWorkoutComplete, userWorkoutUiState, workouts, loopTick],
   );
 
   useEffect(() => {
@@ -341,7 +434,28 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
   const restBlocksSave = inRestPhase;
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 pb-16 pt-6 text-apple-ink sm:px-6 sm:pt-8 md:max-w-3xl md:pb-20 lg:max-w-6xl lg:px-10 lg:pt-10 dark:text-zinc-100">
+    <>
+      <div className="sticky top-0 z-40 border-b border-neutral-200/80 bg-[color-mix(in_srgb,var(--color-apple-surface)_88%,white)] backdrop-blur-md dark:border-zinc-800/90 dark:bg-zinc-950/85">
+        <div className="mx-auto w-full max-w-lg px-4 py-2 sm:px-6 md:max-w-3xl lg:max-w-6xl lg:px-10">
+          <AiManagedLoopRibbon loop={aiLoop} />
+          <TimeBandInterventionBar
+            hydrated={hydrated}
+            todayWorkoutComplete={todayWorkoutComplete}
+            primaryCtaHref="#workout-session-loop"
+          />
+          <AiPresenceStickyBar
+            model={aiPresence}
+            hydrated={hydrated}
+            weekProgressPercent={weekProgressPercent}
+            workoutCtaHref="#workout-session-loop"
+          />
+        </div>
+      </div>
+
+      <div
+        id="workout-session-loop"
+        className="mx-auto w-full max-w-lg px-4 pb-16 pt-6 text-apple-ink sm:px-6 sm:pt-8 md:max-w-3xl md:pb-20 lg:max-w-6xl lg:px-10 lg:pt-10 dark:text-zinc-100"
+      >
       <header className="mb-6 shrink-0 border-b border-neutral-200 pb-4 dark:border-zinc-800 sm:mb-8 lg:mb-10">
         <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300/90">
           시작 → 진행 → 완료 한 흐름
@@ -701,6 +815,7 @@ export function WorkoutSessionClient({ userId, restTargetSeconds }: Props) {
           </div>
         ) : null}
       </main>
-    </div>
+      </div>
+    </>
   );
 }

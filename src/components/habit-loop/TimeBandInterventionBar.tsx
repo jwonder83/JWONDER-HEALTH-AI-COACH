@@ -7,6 +7,8 @@ import { useEffect, useMemo, useState } from "react";
 type Props = {
   hydrated: boolean;
   todayWorkoutComplete: boolean;
+  /** 기본 /workout — 홈 루프에서는 /#section-input */
+  primaryCtaHref?: string;
 };
 
 function shellClass(intervention: TimeBandIntervention): string {
@@ -33,7 +35,7 @@ function animationClass(urgency: TimeBandIntervention["urgency"]): string {
 /**
  * 홈 상단 고정 — 시간대마다 문구·톤이 강해짐. 운동 완료 시 비표시.
  */
-export function TimeBandInterventionBar({ hydrated, todayWorkoutComplete }: Props) {
+export function TimeBandInterventionBar({ hydrated, todayWorkoutComplete, primaryCtaHref = "/workout" }: Props) {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export function TimeBandInterventionBar({ hydrated, todayWorkoutComplete }: Prop
           <p className="mt-0.5 text-[0.95rem] font-bold leading-snug tracking-[-0.02em] sm:text-[1.02rem]">{intervention.message}</p>
         </div>
         <Link
-          href="/workout"
+          href={primaryCtaHref}
           className={`inline-flex min-h-[48px] shrink-0 items-center justify-center rounded-xl px-5 py-3 text-center text-[13px] font-extrabold tracking-[-0.02em] transition active:scale-[0.98] sm:min-h-[52px] sm:min-w-[10.5rem] sm:px-6 sm:text-[14px] ${
             intervention.urgency >= 2
               ? "bg-rose-700 text-white shadow-md hover:bg-rose-800 dark:bg-rose-600 dark:hover:bg-rose-500"

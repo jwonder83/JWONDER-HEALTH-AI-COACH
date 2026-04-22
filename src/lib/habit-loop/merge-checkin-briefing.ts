@@ -1,5 +1,6 @@
 import type { DailyCheckinRecord } from "@/lib/habit-loop/daily-checkin";
 import type { BriefingDecisionKind, DailyStatusBriefing, FatigueLevel } from "@/lib/dashboard/daily-status-briefing";
+import { loadPlanIntensityBias } from "@/lib/plan-feedback/closing-report-plan-feedback";
 
 function clamp(n: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, n));
@@ -41,6 +42,10 @@ export function mergeDailyCheckinIntoBriefing(base: DailyStatusBriefing, checkin
   if (checkin.condition === "good") recommendedIntensityPercent = Math.min(100, recommendedIntensityPercent + 5);
 
   recommendedIntensityPercent = clamp(recommendedIntensityPercent, 0, 100);
+  if (recommendedIntensityPercent > 0) {
+    const bias = loadPlanIntensityBias();
+    recommendedIntensityPercent = clamp(Math.round(recommendedIntensityPercent + bias), 5, 100);
+  }
 
   const decisionKind: BriefingDecisionKind =
     recommendedIntensityPercent <= 0 ? "rest" : fatigue === "high" ? "intensity_cap" : "standard";

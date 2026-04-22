@@ -1,7 +1,9 @@
 "use client";
 
 import { buildDailyStatusBriefing } from "@/lib/dashboard/daily-status-briefing";
+import { loadLocalGoals } from "@/lib/dashboard/local-goals";
 import type { DailyCloseReportKind } from "@/lib/habit-loop/daily-closing-report";
+import { buildClosingReportPlanFeedbackUi } from "@/lib/plan-feedback/closing-report-plan-feedback";
 import { volumeForRow } from "@/lib/workouts/period-stats";
 import { computeLoggingStreakMerged } from "@/lib/workouts/streak";
 import type { WorkoutRow } from "@/types/workout";
@@ -49,6 +51,19 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
     return Math.min(100, Math.round((n / targetSets) * 100));
   }, [kind, todayList.length]);
 
+  const planFeedbackUi = useMemo(() => {
+    const g = loadLocalGoals();
+    const hasWeekly = !!(g.weeklySessionTarget && g.weeklySessionTarget > 0);
+    return buildClosingReportPlanFeedbackUi(kind, todayList.length, hasWeekly);
+  }, [kind, todayList.length, open]);
+
+  const planFeedbackShell =
+    planFeedbackUi.tone === "success"
+      ? "border-emerald-200/90 bg-emerald-50/95 text-emerald-950 dark:border-emerald-800/50 dark:bg-emerald-950/40 dark:text-emerald-50"
+      : planFeedbackUi.tone === "fail"
+        ? "border-rose-200/90 bg-rose-50/95 text-rose-950 dark:border-rose-800/50 dark:bg-rose-950/40 dark:text-rose-50"
+        : "border-amber-200/90 bg-amber-50/95 text-amber-950 dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-50";
+
   const volumeToday = useMemo(() => {
     const v = todayList.reduce((a, w) => a + volumeForRow(w), 0);
     return Math.round(v * 10) / 10;
@@ -95,6 +110,14 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
               {kind === "completed"
                 ? `완료 · 수행률 약 ${completionPct}% · 볼륨 합 ${volumeToday}`
                 : "미완료 · 수행률 0%"}
+            </p>
+          </div>
+          <div className={`rounded-xl border px-4 py-3.5 ${planFeedbackShell}`}>
+            <p className="text-[10px] font-bold uppercase tracking-wide opacity-80">다음 계획 반영</p>
+            <p className="mt-1 text-[15px] font-bold leading-snug">{planFeedbackUi.headline}</p>
+            <p className="mt-1 text-[14px] font-semibold leading-relaxed opacity-95">{planFeedbackUi.effectLine}</p>
+            <p className="mt-2 text-[11px] font-medium leading-snug opacity-80">
+              닫기 시 위 내용이 저장되어 내일 권장 강도·주간 목표에 반영됩니다.
             </p>
           </div>
           <div className={innerBlock}>

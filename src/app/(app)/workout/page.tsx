@@ -12,5 +12,11 @@ export default async function WorkoutPage() {
     redirect("/login");
   }
   const site = await getSiteSettings();
-  return <WorkoutSessionClient userId={user.id} restTargetSeconds={site.experience.workoutRestTargetSeconds} />;
+  return (
+    <WorkoutSessionClient
+      userId={user.id}
+      restTargetSeconds={site.experience.workoutRestTargetSeconds}
+      missedDayHourLocal={site.experience.missedDayHourLocal}
+    />
+  );
 }

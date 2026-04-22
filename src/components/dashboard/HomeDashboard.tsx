@@ -4,6 +4,7 @@ import { WebCoachingSection } from "@/components/coaching/WebCoachingSection";
 import { DailyCheckinModal } from "@/components/habit-loop/DailyCheckinModal";
 import { PostCheckinBriefingModal } from "@/components/habit-loop/PostCheckinBriefingModal";
 import { DailyClosingReportModal } from "@/components/habit-loop/DailyClosingReportModal";
+import { AiManagedLoopRibbon } from "@/components/habit-loop/AiManagedLoopRibbon";
 import { AiPresenceStickyBar } from "@/components/dashboard/home/AiPresenceStickyBar";
 import { TimeBandInterventionBar } from "@/components/habit-loop/TimeBandInterventionBar";
 import { HomeActionHub } from "@/components/dashboard/home/HomeActionHub";
@@ -23,6 +24,7 @@ import { createClient } from "@/lib/supabase/client";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { notifyWorkoutsMutated } from "@/lib/workouts/workouts-events";
 import { buildAiPresenceModel } from "@/lib/dashboard/ai-presence-track";
+import { buildDailyStatusBriefing } from "@/lib/dashboard/daily-status-briefing";
 import { hasWorkoutToday, isNewVolumePr, volumeFromNumbers } from "@/lib/dashboard/insights";
 import { LS_GOALS, loadLocalGoals } from "@/lib/dashboard/local-goals";
 import { ONBOARDING_LS_KEY, type OnboardingProfile } from "@/lib/onboarding/types";
@@ -30,12 +32,15 @@ import { loadUserMemoryFromBrowser, saveUserMemoryToBrowser } from "@/lib/user-m
 import { recomputeUserMemoryProfile } from "@/lib/user-memory/recompute";
 import { applyDailyCheckinToRoutinePlan } from "@/lib/habit-loop/apply-checkin-to-routine";
 import { conditionToFatigueSignal, loadDailyCheckin } from "@/lib/habit-loop/daily-checkin";
+import { mergeDailyCheckinIntoBriefing } from "@/lib/habit-loop/merge-checkin-briefing";
 import {
   DAILY_CLOSE_REPORT_CHANGED_EVENT,
   markDailyCloseReportShown,
   wasDailyCloseReportShown,
   type DailyCloseReportKind,
 } from "@/lib/habit-loop/daily-closing-report";
+import { applyClosingReportFeedback } from "@/lib/plan-feedback/closing-report-plan-feedback";
+import { buildAiManagedLoopSnapshot } from "@/lib/habit-loop/ai-managed-loop";
 import { buildOptimizedTodayRoutine } from "@/lib/routine/adaptive-routine-engine";
 import { computeLoggingStreakMerged, STREAK_PREFERENCE_CHANGED_EVENT } from "@/lib/workouts/streak";
 import { endOfWeekSunday, rollupPeriod, startOfWeekMonday } from "@/lib/workouts/period-stats";
@@ -168,6 +173,45 @@ export function HomeDashboard({ userId, site }: Props) {
   const streakMerged = useMemo(() => computeLoggingStreakMerged(workouts, new Date()), [workouts, streakPreferenceTick]);
 
   const todayWorkoutComplete = useMemo(() => hasWorkoutToday(workouts, new Date()), [workouts]);
+
+  const aiLoop = useMemo(
+    () =>
+      buildAiManagedLoopSnapshot({
+        hydrated,
+        hasDailyCheckin: Boolean(loadDailyCheckin(userId)),
+        checkinModalOpen: checkinOpen,
+        postBriefingOpen: postCheckinBriefingOpen,
+        closingReportOpen: closeReport.open,
+        todayWorkoutComplete,
+        userWorkoutUiState,
+        now: new Date(),
+        workoutEntryHref: "/#section-input",
+      }),
+    [
+      hydrated,
+      userId,
+      checkinOpen,
+      postCheckinBriefingOpen,
+      closeReport.open,
+      todayWorkoutComplete,
+      userWorkoutUiState,
+      habitLoopTick,
+    ],
+  );
+
+  const sessionCoachLine = useMemo(() => {
+    if (!hydrated) return null;
+    const base = buildDailyStatusBriefing(workouts, new Date(), {
+      highLoadDayMinRows: site.experience.briefingHighLoadDayMinRows,
+      highLoadDayMinVolume: site.experience.briefingHighLoadDayMinVolume,
+    });
+    const checkin = loadDailyCheckin(userId);
+    const b = checkin ? mergeDailyCheckinIntoBriefing(base, checkin) : base;
+    if (b.decisionKind === "rest") {
+      return "AI 코치: 오늘은 회복 우선이에요. 가벼운 세트만 남기거나 쉬어도 괜찮아요.";
+    }
+    return `AI 코치(세트·휴식): 오늘 권장 강도 약 ${b.recommendedIntensityPercent}% · 다음 세트 전 휴식 60~120초를 추천해요.`;
+  }, [hydrated, workouts, site.experience, userId, habitLoopTick]);
 
   const weekProgressPercent = useMemo(() => {
     if (!weeklySessionTarget) return null;
@@ -348,8 +392,18 @@ export function HomeDashboard({ userId, site }: Props) {
       <div className={`pointer-events-none absolute inset-0 -z-10 ${pageTint}`} aria-hidden />
       <div className="sticky top-0 z-40 border-b border-neutral-200/80 bg-[color-mix(in_srgb,var(--color-apple-surface)_88%,white)] backdrop-blur-md dark:border-zinc-800/90 dark:bg-zinc-950/85">
         <div className="mx-auto max-w-5xl px-5 py-2 sm:px-8 sm:py-2.5">
-          <TimeBandInterventionBar hydrated={hydrated} todayWorkoutComplete={todayWorkoutComplete} />
-          <AiPresenceStickyBar model={aiPresence} hydrated={hydrated} weekProgressPercent={weekProgressPercent} />
+          <AiManagedLoopRibbon loop={aiLoop} />
+          <TimeBandInterventionBar
+            hydrated={hydrated}
+            todayWorkoutComplete={todayWorkoutComplete}
+            primaryCtaHref="/#section-input"
+          />
+          <AiPresenceStickyBar
+            model={aiPresence}
+            hydrated={hydrated}
+            weekProgressPercent={weekProgressPercent}
+            workoutCtaHref="/#section-input"
+          />
         </div>
       </div>
       <div className="mx-auto max-w-5xl px-5 pt-6 sm:px-8 sm:pt-8">
@@ -584,6 +638,7 @@ export function HomeDashboard({ userId, site }: Props) {
             copy={site.copy.workoutForm}
             omitCardHeader
             allWorkouts={workouts}
+            aiSessionCoachLine={sessionCoachLine}
           />
         </section>
 
@@ -651,6 +706,12 @@ export function HomeDashboard({ userId, site }: Props) {
         experience={site.experience}
         open={hydrated && postCheckinBriefingOpen}
         onDismiss={() => setPostCheckinBriefingOpen(false)}
+        onSecondaryExit={() => {
+          setPostCheckinBriefingOpen(false);
+          window.requestAnimationFrame(() => {
+            document.getElementById("today-single-action")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        }}
         onContinueToWorkout={continueMorningFlowToWorkout}
       />
 
@@ -659,6 +720,7 @@ export function HomeDashboard({ userId, site }: Props) {
         kind={closeReport.kind}
         workouts={workouts}
         onDismiss={() => {
+          applyClosingReportFeedback({ kind: closeReport.kind, workouts, now: new Date() });
           markDailyCloseReportShown(userId, closeReport.kind);
           if (typeof window !== "undefined") {
             window.dispatchEvent(new Event(DAILY_CLOSE_REPORT_CHANGED_EVENT));

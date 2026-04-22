@@ -12,6 +12,8 @@ type Props = {
   experience: SiteExperienceConfig;
   open: boolean;
   onDismiss: () => void;
+  /** 브리핑만 닫고 오늘 할 일 카드로 스크롤 — 루프 이탈 없이 이어가기 */
+  onSecondaryExit: () => void;
   /** 브리핑 후 실행 단계 — 홈 기록 섹션으로 이동 */
   onContinueToWorkout: () => void;
 };
@@ -29,6 +31,7 @@ export function PostCheckinBriefingModal({
   experience,
   open,
   onDismiss,
+  onSecondaryExit,
   onContinueToWorkout,
 }: Props) {
   const model = useHomeActionViewModel({ userId, workouts, hydrated, experience });
@@ -41,7 +44,7 @@ export function PostCheckinBriefingModal({
   return (
     <div className={scrim} role="dialog" aria-modal="true" aria-labelledby="post-checkin-briefing-title">
       <div className={panel}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">오늘의 흐름 · 2단계</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-700/90 dark:text-violet-300/90">AI 루프 · 체크인 다음</p>
         <h2
           id="post-checkin-briefing-title"
           className="font-display mt-2 text-[1.45rem] font-bold leading-tight tracking-[-0.03em] text-apple-ink dark:text-zinc-50 sm:text-[1.6rem]"
@@ -125,10 +128,10 @@ export function PostCheckinBriefingModal({
               )}
               <button
                 type="button"
-                onClick={onDismiss}
+                onClick={onSecondaryExit}
                 className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-neutral-200 bg-white px-4 text-[13px] font-semibold text-apple-ink transition hover:border-neutral-400 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 sm:min-w-[7rem]"
               >
-                나중에
+                오늘 할 일로
               </button>
             </div>
           </>
