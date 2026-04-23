@@ -390,7 +390,7 @@ export function HomeDashboard({ userId, site }: Props) {
       data-user-workout-state={hydrated ? userWorkoutUiState : undefined}
     >
       <div className={`pointer-events-none absolute inset-0 -z-10 ${pageTint}`} aria-hidden />
-      <div className="sticky top-0 z-40 border-b border-neutral-200/80 bg-[color-mix(in_srgb,var(--color-apple-surface)_88%,white)] backdrop-blur-md dark:border-zinc-800/90 dark:bg-zinc-950/85">
+      <div className="border-b border-neutral-200/80 bg-[color-mix(in_srgb,var(--color-apple-surface)_88%,white)] backdrop-blur-md dark:border-zinc-800/90 dark:bg-zinc-950/85">
         <div className="mx-auto max-w-5xl px-5 py-2 sm:px-8 sm:py-2.5">
           <AiManagedLoopRibbon loop={aiLoop} />
           <TimeBandInterventionBar
