@@ -1,7 +1,6 @@
 "use client";
 
 import { AuthSplitShell } from "@/components/auth/AuthSplitShell";
-import { navPillLinkCompact } from "@/components/nav/menu-styles";
 import { SUPABASE_VERCEL_DEPLOY_HINT } from "@/lib/supabase/deploy-hint";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteSettingsMerged } from "@/types/site-settings";
@@ -81,14 +80,6 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
 
   return (
     <>
-      <Link
-        href="/admin"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`fixed right-4 top-4 z-50 shadow-sm backdrop-blur-md sm:right-6 sm:top-5 ${navPillLinkCompact} !bg-white/95 dark:!bg-zinc-950/90`}
-      >
-        Admin
-      </Link>
       <main id="main-content" tabIndex={-1} className="outline-none">
     <AuthSplitShell
       panelImage={site.images.authPanel}
@@ -165,6 +156,17 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
           className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60"
         >
           {formCopy.signupLinkLabel}
+        </Link>
+      </p>
+
+      <p className="mt-10 text-center">
+        <Link
+          href="/admin"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] font-medium tracking-wide text-apple-subtle/55 underline decoration-neutral-300/60 underline-offset-2 transition hover:text-apple-subtle dark:text-zinc-500/70 dark:hover:text-zinc-400"
+        >
+          Admin
         </Link>
       </p>
     </AuthSplitShell>
