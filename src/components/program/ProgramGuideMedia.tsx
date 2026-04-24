@@ -8,14 +8,30 @@ type FigureProps = {
   alt: string;
   priority?: boolean;
   className?: string;
+  maxDisplayWidth?: number;
+  placeholderClassName?: string;
 };
 
 /** 관리자 업로드(Supabase 등) URL은 `next/image` 원격 허용 목록과 어긋날 수 있어 `SiteFillImage`(일반 img) 사용 */
-export function GuideFigure({ src, alt, priority = false, className = "mt-5" }: FigureProps) {
+export function GuideFigure({
+  src,
+  alt,
+  priority = false,
+  className = "mt-5",
+  maxDisplayWidth = 1280,
+  placeholderClassName = "bg-neutral-200 dark:bg-zinc-900",
+}: FigureProps) {
   return (
     <figure className={`${figureRing} ${className}`}>
-      <div className="relative aspect-[16/9] w-full">
-        <SiteFillImage src={src} alt={alt} priority={priority} />
+      <div className="relative aspect-[16/9] w-full bg-neutral-200 dark:bg-zinc-900">
+        <SiteFillImage
+          src={src}
+          alt={alt}
+          priority={priority}
+          maxDisplayWidth={maxDisplayWidth}
+          placeholderClassName={placeholderClassName}
+          sizes="(min-width: 896px) 820px, 92vw"
+        />
       </div>
     </figure>
   );

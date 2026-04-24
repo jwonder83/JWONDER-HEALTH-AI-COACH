@@ -183,8 +183,15 @@ export function WebCoachingSection({
             </div>
           ) : null}
         </div>
-        <div className="relative min-h-[200px] w-full sm:min-h-[220px] lg:min-h-full">
-          <SiteFillImage src={coachingImage.src} alt={coachingImage.alt} className="saturate-[1.02]" />
+        <div className="relative min-h-[200px] w-full bg-neutral-100 sm:min-h-[220px] lg:min-h-full dark:bg-zinc-950">
+          <SiteFillImage
+            src={coachingImage.src}
+            alt={coachingImage.alt}
+            maxDisplayWidth={1400}
+            placeholderClassName="bg-neutral-100 dark:bg-zinc-950"
+            sizes="(min-width: 1024px) 42vw, 100vw"
+            className="saturate-[1.02]"
+          />
           <div
             className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent sm:bg-gradient-to-r sm:from-white/95 sm:via-white/30 sm:to-transparent lg:from-white/90 lg:via-transparent lg:to-zinc-900/25"
             aria-hidden

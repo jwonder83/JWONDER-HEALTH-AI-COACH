@@ -172,6 +172,7 @@ export function RewardStatusCard({ userId, workouts, hydrated, lastXpFloat }: Pr
             className="h-full rounded-full bg-[length:200%_100%] motion-safe:transition-[width] motion-safe:duration-700"
             style={{
               width: `${hydrated ? level.progressPct : 0}%`,
+              backgroundColor: "#7c3aed",
               backgroundImage: "linear-gradient(90deg, #7c3aed, #f59e0b, #a78bfa, #f59e0b)",
               animation: hydrated ? "xp-bar-shine 2.8s linear infinite" : undefined,
             }}

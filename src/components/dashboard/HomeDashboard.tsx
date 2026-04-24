@@ -409,11 +409,14 @@ export function HomeDashboard({ userId, site }: Props) {
       <div className="mx-auto max-w-5xl px-5 pt-6 sm:px-8 sm:pt-8">
         {/* 히어로 */}
         <div className={`relative overflow-hidden sm:rounded-sm ${cardRing}`}>
-          <div className="relative aspect-[16/10] min-h-[240px] w-full sm:aspect-[2.15/1] sm:min-h-[320px]">
+          <div className="relative aspect-[16/10] min-h-[240px] w-full bg-neutral-900 sm:aspect-[2.15/1] sm:min-h-[320px]">
             <SiteFillImage
               src={site.images.hero.src}
               alt={site.images.hero.alt}
               priority
+              maxDisplayWidth={1920}
+              placeholderClassName="bg-neutral-900"
+              sizes="(min-width: 1024px) 896px, 100vw"
               className="object-center grayscale-[0.25] contrast-[1.02]"
             />
             <div
@@ -469,9 +472,16 @@ export function HomeDashboard({ userId, site }: Props) {
           {dashTiles.map((t) => (
             <div
               key={t.key}
-              className="group relative aspect-[4/3] overflow-hidden border border-neutral-200 shadow-sm"
+              className="group relative aspect-[4/3] overflow-hidden border border-neutral-200 bg-zinc-800 shadow-sm"
             >
-              <SiteFillImage src={t.src} alt={t.alt} className="transition duration-700 ease-out group-hover:scale-[1.02] grayscale-[0.2]" />
+              <SiteFillImage
+                src={t.src}
+                alt={t.alt}
+                maxDisplayWidth={800}
+                placeholderClassName="bg-zinc-800"
+                sizes="(min-width: 640px) 30vw, 33vw"
+                className="transition duration-700 ease-out group-hover:scale-[1.02] grayscale-[0.2]"
+              />
               <div
                 className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 transition duration-500 group-hover:from-black/80"
                 aria-hidden

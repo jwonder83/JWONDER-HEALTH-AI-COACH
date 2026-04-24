@@ -17,11 +17,14 @@ export function AuthSplitShell({ panelImage, eyebrow, panelTitle, panelDescripti
     <div className="relative min-h-screen bg-white">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         {/* 데스크톱: 좌측 풀블리드 이미지 */}
-        <div className="relative hidden min-h-screen lg:block">
+        <div className="relative hidden min-h-screen bg-zinc-900 lg:block">
           <SiteFillImage
             src={panelImage.src}
             alt={panelImage.alt}
             priority
+            maxDisplayWidth={1920}
+            placeholderClassName="bg-zinc-900"
+            sizes="50vw"
             className="object-[center_20%]"
           />
           <div
@@ -38,11 +41,14 @@ export function AuthSplitShell({ panelImage, eyebrow, panelTitle, panelDescripti
         </div>
 
         {/* 모바일: 상단 이미지 띠 */}
-        <div className="relative h-48 w-full shrink-0 overflow-hidden lg:hidden">
+        <div className="relative h-48 w-full shrink-0 overflow-hidden bg-zinc-900 lg:hidden">
           <SiteFillImage
             src={panelImage.src}
             alt={panelImage.alt}
             priority
+            maxDisplayWidth={960}
+            placeholderClassName="bg-zinc-900"
+            sizes="100vw"
             className="object-[center_25%]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-zinc-900/30 to-transparent" aria-hidden />

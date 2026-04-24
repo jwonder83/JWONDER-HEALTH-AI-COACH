@@ -185,10 +185,13 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
   if (items.length === 0) {
     return (
       <div className="relative overflow-hidden border border-neutral-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="relative aspect-[5/3] max-h-[220px] w-full sm:aspect-[2.3/1] sm:max-h-[240px]">
+        <div className="relative aspect-[5/3] max-h-[220px] w-full bg-neutral-200 sm:aspect-[2.3/1] sm:max-h-[240px] dark:bg-zinc-900">
           <SiteFillImage
             src={listEmptyImage.src}
             alt={listEmptyImage.alt}
+            maxDisplayWidth={1200}
+            placeholderClassName="bg-neutral-200 dark:bg-zinc-900"
+            sizes="(min-width: 640px) 640px, 100vw"
             className="object-[center_28%] saturate-[1.02]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/92 to-white/20 dark:from-zinc-950 dark:via-zinc-950/92 dark:to-zinc-950/20" aria-hidden />
