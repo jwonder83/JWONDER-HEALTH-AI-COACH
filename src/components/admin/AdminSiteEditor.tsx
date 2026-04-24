@@ -257,8 +257,8 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         <div>
           <h1 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] text-apple-ink">사이트 문구·이미지</h1>
           <p className="mt-2 text-[14px] leading-relaxed text-apple-subtle">
-            이미지는 파일로 Supabase Storage에 올리거나 URL을 직접 입력할 수 있습니다. 로그인 화면 문구는 「로그인」 메뉴에서, 프로그램 안내는 「프로그램」에서
-            수정할 수 있습니다. 홈·운동 동작과 상단 메뉴 라벨은 아래 「앱 동작」에서 조정합니다.
+            이미지는 파일로 Supabase Storage에 올리거나 URL을 직접 입력할 수 있습니다. 로그인·회원가입 폼·홈 대시보드 추가 문구·프로그램 안내·앱 동작을 이 페이지에서 한 번에
+            수정할 수 있습니다. 프로그램 본문·목차·내장 이미지는 「프로그램」 메뉴에서 편집합니다.
           </p>
         </div>
         <Link
@@ -313,6 +313,50 @@ export function AdminSiteEditor({ initialSettings }: Props) {
               className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
               value={settings.copy.appDescription}
               onChange={(e) => setCopy({ appDescription: e.target.value })}
+            />
+          </label>
+        </section>
+
+        <section className="mb-10 space-y-4">
+          <h2 className="text-[15px] font-semibold text-apple-ink">로그인 화면 (/login)</h2>
+          <p className="text-[13px] leading-relaxed text-apple-subtle">
+            좌측 패널·카드·폼 라벨과, 하단 Admin 링크 텍스트입니다.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <PanelFields title="로그인 좌측 패널" value={settings.copy.loginPanel} onChange={(v) => setCopy({ loginPanel: v })} />
+            <CardFields title="로그인 카드" value={settings.copy.loginCard} onChange={(v) => setCopy({ loginCard: v })} />
+          </div>
+          <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:grid-cols-2">
+            {(
+              [
+                ["emailLabel", "이메일 라벨"],
+                ["passwordLabel", "비밀번호 라벨"],
+                ["submitLabel", "로그인 버튼"],
+                ["submittingLabel", "로그인 중 문구"],
+                ["noAccountPrompt", "하단 안내 (가입 유도 앞부분)"],
+                ["signupLinkLabel", "가입 링크 텍스트"],
+              ] as const satisfies ReadonlyArray<[keyof SiteCopyConfig["loginForm"], string]>
+            ).map(([key, label]) => (
+              <label key={key} className="block text-[12px] font-medium text-apple-subtle sm:col-span-2">
+                {label}
+                <input
+                  className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                  value={settings.copy.loginForm[key]}
+                  onChange={(e) =>
+                    setCopy({
+                      loginForm: { ...settings.copy.loginForm, [key]: e.target.value },
+                    })
+                  }
+                />
+              </label>
+            ))}
+          </div>
+          <label className="block rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <span className="text-[12px] font-medium text-apple-subtle">하단 Admin 링크 라벨</span>
+            <input
+              className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+              value={settings.copy.loginExtras.adminLinkLabel}
+              onChange={(e) => setCopy({ loginExtras: { ...settings.copy.loginExtras, adminLinkLabel: e.target.value } })}
             />
           </label>
         </section>
@@ -511,6 +555,75 @@ export function AdminSiteEditor({ initialSettings }: Props) {
         </section>
 
         <section className="mb-10 space-y-4">
+          <h2 className="text-[15px] font-semibold text-apple-ink">홈(/) 대시보드 추가 문구</h2>
+          <p className="text-[13px] leading-relaxed text-apple-subtle">
+            히어로 CTA·요약 카드·바로가기·빈 상태·섹션 eyebrow·코치 한 줄·XP 토스트·삭제 확인 등입니다.{" "}
+            <code className="rounded bg-neutral-100 px-1 text-[11px]">{"{percent}"}</code>{" "}
+            <code className="rounded bg-neutral-100 px-1 text-[11px]">{"{level}"}</code>{" "}
+            <code className="rounded bg-neutral-100 px-1 text-[11px]">{"{xp}"}</code>{" "}
+            <code className="rounded bg-neutral-100 px-1 text-[11px]">{"{exercise}"}</code> 는 저장 시 치환됩니다.
+          </p>
+          <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:grid-cols-2">
+            {(
+              [
+                ["heroCtaTodayCard", "히어로 주요 버튼", 1],
+                ["heroPerformanceLinkLabel", "히어로 성과 링크", 1],
+                ["summaryTotalLabel", "요약: 전체 라벨", 1],
+                ["summaryTotalUnit", "요약: 전체 단위(건)", 1],
+                ["summaryTotalSub", "요약: 전체 부제", 1],
+                ["summaryWeekLabel", "요약: 이번 주 라벨", 1],
+                ["summaryWeekUnit", "요약: 이번 주 단위", 1],
+                ["summaryWeekSub", "요약: 이번 주 부제", 1],
+                ["summaryVolumeLabel", "요약: 볼륨 라벨", 1],
+                ["summaryVolumeUnit", "요약: 볼륨 단위", 1],
+                ["summaryVolumeSubFallback", "요약: 볼륨 부제(1위 없을 때)", 1],
+                ["summaryVolumeSubTopTemplate", "요약: 볼륨 부제(1위 있을 때, {exercise})", 1],
+                ["shortcutsSectionTitle", "바로가기 섹션 제목", 1],
+                ["shortcutWriteTitle", "바로가기: 줄 적기 제목", 1],
+                ["shortcutWriteSubtitle", "바로가기: 줄 적기 설명", 2],
+                ["shortcutPerformanceTitle", "바로가기: 성과 제목", 1],
+                ["shortcutPerformanceSubtitle", "바로가기: 성과 설명", 2],
+                ["shortcutHelpTitle", "바로가기: 도움말 제목", 1],
+                ["shortcutHelpSubtitle", "바로가기: 도움말 설명", 2],
+                ["emptyStateTitle", "기록 없을 때 제목", 1],
+                ["emptyStateSubtitle", "기록 없을 때 설명", 2],
+                ["emptyStateCta", "기록 없을 때 버튼", 1],
+                ["clearAllRecordsLabel", "전체 지우기 버튼", 1],
+                ["navPageSectionsAriaLabel", "섹션 내비 접근성 라벨", 1],
+                ["sectionEyebrowInput", "섹션 eyebrow: 입력", 1],
+                ["sectionEyebrowList", "섹션 eyebrow: 기록", 1],
+                ["sectionEyebrowCoach", "섹션 eyebrow: 코치", 1],
+                ["sectionHintInputBeforeProgram", "입력 섹션 설명(프로그램 링크 앞)", 2],
+                ["sectionHintList", "기록 섹션 설명", 2],
+                ["sessionCoachRestDay", "코치 한 줄: 휴식 추천", 2],
+                ["sessionCoachActiveDayTemplate", "코치 한 줄: 운동일 ({percent})", 2],
+                ["toastPrOnFormSave", "PR 저장 직후 토스트", 2],
+                ["xpToastLevelUpTemplate", "XP: 레벨업 ({level}, {xp})", 1],
+                ["xpToastPrTemplate", "XP: PR ({xp})", 1],
+                ["xpToastGainTemplate", "XP: 일반 ({xp})", 1],
+                ["confirmDeleteAllRecords", "전체 삭제 확인", 3],
+                ["confirmDeleteOneRecord", "한 건 삭제 확인", 2],
+                ["recordsCountSuffix", "기록 건수 접미사(예: 건)", 1],
+              ] as const satisfies ReadonlyArray<[keyof SiteCopyConfig["mainDashboard"], string, number]>
+            ).map(([key, label, rows]) => (
+              <label key={key} className={`block text-[12px] font-medium text-apple-subtle ${rows >= 3 ? "sm:col-span-2" : ""}`}>
+                {label}
+                <textarea
+                  rows={rows}
+                  className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                  value={settings.copy.mainDashboard[key]}
+                  onChange={(e) =>
+                    setCopy({
+                      mainDashboard: { ...settings.copy.mainDashboard, [key]: e.target.value },
+                    })
+                  }
+                />
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-10 space-y-4">
           <h2 className="text-[15px] font-semibold text-apple-ink">운동 입력 폼</h2>
           <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:grid-cols-2">
             {(
@@ -591,6 +704,40 @@ export function AdminSiteEditor({ initialSettings }: Props) {
                     next[i] = e.target.value;
                     setCopy({ mainDashTileCaptions: next });
                   }}
+                />
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-10 space-y-4">
+          <h2 className="text-[15px] font-semibold text-apple-ink">회원가입 폼 (/signup)</h2>
+          <p className="text-[13px] leading-relaxed text-apple-subtle">카드·패널 문구는 아래 블록에서, 이메일·비밀번호 라벨·버튼·성공 메시지는 여기서 수정합니다.</p>
+          <div className="grid gap-3 rounded-2xl border border-black/[0.06] bg-white/85 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:grid-cols-2">
+            {(
+              [
+                ["emailLabel", "이메일 라벨"],
+                ["passwordLabel", "비밀번호 라벨"],
+                ["submitLabel", "가입 버튼"],
+                ["submittingLabel", "처리 중 문구"],
+                ["successLineBefore", "성공: 로그인 버튼 앞 문장"],
+                ["successLoginCta", "성공: 로그인 버튼 글자"],
+                ["successLineAfter", "성공: 버튼 뒤 문장"],
+                ["errorGeneric", "가입 오류(네트워크 등) 메시지"],
+                ["footerPrompt", "하단: 이미 계정 문구"],
+                ["footerLoginLabel", "하단: 로그인 링크"],
+              ] as const satisfies ReadonlyArray<[keyof SiteCopyConfig["signupForm"], string]>
+            ).map(([key, label]) => (
+              <label key={key} className="block text-[12px] font-medium text-apple-subtle sm:col-span-2">
+                {label}
+                <input
+                  className="mt-1 w-full rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-[14px] text-apple-ink"
+                  value={settings.copy.signupForm[key]}
+                  onChange={(e) =>
+                    setCopy({
+                      signupForm: { ...settings.copy.signupForm, [key]: e.target.value },
+                    })
+                  }
                 />
               </label>
             ))}

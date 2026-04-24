@@ -16,7 +16,10 @@ import type {
   SiteHelpCenter,
   SiteImagesConfig,
   SiteLegalPages,
+  SiteLoginExtrasCopy,
+  SiteMainDashboardCopy,
   SiteSettingsMerged,
+  SiteSignupFormCopy,
   WorkoutFormCopyConfig,
 } from "@/types/site-settings";
 import { DEFAULT_SITE_SETTINGS } from "./defaults";
@@ -177,6 +180,42 @@ function mergeLoginForm(base: LoginFormCopyConfig, patch: unknown): LoginFormCop
     noAccountPrompt: mergeString(base.noAccountPrompt, p.noAccountPrompt),
     signupLinkLabel: mergeString(base.signupLinkLabel, p.signupLinkLabel),
   };
+}
+
+function mergeLoginExtras(base: SiteLoginExtrasCopy, patch: unknown): SiteLoginExtrasCopy {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  return {
+    adminLinkLabel: mergeString(base.adminLinkLabel, p.adminLinkLabel),
+  };
+}
+
+function mergeSignupForm(base: SiteSignupFormCopy, patch: unknown): SiteSignupFormCopy {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  return {
+    emailLabel: mergeString(base.emailLabel, p.emailLabel),
+    passwordLabel: mergeString(base.passwordLabel, p.passwordLabel),
+    submitLabel: mergeString(base.submitLabel, p.submitLabel),
+    submittingLabel: mergeString(base.submittingLabel, p.submittingLabel),
+    successLineBefore: mergeString(base.successLineBefore, p.successLineBefore),
+    successLoginCta: mergeString(base.successLoginCta, p.successLoginCta),
+    successLineAfter: mergeString(base.successLineAfter, p.successLineAfter),
+    errorGeneric: mergeString(base.errorGeneric, p.errorGeneric),
+    footerPrompt: mergeString(base.footerPrompt, p.footerPrompt),
+    footerLoginLabel: mergeString(base.footerLoginLabel, p.footerLoginLabel),
+  };
+}
+
+function mergeMainDashboard(base: SiteMainDashboardCopy, patch: unknown): SiteMainDashboardCopy {
+  if (!patch || typeof patch !== "object") return base;
+  const p = patch as Record<string, unknown>;
+  const keys = Object.keys(base) as (keyof SiteMainDashboardCopy)[];
+  const out = { ...base };
+  for (const k of keys) {
+    out[k] = mergeString(base[k], p[k]);
+  }
+  return out;
 }
 
 function mergeWorkoutForm(base: WorkoutFormCopyConfig, patch: unknown): WorkoutFormCopyConfig {
@@ -389,6 +428,9 @@ function mergeCopy(base: SiteCopyConfig, patch: unknown): SiteCopyConfig {
     legalPages: mergeLegalPages(base.legalPages, p.legalPages),
     coachingHistoryTitle: mergeString(base.coachingHistoryTitle, p.coachingHistoryTitle),
     footer: mergeFooter(base.footer, p.footer),
+    loginExtras: mergeLoginExtras(base.loginExtras, p.loginExtras),
+    signupForm: mergeSignupForm(base.signupForm, p.signupForm),
+    mainDashboard: mergeMainDashboard(base.mainDashboard, p.mainDashboard),
   };
 }
 

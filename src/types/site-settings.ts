@@ -53,6 +53,73 @@ export type LoginFormCopyConfig = {
   signupLinkLabel: string;
 };
 
+/** 로그인 페이지 하단 등 부가 문구 */
+export type SiteLoginExtrasCopy = {
+  adminLinkLabel: string;
+};
+
+/** /signup 폼 라벨·버튼·안내 (카드·패널은 signupPanel / signupCard) */
+export type SiteSignupFormCopy = {
+  emailLabel: string;
+  passwordLabel: string;
+  submitLabel: string;
+  submittingLabel: string;
+  successLineBefore: string;
+  successLoginCta: string;
+  successLineAfter: string;
+  errorGeneric: string;
+  footerPrompt: string;
+  footerLoginLabel: string;
+};
+
+/** 홈(/) 대시보드 전용 — 히어로 CTA·요약·바로가기·섹션 힌트 등 */
+export type SiteMainDashboardCopy = {
+  heroCtaTodayCard: string;
+  heroPerformanceLinkLabel: string;
+  summaryTotalLabel: string;
+  summaryTotalUnit: string;
+  summaryTotalSub: string;
+  summaryWeekLabel: string;
+  summaryWeekUnit: string;
+  summaryWeekSub: string;
+  summaryVolumeLabel: string;
+  summaryVolumeUnit: string;
+  summaryVolumeSubFallback: string;
+  /** `{exercise}` 치환 — 1위 종목이 있을 때 부제 */
+  summaryVolumeSubTopTemplate: string;
+  shortcutsSectionTitle: string;
+  shortcutWriteTitle: string;
+  shortcutWriteSubtitle: string;
+  shortcutPerformanceTitle: string;
+  shortcutPerformanceSubtitle: string;
+  shortcutHelpTitle: string;
+  shortcutHelpSubtitle: string;
+  emptyStateTitle: string;
+  emptyStateSubtitle: string;
+  emptyStateCta: string;
+  clearAllRecordsLabel: string;
+  navPageSectionsAriaLabel: string;
+  sectionEyebrowInput: string;
+  sectionEyebrowList: string;
+  sectionEyebrowCoach: string;
+  /** 입력 섹션 설명에서 프로그램 링크 앞 문장 */
+  sectionHintInputBeforeProgram: string;
+  sectionHintList: string;
+  sessionCoachRestDay: string;
+  /** `{percent}` 치환 (추천 강도 %) */
+  sessionCoachActiveDayTemplate: string;
+  toastPrOnFormSave: string;
+  /** `{level}` `{xp}` */
+  xpToastLevelUpTemplate: string;
+  /** `{xp}` */
+  xpToastPrTemplate: string;
+  /** `{xp}` */
+  xpToastGainTemplate: string;
+  confirmDeleteAllRecords: string;
+  confirmDeleteOneRecord: string;
+  recordsCountSuffix: string;
+};
+
 /** 메인 대시보드 운동 입력 카드 문구 */
 export type WorkoutFormCopyConfig = {
   eyebrow: string;
@@ -115,6 +182,9 @@ export type SiteCopyConfig = {
   /** AI 코칭 블록 내 최근 저장 목록 제목 */
   coachingHistoryTitle: string;
   footer: SiteFooterConfig;
+  loginExtras: SiteLoginExtrasCopy;
+  signupForm: SiteSignupFormCopy;
+  mainDashboard: SiteMainDashboardCopy;
 };
 
 export type ProgramYoutubeSlot = {

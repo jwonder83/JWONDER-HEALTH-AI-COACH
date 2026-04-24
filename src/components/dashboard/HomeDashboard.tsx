@@ -93,8 +93,6 @@ const cardRing =
 const sectionShell =
   "scroll-mt-36 border border-neutral-200 bg-white p-6 shadow-sm sm:scroll-mt-44 sm:p-9 dark:border-zinc-800 dark:bg-zinc-950";
 
-const SECTION_HINT_INPUT = "저장하면 바로 아래 목록에 붙어요.";
-const SECTION_HINT_LIST = "날짜·종목별로 보다가 필요하면 하나씩 지울 수 있어요.";
 
 type Props = {
   userId: string;
@@ -207,11 +205,12 @@ export function HomeDashboard({ userId, site }: Props) {
     });
     const checkin = loadDailyCheckin(userId);
     const b = checkin ? mergeDailyCheckinIntoBriefing(base, checkin) : base;
+    const md = site.copy.mainDashboard;
     if (b.decisionKind === "rest") {
-      return "오늘은 쉬는 쪽이 맞아 보여요. 가볍게만 하거나 패스해도 돼요.";
+      return md.sessionCoachRestDay;
     }
-    return `오늘은 평소의 ${b.recommendedIntensityPercent}%쯤으로 가 볼까요. 세트 사이에는 60~120초 쉬는 걸 추천해요.`;
-  }, [hydrated, workouts, site.experience, userId, habitLoopTick]);
+    return md.sessionCoachActiveDayTemplate.replace("{percent}", String(b.recommendedIntensityPercent));
+  }, [hydrated, workouts, site.experience, site.copy.mainDashboard, userId, habitLoopTick]);
 
   const weekProgressPercent = useMemo(() => {
     if (!weeklySessionTarget) return null;
@@ -334,12 +333,13 @@ export function HomeDashboard({ userId, site }: Props) {
     const grant = recordWorkoutXp(userId, input, pr);
     setLastXpFloat({ gained: grant.gainedXp, leveledUp: grant.leveledUp });
     window.setTimeout(() => setLastXpFloat(null), 2600);
+    const xp = site.copy.mainDashboard;
     setToast({
       message: grant.leveledUp
-        ? `레벨 ${grant.levelAfter} 달성! +${grant.gainedXp} XP`
+        ? xp.xpToastLevelUpTemplate.replace("{level}", String(grant.levelAfter)).replace("{xp}", String(grant.gainedXp))
         : pr
-          ? `PR! +${grant.gainedXp} XP`
-          : `+${grant.gainedXp} XP 획득`,
+          ? xp.xpToastPrTemplate.replace("{xp}", String(grant.gainedXp))
+          : xp.xpToastGainTemplate.replace("{xp}", String(grant.gainedXp)),
       variant: grant.leveledUp || pr ? "achievement" : "default",
     });
     await refresh();
@@ -349,7 +349,7 @@ export function HomeDashboard({ userId, site }: Props) {
 
   async function handleClear() {
     if (typeof window === "undefined") return;
-    if (!window.confirm("이 계정에 저장된 모든 운동 기록을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.")) return;
+    if (!window.confirm(site.copy.mainDashboard.confirmDeleteAllRecords)) return;
     const supabase = createClient();
     const { error } = await supabase.from("workouts").delete().eq("user_id", userId);
     if (error) {
@@ -362,7 +362,7 @@ export function HomeDashboard({ userId, site }: Props) {
 
   async function handleDeleteOne(id: string) {
     if (typeof window === "undefined") return;
-    if (!window.confirm("선택한 기록만 삭제하시겠습니까?")) return;
+    if (!window.confirm(site.copy.mainDashboard.confirmDeleteOneRecord)) return;
     const supabase = createClient();
     const { error } = await supabase.from("workouts").delete().eq("id", id).eq("user_id", userId);
     if (error) {
@@ -437,7 +437,7 @@ export function HomeDashboard({ userId, site }: Props) {
                   href="#today-single-action"
                   className="inline-flex w-full max-w-sm items-center justify-center rounded-xl border-2 border-white bg-white/95 px-6 py-3.5 text-[14px] font-bold tracking-[-0.02em] text-black shadow-lg transition hover:bg-white active:scale-[0.98] sm:py-4 sm:text-[15px]"
                 >
-                  오늘 카드 보기
+                  {site.copy.mainDashboard.heroCtaTodayCard}
                 </Link>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] font-medium text-white/75">
                   <Link href="/program" className="underline decoration-white/40 underline-offset-4 transition hover:text-white">
@@ -447,7 +447,7 @@ export function HomeDashboard({ userId, site }: Props) {
                     ·
                   </span>
                   <Link href="/performance" className="underline decoration-white/40 underline-offset-4 transition hover:text-white">
-                    성과
+                    {site.copy.mainDashboard.heroPerformanceLinkLabel}
                   </Link>
                 </div>
               </div>
@@ -498,24 +498,26 @@ export function HomeDashboard({ userId, site }: Props) {
           {[
             {
               k: "total",
-              label: "전체",
+              label: site.copy.mainDashboard.summaryTotalLabel,
               value: hydrated ? `${workouts.length}` : "—",
-              unit: "건",
-              sub: "세트 행",
+              unit: site.copy.mainDashboard.summaryTotalUnit,
+              sub: site.copy.mainDashboard.summaryTotalSub,
             },
             {
               k: "week",
-              label: "이번 주",
+              label: site.copy.mainDashboard.summaryWeekLabel,
               value: hydrated ? `${weekRollup.rowCount}` : "—",
-              unit: "건",
-              sub: "월~일",
+              unit: site.copy.mainDashboard.summaryWeekUnit,
+              sub: site.copy.mainDashboard.summaryWeekSub,
             },
             {
               k: "vol",
-              label: "주간 볼륨",
+              label: site.copy.mainDashboard.summaryVolumeLabel,
               value: hydrated ? `${Math.round(weekRollup.volume * 10) / 10}` : "—",
-              unit: "합",
-              sub: weekRollup.topExercise ? `1위 ${weekRollup.topExercise}` : "kg×회×세트",
+              unit: site.copy.mainDashboard.summaryVolumeUnit,
+              sub: weekRollup.topExercise
+                ? site.copy.mainDashboard.summaryVolumeSubTopTemplate.replace("{exercise}", weekRollup.topExercise)
+                : site.copy.mainDashboard.summaryVolumeSubFallback,
             },
           ].map((s) => (
             <div
@@ -534,7 +536,7 @@ export function HomeDashboard({ userId, site }: Props) {
 
         {/* 빠른 이동 카드 */}
         <div className="mt-8 sm:mt-10">
-          <p className="text-[12px] font-medium tracking-[-0.01em] text-apple-subtle">바로가기</p>
+          <p className="text-[12px] font-medium tracking-[-0.01em] text-apple-subtle">{site.copy.mainDashboard.shortcutsSectionTitle}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="#section-input"
@@ -544,8 +546,10 @@ export function HomeDashboard({ userId, site }: Props) {
                 <IconPencil className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">오늘 줄 적기</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">저장하면 목록에 바로 붙어요</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">
+                  {site.copy.mainDashboard.shortcutWriteTitle}
+                </span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">{site.copy.mainDashboard.shortcutWriteSubtitle}</span>
               </span>
             </Link>
             <Link
@@ -568,8 +572,12 @@ export function HomeDashboard({ userId, site }: Props) {
                 <IconChart className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">성과 보기</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">그래프랑 CSV 다운로드</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">
+                  {site.copy.mainDashboard.shortcutPerformanceTitle}
+                </span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">
+                  {site.copy.mainDashboard.shortcutPerformanceSubtitle}
+                </span>
               </span>
             </Link>
             <Link
@@ -580,8 +588,10 @@ export function HomeDashboard({ userId, site }: Props) {
                 <IconLifeBuoy className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">도움말</span>
-                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">FAQ랑 문의 안내</span>
+                <span className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink group-hover:opacity-70">
+                  {site.copy.mainDashboard.shortcutHelpTitle}
+                </span>
+                <span className="mt-1 block text-[12px] leading-snug text-apple-subtle">{site.copy.mainDashboard.shortcutHelpSubtitle}</span>
               </span>
             </Link>
           </div>
@@ -590,21 +600,21 @@ export function HomeDashboard({ userId, site }: Props) {
         {hydrated && workouts.length === 0 ? (
           <div className="mt-8 flex flex-col gap-3 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
             <div>
-              <p className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink">아직 기록이 없어요</p>
-              <p className="mt-1 text-[13px] leading-snug text-apple-subtle">한 줄부터 쌓아 볼까요?</p>
+              <p className="text-[15px] font-semibold tracking-[-0.02em] text-apple-ink">{site.copy.mainDashboard.emptyStateTitle}</p>
+              <p className="mt-1 text-[13px] leading-snug text-apple-subtle">{site.copy.mainDashboard.emptyStateSubtitle}</p>
             </div>
             <Link
               href="/workout"
               className="inline-flex shrink-0 items-center justify-center rounded-lg border border-black bg-black px-5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-white transition hover:bg-neutral-800 active:scale-[0.98]"
             >
-              줄 적기
+              {site.copy.mainDashboard.emptyStateCta}
             </Link>
           </div>
         ) : null}
 
         {/* 스티키 내비 — 가독성 우선(큰 글씨·굵게·대비) */}
         <div className="sticky top-4 z-20 mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center sm:justify-between">
-          <nav aria-label="페이지 섹션" className={navSegmentBar}>
+          <nav aria-label={site.copy.mainDashboard.navPageSectionsAriaLabel} className={navSegmentBar}>
             {navItems.map((item) => (
               <a key={item.href} href={item.href} className={navSegmentItem}>
                 {item.label}
@@ -612,7 +622,7 @@ export function HomeDashboard({ userId, site }: Props) {
             ))}
           </nav>
           <button type="button" onClick={handleClear} className={`${navToolbarButton} active:scale-[0.98]`}>
-            전체 지우기
+            {site.copy.mainDashboard.clearAllRecordsLabel}
           </button>
         </div>
 
@@ -624,11 +634,11 @@ export function HomeDashboard({ userId, site }: Props) {
         <section id="section-input" className={`${sectionShell} rounded-xl`}>
           <SectionTitleBlock
             step="01"
-            eyebrow="입력"
+            eyebrow={site.copy.mainDashboard.sectionEyebrowInput}
             title={site.copy.mainNavSectionLabels[0]}
             description={
               <>
-                {SECTION_HINT_INPUT}{" "}
+                {site.copy.mainDashboard.sectionHintInputBeforeProgram}{" "}
                 <Link
                   href="/program"
                   className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[4px] hover:opacity-60"
@@ -641,7 +651,7 @@ export function HomeDashboard({ userId, site }: Props) {
           <WorkoutForm
             onSaved={(r) => {
               if (r?.pr) {
-                setToast({ message: "새 PR이에요! 이 종목 볼륨 최고 기록을 갱신했어요.", variant: "achievement" });
+                setToast({ message: site.copy.mainDashboard.toastPrOnFormSave, variant: "achievement" });
               }
             }}
             saveWorkout={saveWorkout}
@@ -655,12 +665,12 @@ export function HomeDashboard({ userId, site }: Props) {
         <section id="section-list" className={`${sectionShell} rounded-xl`}>
           <SectionTitleBlock
             step="02"
-            eyebrow="기록"
+            eyebrow={site.copy.mainDashboard.sectionEyebrowList}
             title={site.copy.mainNavSectionLabels[1]}
-            description={SECTION_HINT_LIST}
+            description={site.copy.mainDashboard.sectionHintList}
             right={
               <span className="rounded-lg border border-neutral-200 bg-neutral-50 px-3.5 py-1.5 text-[12px] font-medium tracking-[-0.01em] text-apple-ink tabular-nums">
-                {hydrated ? `${workouts.length}건` : "—"}
+                {hydrated ? `${workouts.length}${site.copy.mainDashboard.recordsCountSuffix}` : "—"}
               </span>
             }
           />
@@ -677,7 +687,7 @@ export function HomeDashboard({ userId, site }: Props) {
         <section id="section-coach" className={`${sectionShell} rounded-xl`}>
           <SectionTitleBlock
             step="03"
-            eyebrow="코치"
+            eyebrow={site.copy.mainDashboard.sectionEyebrowCoach}
             title={site.copy.mainNavSectionLabels[2]}
             description={site.copy.webCoachingHint}
           />

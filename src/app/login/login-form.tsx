@@ -166,7 +166,7 @@ export function LoginForm({ site, postLoginRedirect, urlError, supabaseEnvReady 
           rel="noopener noreferrer"
           className="text-[10px] font-medium tracking-wide text-apple-subtle/55 underline decoration-neutral-300/60 underline-offset-2 transition hover:text-apple-subtle dark:text-zinc-500/70 dark:hover:text-zinc-400"
         >
-          Admin
+          {site.copy.loginExtras.adminLinkLabel}
         </Link>
       </p>
     </AuthSplitShell>

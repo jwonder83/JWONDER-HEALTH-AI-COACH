@@ -47,7 +47,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       setOk(true);
       setLoading(false);
     } catch {
-      setMsg("가입 처리 중 오류가 났어요. Supabase 환경 변수를 확인해 주세요.");
+      setMsg(site.copy.signupForm.errorGeneric);
       setLoading(false);
     }
   }
@@ -75,17 +75,17 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
       )}
       {ok && !msg && (
         <p className="mt-6 rounded-xl border border-emerald-200/90 bg-emerald-50/95 px-4 py-3 text-[14px] leading-snug text-emerald-900 shadow-sm">
-          가입 요청이 접수됐어요. 메일함을 확인하거나, 바로{" "}
+          {site.copy.signupForm.successLineBefore}{" "}
           <button type="button" className="font-semibold underline" onClick={() => router.push("/login")}>
-            로그인
+            {site.copy.signupForm.successLoginCta}
           </button>
-          해도 돼요.
+          {site.copy.signupForm.successLineAfter}
         </p>
       )}
 
       <form className="mt-8 space-y-5" onSubmit={onSubmit}>
         <label htmlFor={idEmail} className="block text-[13px] font-medium text-apple-subtle">
-          이메일
+          {site.copy.signupForm.emailLabel}
           <input
             id={idEmail}
             name="email"
@@ -98,7 +98,7 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
           />
         </label>
         <label htmlFor={idPassword} className="block text-[13px] font-medium text-apple-subtle">
-          비밀번호 (6자 이상 권장)
+          {site.copy.signupForm.passwordLabel}
           <input
             id={idPassword}
             name="password"
@@ -116,17 +116,17 @@ export function SignupForm({ site, supabaseEnvReady }: Props) {
           disabled={loading || ok}
           className="w-full border border-black bg-black py-3.5 text-[12px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-white hover:text-black active:scale-[0.99] disabled:opacity-45"
         >
-          {loading ? "처리 중…" : "가입하기"}
+          {loading ? site.copy.signupForm.submittingLabel : site.copy.signupForm.submitLabel}
         </button>
       </form>
 
       <p className="mt-8 text-center text-[14px] text-apple-subtle">
-        이미 계정 있어?{" "}
+        {site.copy.signupForm.footerPrompt}{" "}
         <Link
           href="/login"
           className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60"
         >
-          로그인
+          {site.copy.signupForm.footerLoginLabel}
         </Link>
       </p>
     </AuthSplitShell>
