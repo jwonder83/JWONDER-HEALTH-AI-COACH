@@ -3,6 +3,7 @@
 import type { HomeActionViewModel } from "@/lib/dashboard/home-action-state";
 import type { UserWorkoutUiState } from "@/lib/dashboard/user-workout-ui-state";
 import type { RoutineFlowStatus } from "@/lib/routine/today-routine-confirmation";
+import type { SiteHomeSingleActionCopy } from "@/types/site-home-hub-copy";
 import Link from "next/link";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   >;
   routineFlowStatus: RoutineFlowStatus;
   userWorkoutUiState: UserWorkoutUiState;
+  copy: SiteHomeSingleActionCopy;
 };
 
 function scrollToRoutinePlan() {
@@ -21,13 +23,13 @@ function scrollToRoutinePlan() {
 /**
  * 홈 최상단 — 오늘 해야 할 단 하나의 행동(대형 CTA)만 강조.
  */
-export function TodaySingleActionFocus({ model, routineFlowStatus, userWorkoutUiState }: Props) {
+export function TodaySingleActionFocus({ model, routineFlowStatus, userWorkoutUiState, copy }: Props) {
   const done = model.todayWorkoutComplete;
   const planLocked = routineFlowStatus === "confirmed" || routineFlowStatus === "completed";
 
-  const eyebrow = done || planLocked ? "오늘 운동 (고정)" : "오늘 운동";
+  const eyebrow = done || planLocked ? copy.eyebrowWhenPlanLocked : copy.eyebrowDefault;
   const ctaLabel =
-    userWorkoutUiState === "active" && !done ? "세션 이어가기" : done ? "추가로 기록하기" : "운동 시작하기";
+    userWorkoutUiState === "active" && !done ? copy.ctaWhenSessionActive : done ? copy.ctaWhenDone : copy.ctaStart;
 
   const subline = !done && model.coachDecisionConfirmedLine ? model.coachDecisionConfirmedLine : null;
 
@@ -80,7 +82,7 @@ export function TodaySingleActionFocus({ model, routineFlowStatus, userWorkoutUi
             onClick={scrollToRoutinePlan}
             className="mt-3 w-full text-center text-[12px] font-semibold text-apple-subtle underline decoration-neutral-300 decoration-1 underline-offset-4 transition hover:text-apple-ink dark:text-zinc-500 dark:decoration-zinc-600 dark:hover:text-zinc-300"
           >
-            플랜만 바꾸기 (선택)
+            {copy.linkChangePlanOptional}
           </button>
         ) : null}
       </div>

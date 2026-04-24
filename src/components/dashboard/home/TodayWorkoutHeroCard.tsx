@@ -3,6 +3,7 @@
 import type { HomeActionViewModel } from "@/lib/dashboard/home-action-state";
 import type { UserWorkoutUiState } from "@/lib/dashboard/user-workout-ui-state";
 import type { RoutineFlowStatus } from "@/lib/routine/today-routine-confirmation";
+import type { SiteTodayWorkoutHeroCopy } from "@/types/site-home-hub-copy";
 import Link from "next/link";
 
 const shellBase =
@@ -26,16 +27,22 @@ type Props = {
   workoutSectionId: string;
   routineFlowStatus: RoutineFlowStatus;
   userWorkoutUiState: UserWorkoutUiState;
-  /** 홈 상단 단일 CTA와 겹치지 않도록 하단 주 버튼 숨김 */
   hidePrimaryCta?: boolean;
+  copy: SiteTodayWorkoutHeroCopy;
 };
 
-function LiveRoutineFeed({ routine }: { routine: HomeActionViewModel["routine"] }) {
+function LiveRoutineFeed({
+  routine,
+  hero,
+}: {
+  routine: HomeActionViewModel["routine"];
+  hero: SiteTodayWorkoutHeroCopy;
+}) {
   const adjustments = routine.adjustments?.filter(Boolean) ?? [];
   if (adjustments.length > 0) {
     return (
       <div className="mt-4 rounded-xl border border-white/15 bg-white/5 px-3 py-3 backdrop-blur-sm">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/90">루틴 피드</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/90">{hero.routineFeedEyebrow}</p>
         <ul className="mt-2 space-y-3 text-[13px] leading-snug text-white/85">
           {adjustments.map((a, i) => (
             <li key={`${a.type}-${i}`} className="flex gap-2">
@@ -44,7 +51,7 @@ function LiveRoutineFeed({ routine }: { routine: HomeActionViewModel["routine"] 
                 <p>{a.message}</p>
                 <p className="mt-1 flex flex-wrap items-baseline gap-1.5 text-[11px] leading-relaxed text-white/55">
                   <span className="shrink-0 rounded border border-white/20 bg-white/5 px-1 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-white/50">
-                    이유
+                    {hero.reasonChip}
                   </span>
                   <span>{a.reason}</span>
                 </p>
@@ -52,9 +59,7 @@ function LiveRoutineFeed({ routine }: { routine: HomeActionViewModel["routine"] 
             </li>
           ))}
         </ul>
-        {routine.source === "rules" ? (
-          <p className="mt-2 text-[10px] text-white/45">지금은 규칙 엔진이 짜 준 피드예요. GPT 붙이면 여기 문구가 더 말 잘해요.</p>
-        ) : null}
+        {routine.source === "rules" ? <p className="mt-2 text-[10px] text-white/45">{hero.rulesEngineFootnote}</p> : null}
       </div>
     );
   }
@@ -63,7 +68,7 @@ function LiveRoutineFeed({ routine }: { routine: HomeActionViewModel["routine"] 
   if (msgs.length === 0) return null;
   return (
     <div className="mt-4 rounded-xl border border-white/15 bg-white/5 px-3 py-3 backdrop-blur-sm">
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/90">루틴 피드</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/90">{hero.routineFeedEyebrow}</p>
       <ul className="mt-2 space-y-2 text-[13px] leading-snug text-white/85">
         {msgs.map((m, i) => (
           <li key={i} className="flex gap-2">
@@ -74,13 +79,11 @@ function LiveRoutineFeed({ routine }: { routine: HomeActionViewModel["routine"] 
       </ul>
       <p className="mt-2 flex flex-wrap items-baseline gap-1.5 text-[11px] leading-relaxed text-white/55">
         <span className="shrink-0 rounded border border-white/20 bg-white/5 px-1 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-white/50">
-          이유
+          {hero.reasonChip}
         </span>
         <span>{routine.recommendationReason}</span>
       </p>
-      {routine.source === "rules" ? (
-        <p className="mt-2 text-[10px] text-white/45">규칙 기반 피드 · GPT 연결 시 같은 자리에 문구만 갈아끼워져요.</p>
-      ) : null}
+      {routine.source === "rules" ? <p className="mt-2 text-[10px] text-white/45">{hero.liveFeedFootnote}</p> : null}
     </div>
   );
 }
@@ -102,6 +105,7 @@ export function TodayWorkoutHeroCard({
   routineFlowStatus,
   userWorkoutUiState,
   hidePrimaryCta = false,
+  copy: hero,
 }: Props) {
   const done = model.todayWorkoutComplete;
   const planLocked = routineFlowStatus === "confirmed" || routineFlowStatus === "completed";
@@ -119,41 +123,44 @@ export function TodayWorkoutHeroCard({
 
   const shell = `${shellBase}${shellRing}`;
 
+  const trustLine =
+    model.coachTrustConfidencePercent > 0
+      ? hero.trustTemplate.replace("{percent}", String(model.coachTrustConfidencePercent))
+      : null;
+
   return (
     <section className={shell} id={workoutSectionId} aria-labelledby="today-workout-heading" data-user-workout-state={userWorkoutUiState}>
       <div className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-white/5 blur-2xl" aria-hidden />
       <div className="pointer-events-none absolute -bottom-10 -left-10 size-48 rounded-full bg-emerald-500/10 blur-3xl" aria-hidden />
 
       <div className="relative">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/60">오늘 픽</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/60">{hero.pickEyebrow}</p>
         <h2 id="today-workout-heading" className="font-display mt-2 text-[1.5rem] font-bold leading-[1.15] tracking-[-0.02em] sm:text-[1.75rem]">
           {model.routine.title}
         </h2>
         {routineFlowStatus === "confirmed" && !done ? (
           <p className="mt-2 inline-flex rounded-lg border border-amber-300/40 bg-amber-400/15 px-3 py-1.5 text-[12px] font-semibold text-amber-100">
-            오늘 운동 · 고정됨 — 이제 몸만 움직이면 돼요
+            {hero.badgeTodayLocked}
           </p>
         ) : null}
         {userWorkoutUiState === "active" && !done ? (
           <p className="mt-2 inline-flex rounded-lg border border-indigo-300/45 bg-indigo-500/25 px-3 py-1.5 text-[12px] font-semibold text-indigo-50">
-            세션 진행 중 — 운동 화면에서 세트만 이어서 저장하면 돼요
+            {hero.badgeSessionActive}
           </p>
         ) : null}
         <p className="mt-2 max-w-prose whitespace-pre-line text-[14px] leading-relaxed text-white/75 sm:text-[15px]">
           {model.routine.description}
         </p>
         {userWorkoutUiState === "missed" && !done ? (
-          <p className="mt-2 text-[13px] font-semibold leading-snug text-rose-200">
-            오늘은 아직 미완이에요. 세트 하나만 저장하면 완료로 바뀌어요.
-          </p>
+          <p className="mt-2 text-[13px] font-semibold leading-snug text-rose-200">{hero.missedHint}</p>
         ) : null}
 
         <div className="mt-4 rounded-xl border border-white/12 bg-white/[0.07] px-3 py-3 sm:px-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/85">오늘 결정</p>
-            {model.coachTrustConfidencePercent > 0 ? (
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200/85">{hero.decisionEyebrow}</p>
+            {trustLine ? (
               <span className="rounded-full border border-emerald-400/35 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-extrabold tabular-nums text-emerald-50">
-                신뢰도 {model.coachTrustConfidencePercent}%
+                {trustLine}
               </span>
             ) : null}
           </div>
@@ -163,7 +170,7 @@ export function TodayWorkoutHeroCard({
           {model.coachTrustPrimaryReason ? (
             <p className="mt-2 flex flex-wrap items-baseline gap-1.5 text-[11px] leading-relaxed text-emerald-100/90">
               <span className="shrink-0 rounded border border-white/25 bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-white/70">
-                핵심 근거
+                {hero.primaryReasonBadge}
               </span>
               <span>{model.coachTrustPrimaryReason}</span>
             </p>
@@ -171,27 +178,27 @@ export function TodayWorkoutHeroCard({
           <p className="mt-2 border-t border-white/10 pt-2 text-[13px] font-semibold leading-snug text-white/85">{model.coachLine}</p>
           <p className="mt-2 flex flex-wrap items-baseline gap-1.5 text-[11px] leading-relaxed text-white/55">
             <span className="shrink-0 rounded border border-emerald-400/35 bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-emerald-100/90">
-              데이터
+              {hero.dataBadge}
             </span>
             <span>{model.coachLineReason}</span>
           </p>
         </div>
 
-        <LiveRoutineFeed routine={model.routine} />
+        <LiveRoutineFeed routine={model.routine} hero={hero} />
 
         <div className="mt-4 flex flex-wrap items-center gap-2 text-[12px] font-medium text-white/85 sm:text-[13px]">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 tabular-nums backdrop-blur-sm">
             <span className="size-1.5 rounded-full bg-emerald-400" aria-hidden />
-            대충 {model.estimatedDurationLabel}
+            {hero.approxDurationPrefix} {model.estimatedDurationLabel}
           </span>
           {routineFlowStatus === "confirmed" && !done ? (
-            <span className="rounded-full border border-emerald-400/45 bg-emerald-500/20 px-3 py-1 text-emerald-100">오늘 플랜 고정됨</span>
+            <span className="rounded-full border border-emerald-400/45 bg-emerald-500/20 px-3 py-1 text-emerald-100">{hero.chipPlanConfirmed}</span>
           ) : null}
           {routineFlowStatus === "suggested" && !done ? (
-            <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-white/80">아래에서 플랜만 골라 주세요</span>
+            <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-white/80">{hero.chipPickPlan}</span>
           ) : null}
           {done ? (
-            <span className="rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-emerald-200">오늘 세션은 찍혔어요</span>
+            <span className="rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-emerald-200">{hero.chipSessionLogged}</span>
           ) : null}
         </div>
 
@@ -201,13 +208,13 @@ export function TodayWorkoutHeroCard({
               href="/workout"
               className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/35 bg-white/10 px-4 text-[12px] font-bold text-white transition hover:bg-white/15"
             >
-              운동 화면 바로가기
+              {hero.linkWorkoutScreen}
             </Link>
             <Link
               href="/program"
               className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-white/25 px-4 text-[12px] font-semibold text-white/85 transition hover:bg-white/10"
             >
-              프로그램
+              {hero.linkProgram}
             </Link>
           </div>
         ) : (
@@ -217,7 +224,7 @@ export function TodayWorkoutHeroCard({
                 href="/workout"
                 className="inline-flex min-h-[52px] w-full items-center justify-center rounded-xl bg-white px-6 text-[15px] font-bold tracking-[-0.01em] text-black shadow-lg transition hover:bg-neutral-100 active:scale-[0.99] sm:min-h-[56px] sm:max-w-xs sm:text-[16px]"
               >
-                추가로 한 세트 더
+                {hero.ctaOneMoreSet}
               </Link>
             ) : done || planLocked ? (
               <Link
@@ -228,7 +235,7 @@ export function TodayWorkoutHeroCard({
                     : "from-amber-300 to-amber-400 ring-2 ring-amber-200/80 hover:from-amber-200 hover:to-amber-300 dark:from-amber-400 dark:to-amber-500 dark:ring-amber-300/50"
                 }`}
               >
-                {userWorkoutUiState === "active" ? "세션 이어가기" : "운동 시작하기"}
+                {userWorkoutUiState === "active" ? hero.ctaResumeSession : hero.ctaStartWorkout}
               </Link>
             ) : (
               <button
@@ -236,7 +243,7 @@ export function TodayWorkoutHeroCard({
                 onClick={scrollToTodayPlan}
                 className="inline-flex min-h-[58px] w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-white/45 bg-white/5 px-6 text-[16px] font-bold tracking-[-0.01em] text-white/90 backdrop-blur-sm transition hover:border-white/70 hover:bg-white/10 active:scale-[0.99] sm:min-h-[60px] sm:max-w-md sm:flex-1 sm:text-[17px]"
               >
-                먼저 아래에서 플랜 정하기
+                {hero.ctaPickPlanFirst}
               </button>
             )}
             <Link
@@ -247,7 +254,7 @@ export function TodayWorkoutHeroCard({
                   : "inline-flex min-h-[50px] w-full items-center justify-center rounded-xl border-2 border-white/40 bg-white/10 px-5 text-[12px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/15 sm:min-h-[56px] sm:w-auto sm:min-w-[11rem]"
               }
             >
-              {done ? "프로그램 훑기" : "참고만 보기"}
+              {done ? hero.linkProgramBrowse : hero.linkReferenceOnly}
             </Link>
           </div>
         )}

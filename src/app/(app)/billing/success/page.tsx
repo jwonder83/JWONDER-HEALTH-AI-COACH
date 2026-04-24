@@ -1,7 +1,9 @@
 import { BillingSuccessClient } from "./billing-success-client";
+import { getSiteSettings } from "@/lib/site-settings/load-server";
 import { Suspense } from "react";
 
-export default function BillingSuccessPage() {
+export default async function BillingSuccessPage() {
+  const site = await getSiteSettings();
   return (
     <Suspense
       fallback={
@@ -10,7 +12,7 @@ export default function BillingSuccessPage() {
         </div>
       }
     >
-      <BillingSuccessClient />
+      <BillingSuccessClient copy={site.copy.billingPages} />
     </Suspense>
   );
 }

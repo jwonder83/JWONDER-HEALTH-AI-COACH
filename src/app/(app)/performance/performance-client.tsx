@@ -4,11 +4,13 @@ import { BodyWeightPanel } from "@/components/bodyweight/BodyWeightPanel";
 import { navToolbarButton } from "@/components/nav/menu-styles";
 import { PerformanceStoryReport } from "@/components/performance/PerformanceStoryReport";
 import { SectionTitleBlock } from "@/components/ui/SectionTitleBlock";
+import type { SitePerformancePageCopy } from "@/types/site-settings";
 import type { WorkoutRow } from "@/types/workout";
 import { useId, useMemo, useState } from "react";
 
 type Props = {
   initialRows: WorkoutRow[];
+  copy: SitePerformancePageCopy;
 };
 
 function formatDate(iso: string) {
@@ -25,7 +27,7 @@ function startOfDay(d: Date) {
   return x.getTime();
 }
 
-export function PerformanceClient({ initialRows }: Props) {
+export function PerformanceClient({ initialRows, copy }: Props) {
   const fid = useId();
   const idQ = `${fid}-q`;
   const idFrom = `${fid}-from`;
@@ -80,41 +82,43 @@ export function PerformanceClient({ initialRows }: Props) {
     URL.revokeObjectURL(url);
   }
 
+  const countBadge = copy.countBadgeTemplate.replace("{count}", String(stats.count));
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 text-apple-ink dark:text-zinc-100 sm:px-8 sm:py-14">
       <SectionTitleBlock
-        step="02"
-        eyebrow="리포트"
-        title="운동 성과 리포트"
-        description="기간별 요약, 차트, 필터, CSV 내려받기를 한 화면에서 제공합니다."
+        step={copy.sectionStep}
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        description={copy.description}
         right={
           <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-[11px] font-semibold tabular-nums text-apple-ink shadow-sm sm:text-[12px] dark:border-zinc-700 dark:bg-zinc-900">
-            {stats.count}건
+            {countBadge}
           </span>
         }
       />
 
       <div className="mt-8">
-        <PerformanceStoryReport rows={initialRows} />
+        <PerformanceStoryReport rows={initialRows} copy={copy.story} />
       </div>
 
-      <BodyWeightPanel />
+      <BodyWeightPanel copy={copy.bodyWeight} />
 
       <div className="mt-8 rounded-[1.75rem] border border-neutral-200/90 bg-white/95 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label htmlFor={idQ} className="block text-[12px] font-semibold text-apple-subtle">
-            종목 검색
+            {copy.searchLabel}
             <input
               id={idQ}
               name="q"
               className="mt-1.5 w-full rounded-xl border border-neutral-200/90 px-3 py-2 text-[15px] text-apple-ink shadow-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="예: 스쿼트"
+              placeholder={copy.searchPlaceholder}
             />
           </label>
           <label htmlFor={idFrom} className="block text-[12px] font-semibold text-apple-subtle">
-            시작 날짜
+            {copy.dateFromLabel}
             <input
               id={idFrom}
               name="from"
@@ -125,7 +129,7 @@ export function PerformanceClient({ initialRows }: Props) {
             />
           </label>
           <label htmlFor={idTo} className="block text-[12px] font-semibold text-apple-subtle">
-            종료 날짜
+            {copy.dateToLabel}
             <input
               id={idTo}
               name="to"
@@ -145,18 +149,18 @@ export function PerformanceClient({ initialRows }: Props) {
               }}
               className={`w-full ${navToolbarButton}`}
             >
-              초기화
+              {copy.resetButton}
             </button>
           </div>
         </div>
 
         <div className="mt-6 grid gap-3 border-t border-neutral-200/90 pt-6 sm:grid-cols-3">
           <div className="rounded-2xl border border-neutral-200/90 bg-neutral-50 px-4 py-3 text-center">
-            <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle">세트</p>
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle">{copy.statSetsLabel}</p>
             <p className="font-display mt-1 text-2xl font-bold tabular-nums">{stats.count}</p>
           </div>
           <div className="rounded-2xl border border-neutral-200/90 bg-neutral-100 px-4 py-3 text-center sm:col-span-2">
-            <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle">볼륨 합</p>
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-apple-subtle">{copy.statVolumeLabel}</p>
             <p className="font-display mt-1 text-2xl font-bold tabular-nums">{Math.round(stats.volume * 10) / 10}</p>
           </div>
         </div>
@@ -167,21 +171,21 @@ export function PerformanceClient({ initialRows }: Props) {
           disabled={filtered.length === 0}
           className="mt-6 w-full rounded-lg border border-black bg-black py-3 text-[13px] font-semibold tracking-[-0.02em] text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          CSV 내려받기 ({filtered.length}건)
+          {copy.csvDownloadTemplate.replace("{count}", String(filtered.length))}
         </button>
       </div>
 
       <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-neutral-200/90 bg-white shadow-sm">
-        <div className="border-b border-neutral-200 bg-black px-4 py-2.5 text-[12px] font-medium tracking-[-0.01em] text-white">목록 미리보기</div>
+        <div className="border-b border-neutral-200 bg-black px-4 py-2.5 text-[12px] font-medium tracking-[-0.01em] text-white">{copy.listPreviewTitle}</div>
         <ul className="max-h-[min(480px,50vh)] divide-y divide-neutral-200 overflow-y-auto">
           {filtered.length === 0 ? (
-            <li className="px-4 py-8 text-center text-[14px] text-apple-subtle">조건에 맞는 기록이 없습니다.</li>
+            <li className="px-4 py-8 text-center text-[14px] text-apple-subtle">{copy.emptyFiltered}</li>
           ) : (
             filtered.map((w) => (
               <li key={w.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-[14px]">
                 <span className="font-semibold text-apple-ink">{w.exercise_name}</span>
                 <span className="tabular-nums text-apple-subtle">
-                  {Number(w.weight_kg)}kg · {w.reps}×{w.sets} · {w.success ? "달성" : "미달"}
+                  {Number(w.weight_kg)}kg · {w.reps}×{w.sets} · {w.success ? copy.outcomeSuccess : copy.outcomeFail}
                 </span>
                 <time className="w-full text-[12px] text-apple-subtle sm:w-auto">{formatDate(w.created_at)}</time>
               </li>

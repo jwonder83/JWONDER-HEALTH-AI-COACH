@@ -1,4 +1,5 @@
 import { SettingsForm } from "./settings-form";
+import { getSiteSettings } from "@/lib/site-settings/load-server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -10,5 +11,6 @@ export default async function SettingsPage() {
   if (!user) {
     redirect("/login");
   }
-  return <SettingsForm email={user.email ?? ""} />;
+  const site = await getSiteSettings();
+  return <SettingsForm email={user.email ?? ""} copy={site.copy.settingsPage} />;
 }

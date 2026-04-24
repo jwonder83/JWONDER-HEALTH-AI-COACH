@@ -17,6 +17,7 @@ export default async function WorkoutPage() {
       userId={user.id}
       restTargetSeconds={site.experience.workoutRestTargetSeconds}
       missedDayHourLocal={site.experience.missedDayHourLocal}
+      sessionCopy={site.copy.workoutSession}
     />
   );
 }

@@ -56,13 +56,13 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
             <Link
               href="/"
               className="font-display relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-apple-ink bg-apple-ink text-[15px] font-semibold text-white transition hover:bg-white hover:text-apple-ink"
-              aria-label="홈"
+              aria-label={site.copy.appShell.homeAriaLabel}
             >
               {site.images.headerLogo.src.trim() ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={site.images.headerLogo.src}
-                  alt={site.images.headerLogo.alt.trim() || "홈"}
+                  alt={site.images.headerLogo.alt.trim() || site.copy.appShell.homeLogoFallbackAlt}
                   className="size-full object-contain p-0.5"
                   loading="eager"
                   decoding="async"
@@ -71,7 +71,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                 <span aria-hidden>{initialFromEmail(email)}</span>
               )}
             </Link>
-            <nav aria-label="주요 메뉴" className="flex flex-wrap items-center gap-x-0.5 gap-y-1 sm:gap-x-1">
+            <nav aria-label={site.copy.appShell.mainNavAriaLabel} className="flex flex-wrap items-center gap-x-0.5 gap-y-1 sm:gap-x-1">
               <Link href="/" className={navHeaderLink}>
                 {site.experience.navLabels.home}
               </Link>
@@ -99,10 +99,10 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
             <ThemeToggle />
             {showAdminLink ? (
               <Link href="/admin" className={navHeaderLink}>
-                운영
+                {site.copy.appShell.adminLinkLabel}
               </Link>
             ) : null}
-            <SignOutButton className={navHeaderLinkMuted} />
+            <SignOutButton className={navHeaderLinkMuted} label={site.copy.appShell.signOutLabel} />
           </div>
         </div>
       </header>
@@ -144,7 +144,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                     href={footerMeta.statusUrl}
                     className="underline decoration-neutral-300 underline-offset-4 transition hover:text-apple-ink dark:hover:text-zinc-100"
                   >
-                    {footerMeta.statusLabel?.trim() || "장애 시 상태 확인"}
+                    {footerMeta.statusLabel?.trim() || site.copy.appShell.footerStatusFallback}
                   </FooterNavLink>
                   {footerMeta.feedbackMailto || footerMeta.feedbackFormUrl ? (
                     <span className="text-neutral-300" aria-hidden>
@@ -158,7 +158,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                   href={footerMeta.feedbackMailto}
                   className="underline decoration-neutral-300 underline-offset-4 transition hover:text-apple-ink"
                 >
-                  문의(메일)
+                  {site.copy.appShell.footerFeedbackMail}
                 </a>
               ) : null}
               {footerMeta.feedbackMailto && footerMeta.feedbackFormUrl ? (
@@ -171,7 +171,7 @@ export function AppShell({ email, showAdminLink, site, children, footerMeta }: P
                   href={footerMeta.feedbackFormUrl}
                   className="underline decoration-neutral-300 underline-offset-4 transition hover:text-apple-ink"
                 >
-                  문의(폼)
+                  {site.copy.appShell.footerFeedbackForm}
                 </FooterNavLink>
               ) : null}
             </p>

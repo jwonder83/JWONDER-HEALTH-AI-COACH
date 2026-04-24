@@ -5,6 +5,7 @@ import Link from "next/link";
 export default async function HelpPage() {
   const site = await getSiteSettings();
   const h = site.copy.helpCenter;
+  const x = site.copy.helpPageExtras;
   const statusUrl = process.env.NEXT_PUBLIC_STATUS_URL?.trim();
   const statusLabel = process.env.NEXT_PUBLIC_STATUS_LABEL?.trim();
   const feedbackEmail = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL?.trim();
@@ -12,10 +13,10 @@ export default async function HelpPage() {
   const hasExtraLinks = Boolean(statusUrl || feedbackEmail || feedbackFormUrl);
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8 sm:py-14">
-      <SectionTitleBlock step="?" eyebrow="도움" title={h.pageTitle} />
+      <SectionTitleBlock step="?" eyebrow={x.pageEyebrow} title={h.pageTitle} />
       <p className="mt-2 whitespace-pre-wrap text-[14px] leading-snug text-apple-subtle sm:text-[15px]">{h.intro}</p>
       <p className="mt-4 text-[14px] leading-snug text-apple-subtle sm:text-[15px]">
-        스플릿·델로드·RPE 등은{" "}
+        {x.programHintBeforeLink}{" "}
         <Link href="/program" className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] hover:opacity-60">
           {site.program.promoLinkLabel}
         </Link>
@@ -24,7 +25,7 @@ export default async function HelpPage() {
 
       {hasExtraLinks ? (
         <div className="mt-8 rounded-2xl border border-neutral-200 bg-white/90 px-4 py-4 shadow-sm sm:px-5">
-          <p className="text-[12px] font-medium tracking-[-0.01em] text-apple-subtle">더보기</p>
+          <p className="text-[12px] font-medium tracking-[-0.01em] text-apple-subtle">{x.moreLinksTitle}</p>
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-apple-subtle">
             {statusUrl ? (
               <a
@@ -33,7 +34,7 @@ export default async function HelpPage() {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                {statusLabel || "장애 시 상태 확인"}
+                {statusLabel || x.statusFallbackLabel}
               </a>
             ) : null}
             {feedbackEmail ? (
@@ -41,7 +42,7 @@ export default async function HelpPage() {
                 href={`mailto:${feedbackEmail}`}
                 className="font-semibold text-apple-ink underline decoration-neutral-400 underline-offset-[5px] transition hover:opacity-60"
               >
-                피드백·문의(메일)
+                {x.feedbackMailLabel}
               </a>
             ) : null}
             {feedbackFormUrl ? (
@@ -51,7 +52,7 @@ export default async function HelpPage() {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                피드백·문의(폼)
+                {x.feedbackFormLabel}
               </a>
             ) : null}
           </p>

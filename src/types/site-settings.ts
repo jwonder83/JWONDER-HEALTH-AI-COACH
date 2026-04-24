@@ -1,3 +1,7 @@
+import type { SiteHomeHubCopy } from "@/types/site-home-hub-copy";
+
+export type { SiteHomeHubCopy };
+
 export type ImageSlot = {
   src: string;
   alt: string;
@@ -19,6 +23,8 @@ export type SiteHelpCenter = {
 
 /** /legal/terms, /legal/privacy — 어드민에서 편집 (플레인 텍스트) */
 export type SiteLegalPages = {
+  termsEyebrow: string;
+  privacyEyebrow: string;
   termsTitle: string;
   termsBody: string;
   privacyTitle: string;
@@ -120,6 +126,213 @@ export type SiteMainDashboardCopy = {
   recordsCountSuffix: string;
 };
 
+/** 헤더·푸터 보조 링크 — 어드민에서 편집 */
+export type SiteAppShellCopy = {
+  homeAriaLabel: string;
+  mainNavAriaLabel: string;
+  adminLinkLabel: string;
+  signOutLabel: string;
+  homeLogoFallbackAlt: string;
+  footerFeedbackMail: string;
+  footerFeedbackForm: string;
+  footerStatusFallback: string;
+};
+
+/** /settings */
+export type SiteSettingsPageCopy = {
+  sectionStep: string;
+  sectionEyebrow: string;
+  title: string;
+  description: string;
+  emailHeading: string;
+  passwordHelp: string;
+  btnSending: string;
+  btnRequestReset: string;
+  msgResetSent: string;
+  msgGenericError: string;
+};
+
+export type SitePerformanceStoryCopy = {
+  reportEyebrow: string;
+  reportTitle: string;
+  reportSubtitle: string;
+  summaryEyebrow: string;
+  thisWeekVolumeLabel: string;
+  lastWeekVolumeLabel: string;
+  weekDeltaLabel: string;
+  rowCountLabel: string;
+  highlightsTitle: string;
+  chartVolumeTitle: string;
+  chartVolumeSubtitle: string;
+  chartWeekBarTitleTemplate: string;
+  chartActiveDaysBarTitleTemplate: string;
+  chartActiveDaysTitle: string;
+  chartActiveDaysSubtitle: string;
+  chartActiveDaysUnitSuffix: string;
+  section7DayTitle: string;
+  section7DaySubtitle: string;
+};
+
+export type SiteBodyWeightPanelCopy = {
+  eyebrow: string;
+  title: string;
+  subtitleLocal: string;
+  emptyHint: string;
+  dateLabel: string;
+  weightLabel: string;
+  placeholder: string;
+  saveButton: string;
+  deleteButton: string;
+  msgBadDate: string;
+  msgBadRange: string;
+  msgSavedLocal: string;
+};
+
+/** /performance */
+export type SitePerformancePageCopy = {
+  sectionStep: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  /** `{count}` 접미 앞 통계 배지 등 */
+  countBadgeTemplate: string;
+  searchLabel: string;
+  searchPlaceholder: string;
+  dateFromLabel: string;
+  dateToLabel: string;
+  resetButton: string;
+  statSetsLabel: string;
+  statVolumeLabel: string;
+  /** `{count}` */
+  csvDownloadTemplate: string;
+  listPreviewTitle: string;
+  emptyFiltered: string;
+  outcomeSuccess: string;
+  outcomeFail: string;
+  story: SitePerformanceStoryCopy;
+  bodyWeight: SiteBodyWeightPanelCopy;
+};
+
+/** /help 페이지에서 helpCenter 외 고정 문구 */
+export type SiteHelpPageExtrasCopy = {
+  pageEyebrow: string;
+  programHintBeforeLink: string;
+  moreLinksTitle: string;
+  feedbackMailLabel: string;
+  feedbackFormLabel: string;
+  statusFallbackLabel: string;
+};
+
+export type SiteOnboardingCopy = {
+  errorRoutineMd: string;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  goalLegend: string;
+  goalBulk: string;
+  goalCut: string;
+  goalMaintain: string;
+  expLegend: string;
+  expBeginner: string;
+  expIntermediate: string;
+  expAdvanced: string;
+  daysLegend: string;
+  /** `{n}` 주 n회 */
+  daysPerWeekTemplate: string;
+  equipmentLegend: string;
+  equipmentPlaceholder: string;
+  back: string;
+  next: string;
+  generating: string;
+  submit: string;
+  savedTitle: string;
+  homeCta: string;
+};
+
+export type SiteBillingPagesCopy = {
+  successTitle: string;
+  successBodyHtmlIntro: string;
+  successBodyHtmlOutro: string;
+  successBullet1: string;
+  successBullet2: string;
+  successBullet3: string;
+  homeLink: string;
+  cancelTitle: string;
+  cancelSubtitle: string;
+  settingsLink: string;
+  billingLegacyTitle: string;
+  billingLegacyBody: string;
+  billingLegacyCtaSuccess: string;
+  billingLegacyCtaSettings: string;
+};
+
+/** /workout 세션 UI */
+export type SiteWorkoutSessionCopy = {
+  flowTagline: string;
+  flowStep1: string;
+  flowStep2: string;
+  flowStep3: string;
+  flowAriaLabel: string;
+  coachModeLabel: string;
+  coachModeAriaOn: string;
+  coachModeAriaOff: string;
+  coachModeSrOn: string;
+  coachModeSrOff: string;
+  workoutModeIdleLabel: string;
+  coachCueResumeNext: string;
+  toastExerciseRequired: string;
+  coachCueRestTemplate: string;
+  toastXpLevelTemplate: string;
+  toastXpPrTemplate: string;
+  toastXpGainTemplate: string;
+  notifyEyebrow: string;
+  prBannerEyebrow: string;
+  prBannerTitle: string;
+  prBannerSubtitle: string;
+  idleStepEyebrow: string;
+  startButton: string;
+  idleHintFlow: string;
+  idleHintCoachOn: string;
+  idleHintCoachOff: string;
+  activeStepEyebrow: string;
+  restRegionAria: string;
+  restEyebrow: string;
+  restTitleTemplate: string;
+  restProgressTemplate: string;
+  restRemainingPartTemplate: string;
+  restNextOk: string;
+  restLongNudge: string;
+  restNextButton: string;
+  exerciseLabel: string;
+  exercisePlaceholder: string;
+  prevSameEyebrow: string;
+  volumeWord: string;
+  noPrevSameHint: string;
+  weightLabel: string;
+  repsLabel: string;
+  setsLabel: string;
+  weightQuickEntry: string;
+  weightFineTune: string;
+  repsQuickEntry: string;
+  outcomeSuccess: string;
+  outcomeFail: string;
+  saveSet: string;
+  savingSet: string;
+  saveBlockedRest: string;
+  finishSession: string;
+  doneStepEyebrow: string;
+  doneTitle: string;
+  doneResultEyebrow: string;
+  doneSessionLine: string;
+  /** `{count}` */
+  donePrSetsTemplate: string;
+  summarySets: string;
+  summaryVolume: string;
+  summaryPrSets: string;
+  summaryTime: string;
+  linkHome: string;
+};
+
 /** 메인 대시보드 운동 입력 카드 문구 */
 export type WorkoutFormCopyConfig = {
   eyebrow: string;
@@ -185,6 +398,14 @@ export type SiteCopyConfig = {
   loginExtras: SiteLoginExtrasCopy;
   signupForm: SiteSignupFormCopy;
   mainDashboard: SiteMainDashboardCopy;
+  appShell: SiteAppShellCopy;
+  settingsPage: SiteSettingsPageCopy;
+  performancePage: SitePerformancePageCopy;
+  helpPageExtras: SiteHelpPageExtrasCopy;
+  onboarding: SiteOnboardingCopy;
+  billingPages: SiteBillingPagesCopy;
+  workoutSession: SiteWorkoutSessionCopy;
+  homeHub: SiteHomeHubCopy;
 };
 
 export type ProgramYoutubeSlot = {

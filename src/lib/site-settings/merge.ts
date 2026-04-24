@@ -16,10 +16,18 @@ import type {
   SiteHelpCenter,
   SiteImagesConfig,
   SiteLegalPages,
+  SiteAppShellCopy,
+  SiteBillingPagesCopy,
+  SiteHelpPageExtrasCopy,
+  SiteHomeHubCopy,
   SiteLoginExtrasCopy,
   SiteMainDashboardCopy,
+  SiteOnboardingCopy,
+  SitePerformancePageCopy,
   SiteSettingsMerged,
+  SiteSettingsPageCopy,
   SiteSignupFormCopy,
+  SiteWorkoutSessionCopy,
   WorkoutFormCopyConfig,
 } from "@/types/site-settings";
 import { DEFAULT_SITE_SETTINGS } from "./defaults";
@@ -162,6 +170,8 @@ function mergeLegalPages(base: SiteLegalPages, patch: unknown): SiteLegalPages {
   if (!patch || typeof patch !== "object") return base;
   const p = patch as Record<string, unknown>;
   return {
+    termsEyebrow: mergeString(base.termsEyebrow, p.termsEyebrow),
+    privacyEyebrow: mergeString(base.privacyEyebrow, p.privacyEyebrow),
     termsTitle: mergeString(base.termsTitle, p.termsTitle),
     termsBody: mergeString(base.termsBody, p.termsBody),
     privacyTitle: mergeString(base.privacyTitle, p.privacyTitle),
@@ -238,6 +248,56 @@ function mergeWorkoutForm(base: WorkoutFormCopyConfig, patch: unknown): WorkoutF
     savingButtonLabel: mergeString(base.savingButtonLabel, p.savingButtonLabel),
     savedToast: mergeString(base.savedToast, p.savedToast),
   };
+}
+
+/** 문자열만 담긴 중첩 객체 — DB 패치와 기본값을 합칩니다. */
+function mergeRecursiveStringConfig(base: Record<string, unknown>, patch: unknown): Record<string, unknown> {
+  if (!patch || typeof patch !== "object") return { ...base };
+  const p = patch as Record<string, unknown>;
+  const out: Record<string, unknown> = { ...base };
+  for (const k of Object.keys(base)) {
+    const bv = base[k];
+    const pv = p[k];
+    if (typeof bv === "string") {
+      out[k] = mergeString(bv, pv);
+    } else if (bv && typeof bv === "object" && !Array.isArray(bv)) {
+      const nestedPatch = typeof pv === "object" && pv !== null && !Array.isArray(pv) ? pv : undefined;
+      out[k] = mergeRecursiveStringConfig(bv as Record<string, unknown>, nestedPatch);
+    }
+  }
+  return out;
+}
+
+function mergeAppShell(base: SiteAppShellCopy, patch: unknown): SiteAppShellCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SiteAppShellCopy;
+}
+
+function mergeSettingsPage(base: SiteSettingsPageCopy, patch: unknown): SiteSettingsPageCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SiteSettingsPageCopy;
+}
+
+function mergePerformancePage(base: SitePerformancePageCopy, patch: unknown): SitePerformancePageCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SitePerformancePageCopy;
+}
+
+function mergeHelpPageExtras(base: SiteHelpPageExtrasCopy, patch: unknown): SiteHelpPageExtrasCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SiteHelpPageExtrasCopy;
+}
+
+function mergeOnboardingCopy(base: SiteOnboardingCopy, patch: unknown): SiteOnboardingCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SiteOnboardingCopy;
+}
+
+function mergeBillingPages(base: SiteBillingPagesCopy, patch: unknown): SiteBillingPagesCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SiteBillingPagesCopy;
+}
+
+function mergeWorkoutSessionCopy(base: SiteWorkoutSessionCopy, patch: unknown): SiteWorkoutSessionCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SiteWorkoutSessionCopy;
+}
+
+function mergeHomeHub(base: SiteHomeHubCopy, patch: unknown): SiteHomeHubCopy {
+  return mergeRecursiveStringConfig(base as unknown as Record<string, unknown>, patch) as SiteHomeHubCopy;
 }
 
 function mergeMainHero(
@@ -431,6 +491,14 @@ function mergeCopy(base: SiteCopyConfig, patch: unknown): SiteCopyConfig {
     loginExtras: mergeLoginExtras(base.loginExtras, p.loginExtras),
     signupForm: mergeSignupForm(base.signupForm, p.signupForm),
     mainDashboard: mergeMainDashboard(base.mainDashboard, p.mainDashboard),
+    appShell: mergeAppShell(base.appShell, p.appShell),
+    settingsPage: mergeSettingsPage(base.settingsPage, p.settingsPage),
+    performancePage: mergePerformancePage(base.performancePage, p.performancePage),
+    helpPageExtras: mergeHelpPageExtras(base.helpPageExtras, p.helpPageExtras),
+    onboarding: mergeOnboardingCopy(base.onboarding, p.onboarding),
+    billingPages: mergeBillingPages(base.billingPages, p.billingPages),
+    workoutSession: mergeWorkoutSessionCopy(base.workoutSession, p.workoutSession),
+    homeHub: mergeHomeHub(base.homeHub, p.homeHub),
   };
 }
 

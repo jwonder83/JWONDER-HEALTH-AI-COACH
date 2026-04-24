@@ -1,10 +1,12 @@
 "use client";
 
 import { getNextMilestoneRemaining, getStreakMilestoneBadges } from "@/lib/workouts/streak-engagement";
+import type { SiteStreakMilestoneBadgesCopy } from "@/types/site-home-hub-copy";
 
 type Props = {
   streakDays: number;
   hydrated: boolean;
+  copy: SiteStreakMilestoneBadgesCopy;
 };
 
 const ring = {
@@ -21,33 +23,36 @@ function tierClass(days: number, unlocked: boolean): string {
   return ring.bronze;
 }
 
-export function StreakMilestoneBadges({ streakDays, hydrated }: Props) {
+export function StreakMilestoneBadges({ streakDays, hydrated, copy }: Props) {
   if (!hydrated) return null;
   const badges = getStreakMilestoneBadges(streakDays);
   const next = getNextMilestoneRemaining(streakDays);
 
   return (
     <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-zinc-800">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500">연속 스택 뱃지</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle dark:text-zinc-500">{copy.titleEyebrow}</p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {badges.map((b) => (
           <div
             key={b.days}
             className={`flex min-w-[4.5rem] flex-col items-center rounded-xl border px-2.5 py-2 transition ${tierClass(b.days, b.unlocked)}`}
           >
-            <span className="text-[9px] font-bold uppercase tracking-wider opacity-80">연속</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider opacity-80">{copy.streakWord}</span>
             <span className="font-display text-lg font-bold tabular-nums">{b.label}</span>
-            {b.unlocked ? <span className="mt-0.5 text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">획득</span> : <span className="mt-0.5 text-[9px] opacity-70">잠금</span>}
+            {b.unlocked ? (
+              <span className="mt-0.5 text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">{copy.unlocked}</span>
+            ) : (
+              <span className="mt-0.5 text-[9px] opacity-70">{copy.locked}</span>
+            )}
           </div>
         ))}
       </div>
       {next ? (
         <p className="mt-2 text-[12px] font-medium text-apple-subtle dark:text-zinc-400">
-          <span className="tabular-nums text-apple-ink dark:text-zinc-200">{next.next}일</span> 뱃지까지{" "}
-          <span className="font-semibold tabular-nums text-amber-700 dark:text-amber-300">{next.remaining}일</span> 남음
+          {copy.nextBadgeTemplate.replace("{next}", String(next.next)).replace("{remaining}", String(next.remaining))}
         </p>
       ) : streakDays >= 30 ? (
-        <p className="mt-2 text-[12px] font-semibold text-amber-800 dark:text-amber-200">30일 뱃지 풀콤보 달성.</p>
+        <p className="mt-2 text-[12px] font-semibold text-amber-800 dark:text-amber-200">{copy.fullComboLine}</p>
       ) : null}
     </div>
   );

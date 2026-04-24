@@ -1,12 +1,15 @@
+import { getSiteSettings } from "@/lib/site-settings/load-server";
 import Link from "next/link";
 
-export default function PaymentCancelPage() {
+export default async function PaymentCancelPage() {
+  const site = await getSiteSettings();
+  const b = site.copy.billingPages;
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center text-apple-ink dark:text-zinc-100">
-      <p className="font-display text-2xl font-bold tracking-tight">결제가 취소되었습니다</p>
-      <p className="mt-4 text-[15px] text-apple-subtle dark:text-zinc-400">언제든지 다시 시도할 수 있어요.</p>
+      <p className="font-display text-2xl font-bold tracking-tight">{b.cancelTitle}</p>
+      <p className="mt-4 text-[15px] text-apple-subtle dark:text-zinc-400">{b.cancelSubtitle}</p>
       <Link href="/settings" className="mt-10 inline-block text-[15px] font-semibold underline underline-offset-4">
-        설정으로
+        {b.settingsLink}
       </Link>
     </div>
   );

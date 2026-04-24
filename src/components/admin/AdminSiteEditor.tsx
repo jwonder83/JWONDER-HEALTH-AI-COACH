@@ -8,6 +8,7 @@ import type {
   SiteSettingsMerged,
   WorkoutFormCopyConfig,
 } from "@/types/site-settings";
+import { AdminHomeHubCopyFields } from "@/components/admin/AdminHomeHubCopyFields";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
@@ -622,6 +623,11 @@ export function AdminSiteEditor({ initialSettings }: Props) {
             ))}
           </div>
         </section>
+
+        <AdminHomeHubCopyFields
+          value={settings.copy.homeHub}
+          onChange={(next) => setCopy({ homeHub: next })}
+        />
 
         <section className="mb-10 space-y-4">
           <h2 className="text-[15px] font-semibold text-apple-ink">운동 입력 폼</h2>

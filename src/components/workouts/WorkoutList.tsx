@@ -7,6 +7,7 @@ import {
   type WorkoutRowInsight,
 } from "@/lib/workouts/row-insights";
 import type { ImageSlot } from "@/types/site-settings";
+import type { SiteWorkoutListInsightsCopy } from "@/types/site-home-hub-copy";
 import type { WorkoutRow } from "@/types/workout";
 import { useMemo, type ReactNode } from "react";
 
@@ -16,6 +17,7 @@ type Props = {
   listEmptyImage: ImageSlot;
   listEmptyTitle: string;
   listEmptySubtitle: string;
+  insightsCopy: SiteWorkoutListInsightsCopy;
   onDeleteItem?: (id: string) => void;
 };
 
@@ -62,9 +64,11 @@ function Skeleton() {
 function DeltaBadges({
   volumePct,
   weightPct,
+  copy,
 }: {
   volumePct: number | null;
   weightPct: number | null;
+  copy: SiteWorkoutListInsightsCopy;
 }) {
   const nodes: ReactNode[] = [];
   if (volumePct !== null) {
@@ -81,7 +85,7 @@ function DeltaBadges({
               : "rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-bold tabular-nums text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300"
         }
       >
-        볼륨 {flat ? "유지" : `${up ? "+" : ""}${volumePct}%`}
+        {copy.volumePrefix} {flat ? copy.deltaFlat : `${up ? "+" : ""}${volumePct}%`}
       </span>,
     );
   }
@@ -99,7 +103,7 @@ function DeltaBadges({
               : "rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-[11px] font-bold tabular-nums text-orange-900 dark:border-orange-900/50 dark:bg-orange-950/40 dark:text-orange-200"
         }
       >
-        중량 {flat ? "유지" : `${up ? "+" : ""}${weightPct}%`}
+        {copy.weightPrefix} {flat ? copy.deltaFlat : `${up ? "+" : ""}${weightPct}%`}
       </span>,
     );
   }
@@ -110,9 +114,11 @@ function DeltaBadges({
 function PerformanceOverview({
   items,
   insights,
+  copy,
 }: {
   items: WorkoutRow[];
   insights: Map<string, WorkoutRowInsight>;
+  copy: SiteWorkoutListInsightsCopy;
 }) {
   const volTotal = useMemo(() => totalVolume(items), [items]);
   const prCount = useMemo(() => countVolumePrs(items, insights), [items, insights]);
@@ -123,33 +129,36 @@ function PerformanceOverview({
     <div className="border-b border-neutral-200 bg-gradient-to-b from-neutral-50/90 to-white px-4 py-5 dark:border-zinc-800 dark:from-zinc-900/80 dark:to-zinc-950 sm:px-6 sm:py-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-apple-subtle">짧게 요약</p>
-          <h3 className="font-display mt-1 text-[1.25rem] font-bold tracking-[-0.02em] text-apple-ink dark:text-zinc-100 sm:text-[1.4rem]">기록 들여다보기</h3>
-          <p className="mt-1 max-w-md text-[13px] leading-relaxed text-apple-subtle">볼륨·PR·부위 비중은 저장된 세트를 알아서 묶어서 보여줘요.</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-apple-subtle">{copy.eyebrow}</p>
+          <h3 className="font-display mt-1 text-[1.25rem] font-bold tracking-[-0.02em] text-apple-ink dark:text-zinc-100 sm:text-[1.4rem]">{copy.title}</h3>
+          <p className="mt-1 max-w-md text-[13px] leading-relaxed text-apple-subtle">{copy.subtitle}</p>
         </div>
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-neutral-200/90 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle">누적 볼륨</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle">{copy.volumeEyebrow}</p>
           <p className="font-display mt-1 text-[1.35rem] font-bold tabular-nums text-apple-ink dark:text-zinc-100">{volTotal}</p>
-          <p className="mt-0.5 text-[11px] text-apple-subtle">kg×회×세트 합</p>
+          <p className="mt-0.5 text-[11px] text-apple-subtle">{copy.volumeUnitHint}</p>
         </div>
         <div className="rounded-2xl border border-amber-200/80 bg-amber-50/90 p-4 shadow-sm dark:border-amber-900/40 dark:bg-amber-950/30">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-900/80 dark:text-amber-200/90">볼륨 PR</p>
-          <p className="font-display mt-1 text-[1.35rem] font-bold tabular-nums text-amber-950 dark:text-amber-100">{prCount}회</p>
-          <p className="mt-0.5 text-[11px] text-amber-900/70 dark:text-amber-200/70">종목별 최댓값 갈아끼운 횟수</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-900/80 dark:text-amber-200/90">{copy.prEyebrow}</p>
+          <p className="font-display mt-1 text-[1.35rem] font-bold tabular-nums text-amber-950 dark:text-amber-100">
+            {prCount}
+            {copy.prCountSuffix}
+          </p>
+          <p className="mt-0.5 text-[11px] text-amber-900/70 dark:text-amber-200/70">{copy.prHint}</p>
         </div>
         <div className="col-span-2 rounded-2xl border border-neutral-200/90 bg-white p-4 shadow-sm sm:col-span-1 dark:border-zinc-800 dark:bg-zinc-900/80">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle">총 세트 행</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-apple-subtle">{copy.rowsEyebrow}</p>
           <p className="font-display mt-1 text-[1.35rem] font-bold tabular-nums text-apple-ink dark:text-zinc-100">{items.length}</p>
-          <p className="mt-0.5 text-[11px] text-apple-subtle">저장 건수</p>
+          <p className="mt-0.5 text-[11px] text-apple-subtle">{copy.rowsHint}</p>
         </div>
       </div>
 
       {muscleSlices.length > 0 ? (
         <div className="mt-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-apple-subtle">부위별 볼륨 비중(추정)</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-apple-subtle">{copy.muscleEyebrow}</p>
           <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-zinc-800" aria-hidden>
             {muscleSlices.map((s) => (
               <div
@@ -175,7 +184,15 @@ function PerformanceOverview({
   );
 }
 
-export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, listEmptySubtitle, onDeleteItem }: Props) {
+export function WorkoutList({
+  items,
+  loading,
+  listEmptyImage,
+  listEmptyTitle,
+  listEmptySubtitle,
+  insightsCopy,
+  onDeleteItem,
+}: Props) {
   const insights = useMemo(() => (items.length > 0 ? computeWorkoutRowInsights(items) : new Map()), [items]);
 
   if (loading) {
@@ -206,7 +223,7 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
 
   return (
     <div className={listShell}>
-      <PerformanceOverview items={items} insights={insights} />
+      <PerformanceOverview items={items} insights={insights} copy={insightsCopy} />
       <ul>
         {items.map((w, i) => {
           const row = insights.get(w.id);
@@ -238,11 +255,13 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
                     <p className="mt-1 text-[14px] text-apple-subtle">
                       <span className="font-semibold text-apple-ink dark:text-zinc-200">{Number(w.weight_kg)}kg</span>
                       <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span>
-                      {w.reps}회 × {w.sets}세트
+                      {insightsCopy.repsSetsTemplate.replace("{reps}", String(w.reps)).replace("{sets}", String(w.sets))}
                       <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span>
-                      <span className="font-semibold text-apple-ink dark:text-zinc-200">볼륨 {vol}</span>
+                      <span className="font-semibold text-apple-ink dark:text-zinc-200">
+                        {insightsCopy.volumeInlinePrefix} {vol}
+                      </span>
                     </p>
-                    <DeltaBadges volumePct={row?.volumeDeltaPct ?? null} weightPct={row?.weightDeltaPct ?? null} />
+                    <DeltaBadges volumePct={row?.volumeDeltaPct ?? null} weightPct={row?.weightDeltaPct ?? null} copy={insightsCopy} />
                   </div>
                 </div>
                 <div className="flex shrink-0 flex-row flex-wrap items-center justify-between gap-2 border-t border-neutral-100 pt-2 dark:border-zinc-800/80 sm:flex-col sm:items-end sm:justify-center sm:border-0 sm:pt-0">
@@ -253,7 +272,7 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
                         : "border border-neutral-300 bg-neutral-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-apple-ink dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
                     }
                   >
-                    {w.success ? "성공" : "실패"}
+                    {w.success ? insightsCopy.success : insightsCopy.fail}
                   </span>
                   <time className="text-[12px] tabular-nums text-apple-subtle">{formatDate(w.created_at)}</time>
                   {onDeleteItem ? (
@@ -262,7 +281,7 @@ export function WorkoutList({ items, loading, listEmptyImage, listEmptyTitle, li
                       onClick={() => onDeleteItem(w.id)}
                       className="border border-neutral-300 bg-white px-3 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-apple-subtle transition hover:border-black hover:text-apple-ink dark:border-zinc-600 dark:bg-zinc-900 dark:hover:border-zinc-400"
                     >
-                      지우기
+                      {insightsCopy.delete}
                     </button>
                   ) : null}
                 </div>

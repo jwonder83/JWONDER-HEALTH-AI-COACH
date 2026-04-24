@@ -1,17 +1,19 @@
 "use client";
 
 import type { UserWorkoutUiState } from "@/lib/dashboard/user-workout-ui-state";
+import type { SiteUserWorkoutRibbonCopy } from "@/types/site-home-hub-copy";
 import Link from "next/link";
 
 type Props = {
   state: UserWorkoutUiState;
+  copy: SiteUserWorkoutRibbonCopy;
 };
 
-function stateLabel(s: UserWorkoutUiState): string {
-  if (s === "idle") return "운동 전";
-  if (s === "active") return "운동 중";
-  if (s === "completed") return "운동 완료";
-  return "운동 미완";
+function stateLabel(s: UserWorkoutUiState, copy: SiteUserWorkoutRibbonCopy): string {
+  if (s === "idle") return copy.stateIdle;
+  if (s === "active") return copy.stateActive;
+  if (s === "completed") return copy.stateCompleted;
+  return copy.stateMissed;
 }
 
 function habitPhase(s: UserWorkoutUiState): "pre" | "active" | "completed" | "missed" {
@@ -21,7 +23,7 @@ function habitPhase(s: UserWorkoutUiState): "pre" | "active" | "completed" | "mi
   return "missed";
 }
 
-export function UserWorkoutStateRibbon({ state }: Props) {
+export function UserWorkoutStateRibbon({ state, copy }: Props) {
   const shell =
     state === "completed"
       ? "border-emerald-400/50 bg-gradient-to-r from-emerald-50 via-white to-teal-50 dark:border-emerald-700/45 dark:from-emerald-950/40 dark:via-zinc-950 dark:to-teal-950/25"
@@ -40,10 +42,13 @@ export function UserWorkoutStateRibbon({ state }: Props) {
           ? "border-rose-600/35 bg-rose-600/15 text-rose-950 dark:border-rose-500/40 dark:bg-rose-500/20 dark:text-rose-50"
           : "border-amber-700/25 bg-amber-500/12 text-amber-950 dark:border-amber-500/35 dark:bg-amber-500/15 dark:text-amber-100";
 
+  const label = stateLabel(state, copy);
+  const aria = copy.ariaLabelTemplate.replace("{label}", label);
+
   return (
     <aside
       className={`rounded-2xl border-2 px-4 py-3.5 shadow-sm sm:px-5 sm:py-4 ${shell}`}
-      aria-label={`오늘 운동 상태: ${stateLabel(state)}`}
+      aria-label={aria}
       data-user-workout-state={state}
       data-habit-phase={habitPhase(state)}
     >
@@ -54,27 +59,23 @@ export function UserWorkoutStateRibbon({ state }: Props) {
               state === "active" ? "motion-safe:animate-pulse" : ""
             }`}
           >
-            {stateLabel(state)}
+            {label}
           </span>
           {state === "idle" ? (
             <p className="min-w-0 text-[13px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">
-              오늘은 아직 기록 전이에요. 아래에서 <span className="text-amber-800 dark:text-amber-300">플랜 고르기 → 운동 들어가기</span>만 이어가면 돼요.
+              {copy.messageIdleBefore}
+              <span className="text-amber-800 dark:text-amber-300">{copy.messageIdleHighlight}</span>
+              {copy.messageIdleAfter}
             </p>
           ) : null}
           {state === "active" ? (
-            <p className="min-w-0 text-[13px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">
-              세션 진행 중이에요. 운동 화면으로 돌아가 휴식·세트만 이어서 저장하면 돼요.
-            </p>
+            <p className="min-w-0 text-[13px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">{copy.messageActive}</p>
           ) : null}
           {state === "completed" ? (
-            <p className="min-w-0 text-[13px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">
-              오늘 볼륨이 쌓였어요. 성취·분석은 성과 탭에서 확인해 보세요.
-            </p>
+            <p className="min-w-0 text-[13px] font-semibold leading-snug text-apple-ink dark:text-zinc-100">{copy.messageCompleted}</p>
           ) : null}
           {state === "missed" ? (
-            <p className="min-w-0 text-[13px] font-semibold leading-snug text-rose-950 dark:text-rose-50">
-              오늘은 아직 세트가 없어요. 짧게라도 한 번 돌리면 스트릭이랑 기록이 이어져요.
-            </p>
+            <p className="min-w-0 text-[13px] font-semibold leading-snug text-rose-950 dark:text-rose-50">{copy.messageMissed}</p>
           ) : null}
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
@@ -83,7 +84,7 @@ export function UserWorkoutStateRibbon({ state }: Props) {
               href="/workout"
               className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-black px-4 text-[13px] font-bold text-white transition hover:bg-neutral-800 active:scale-[0.99] dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
             >
-              운동 시작하기
+              {copy.ctaStartWorkout}
             </Link>
           ) : null}
           {state === "active" ? (
@@ -91,7 +92,7 @@ export function UserWorkoutStateRibbon({ state }: Props) {
               href="/workout"
               className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 text-[13px] font-bold text-white shadow-md ring-2 ring-indigo-400/30 transition hover:opacity-95 active:scale-[0.99]"
             >
-              세션 이어가기
+              {copy.ctaResumeSession}
             </Link>
           ) : null}
           {state === "completed" ? (
@@ -99,7 +100,7 @@ export function UserWorkoutStateRibbon({ state }: Props) {
               href="/performance"
               className="inline-flex min-h-[44px] items-center justify-center rounded-xl border-2 border-emerald-700/40 bg-white px-4 text-[13px] font-bold text-emerald-900 transition hover:bg-emerald-50 active:scale-[0.99] dark:border-emerald-500/50 dark:bg-zinc-900 dark:text-emerald-100 dark:hover:bg-emerald-950/40"
             >
-              분석 보기
+              {copy.ctaViewAnalysis}
             </Link>
           ) : null}
           {state === "missed" ? (
@@ -108,13 +109,13 @@ export function UserWorkoutStateRibbon({ state }: Props) {
                 href="/workout"
                 className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-rose-700 px-4 text-[13px] font-bold text-white shadow-md transition hover:bg-rose-800 active:scale-[0.99] dark:bg-rose-600 dark:hover:bg-rose-500"
               >
-                빠른 루틴 시작
+                {copy.ctaQuickStart}
               </Link>
               <Link
                 href="/program"
                 className="inline-flex min-h-[44px] items-center justify-center rounded-xl border-2 border-rose-400/60 bg-white px-4 text-[13px] font-bold text-rose-900 transition hover:bg-rose-50 active:scale-[0.99] dark:border-rose-500/50 dark:bg-zinc-900 dark:text-rose-100 dark:hover:bg-rose-950/30"
               >
-                짧은 루틴 찾기
+                {copy.ctaFindShortRoutine}
               </Link>
             </>
           ) : null}

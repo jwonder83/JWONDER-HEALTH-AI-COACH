@@ -18,6 +18,7 @@ import { useHomeActionViewModel } from "@/components/dashboard/home/use-home-act
 import { useTodayRoutineConfirmation } from "@/components/dashboard/home/use-today-routine-confirmation";
 import type { UserWorkoutUiState } from "@/lib/dashboard/user-workout-ui-state";
 import type { SiteExperienceConfig } from "@/types/site-settings";
+import type { SiteHomeHubCopy } from "@/types/site-home-hub-copy";
 import type { WorkoutRow } from "@/types/workout";
 
 const secondaryShell = "mt-10 border-t border-neutral-200/90 pt-8 dark:border-zinc-800";
@@ -29,10 +30,11 @@ type Props = {
   hydrated: boolean;
   userWorkoutUiState: UserWorkoutUiState;
   experience: SiteExperienceConfig;
+  homeHub: SiteHomeHubCopy;
 };
 
 /** 홈 상단 — 오늘 운동 시작을 최우선으로 하는 카드 묶음 */
-export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, experience }: Props) {
+export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, experience, homeHub }: Props) {
   const model = useHomeActionViewModel({ userId, workouts, hydrated, experience });
   const routineFlow = useTodayRoutineConfirmation({
     routine: model.routine,
@@ -45,12 +47,15 @@ export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, 
         model={model}
         routineFlowStatus={routineFlow.status}
         userWorkoutUiState={userWorkoutUiState}
+        copy={homeHub.singleAction}
       />
 
       <div className={secondaryShell}>
-        <p className="mb-5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-apple-subtle dark:text-zinc-500">기록 · 분석 · 코치</p>
+        <p className="mb-5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-apple-subtle dark:text-zinc-500">
+          {homeHub.secondary.sectionEyebrow}
+        </p>
         <div className={secondaryGrid}>
-          <UserWorkoutStateRibbon state={userWorkoutUiState} />
+          <UserWorkoutStateRibbon state={userWorkoutUiState} copy={homeHub.userRibbon} />
           <WeeklyStakeCard stake={model.weeklyStake} hydrated={model.hydrated} todayWorkoutComplete={model.todayWorkoutComplete} />
           {model.hydrated &&
           !model.todayWorkoutComplete &&
@@ -66,7 +71,12 @@ export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, 
             streakDays={model.streakDays}
             recoveryDay={model.recoveryAfterMissedYesterday}
           />
-          <TodayStatusCard model={model} uiState={userWorkoutUiState} />
+          <TodayStatusCard
+            model={model}
+            uiState={userWorkoutUiState}
+            copy={homeHub.todayStatus}
+            streakBadgesCopy={homeHub.streakBadges}
+          />
           <DailyStatusBriefingCard
             briefing={model.dailyBriefing}
             hydrated={model.hydrated}
@@ -93,6 +103,7 @@ export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, 
                 afternoonEndHour: experience.interventionAfternoonEndHour,
                 eveningEndHour: experience.interventionEveningEndHour,
               }}
+              copy={homeHub.noWorkout}
             />
           ) : null}
           <BehaviorInterventionBanner
@@ -103,6 +114,7 @@ export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, 
             status={routineFlow.status}
             onConfirm={routineFlow.confirm}
             onRequestPlanChange={routineFlow.requestPlanChange}
+            copy={homeHub.todayPlan}
           />
           <TodayWorkoutHeroCard
             model={model}
@@ -110,6 +122,7 @@ export function HomeActionHub({ userId, workouts, hydrated, userWorkoutUiState, 
             workoutSectionId="today-workout"
             userWorkoutUiState={userWorkoutUiState}
             hidePrimaryCta
+            copy={homeHub.todayHero}
           />
           <RecentActivitySummaryCard items={model.recentActivities} hydrated={model.hydrated} />
         </div>

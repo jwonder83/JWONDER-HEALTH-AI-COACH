@@ -461,11 +461,12 @@ export function HomeDashboard({ userId, site }: Props) {
           hydrated={hydrated}
           userWorkoutUiState={userWorkoutUiState}
           experience={site.experience}
+          homeHub={site.copy.homeHub}
         />
 
         <RewardStatusCard userId={userId} workouts={workouts} hydrated={hydrated} lastXpFloat={lastXpFloat} />
 
-        <OnboardingBanner />
+        <OnboardingBanner copy={site.copy.homeHub.onboardingBanner} />
 
         {/* Unsplash 타일 띠 */}
         <div className="mt-8 grid grid-cols-3 gap-2 sm:mt-10 sm:gap-3">
@@ -680,6 +681,7 @@ export function HomeDashboard({ userId, site }: Props) {
             listEmptyImage={site.images.listEmpty}
             listEmptyTitle={site.copy.listEmptyTitle}
             listEmptySubtitle={site.copy.listEmptySubtitle}
+            insightsCopy={site.copy.homeHub.workoutList}
             onDeleteItem={(id) => void handleDeleteOne(id)}
           />
         </section>

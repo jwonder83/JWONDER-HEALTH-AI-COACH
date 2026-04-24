@@ -3,6 +3,7 @@
 import { StreakMilestoneBadges } from "@/components/gamification/StreakMilestoneBadges";
 import type { HomeActionViewModel } from "@/lib/dashboard/home-action-state";
 import type { UserWorkoutUiState } from "@/lib/dashboard/user-workout-ui-state";
+import type { SiteHomeHubCopy } from "@/types/site-home-hub-copy";
 
 type Props = {
   model: Pick<
@@ -18,6 +19,8 @@ type Props = {
     | "recoveryAfterMissedYesterday"
   >;
   uiState: UserWorkoutUiState;
+  copy: SiteHomeHubCopy["todayStatus"];
+  streakBadgesCopy: SiteHomeHubCopy["streakBadges"];
 };
 
 function shellFor(uiState: UserWorkoutUiState, hydrated: boolean): string {
@@ -38,7 +41,7 @@ function shellFor(uiState: UserWorkoutUiState, hydrated: boolean): string {
   return `${base} border-amber-300/70 bg-gradient-to-br from-amber-50/90 via-white to-neutral-50 ring-amber-500/10 dark:border-amber-700/45 dark:from-amber-950/35 dark:via-zinc-950 dark:to-zinc-900 dark:ring-amber-500/10`;
 }
 
-export function TodayStatusCard({ model, uiState }: Props) {
+export function TodayStatusCard({ model, uiState, copy, streakBadgesCopy }: Props) {
   const pct = model.goalProgressPercent;
   const barWidth = model.hydrated ? (pct !== null ? pct : model.todayWorkoutComplete ? 100 : 12) : 12;
   const shell = shellFor(uiState, model.hydrated);
@@ -48,62 +51,64 @@ export function TodayStatusCard({ model, uiState }: Props) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 id="today-status-heading" className="text-[10px] font-bold uppercase tracking-[0.2em] text-apple-subtle">
-            오늘 한 줄 요약
+            {copy.titleEyebrow}
           </h2>
           <p className="font-display mt-2 text-[1.25rem] font-bold leading-tight text-apple-ink sm:text-[1.4rem] dark:text-zinc-100">
             {!model.hydrated ? (
-              <span className="text-apple-subtle">불러오는 중…</span>
+              <span className="text-apple-subtle">{copy.loadingMain}</span>
             ) : uiState === "completed" ? (
               <>
-                오늘 운동 <span className="text-emerald-600 dark:text-emerald-400">완료</span>
+                {copy.lineCompleted} <span className="text-emerald-600 dark:text-emerald-400">{copy.lineCompletedWord}</span>
               </>
             ) : uiState === "active" ? (
               <>
-                지금 <span className="text-indigo-600 dark:text-indigo-400">운동 중</span>
+                {copy.lineActive} <span className="text-indigo-600 dark:text-indigo-400">{copy.lineActiveWord}</span>
               </>
             ) : uiState === "missed" ? (
               <>
-                오늘 운동 <span className="text-rose-600 dark:text-rose-400">미완</span>
+                {copy.lineMissed} <span className="text-rose-600 dark:text-rose-400">{copy.lineMissedWord}</span>
               </>
             ) : (
               <>
-                오늘 운동 <span className="text-amber-600 dark:text-amber-400">전</span>
+                {copy.lineBefore} <span className="text-amber-600 dark:text-amber-400">{copy.lineBeforeWord}</span>
               </>
             )}
           </p>
         </div>
         <div className="rounded-full border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-teal-50 px-3.5 py-2 text-center shadow-sm dark:border-emerald-900/50 dark:from-emerald-950/50 dark:to-teal-950/40">
-          <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-emerald-800/90 dark:text-emerald-300/90">연속 스택</p>
+          <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-emerald-800/90 dark:text-emerald-300/90">{copy.streakEyebrow}</p>
           <p className="font-display text-[1.25rem] font-bold tabular-nums text-emerald-900 dark:text-emerald-200">
-            {model.hydrated ? `${model.streakDays}일` : "—"}
+            {model.hydrated ? `${model.streakDays}${copy.streakDaysSuffix}` : "—"}
           </p>
           {model.hydrated && model.recoveryAfterMissedYesterday && !model.todayWorkoutComplete ? (
-            <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300">유지 모드</p>
+            <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300">{copy.recoveryModeBadge}</p>
           ) : null}
         </div>
       </div>
 
       {model.hydrated && uiState === "idle" && !model.todayWorkoutComplete ? (
         <p className="mt-3 rounded-xl border border-amber-300/70 bg-amber-50/90 px-3 py-2 text-[12px] font-semibold leading-relaxed text-amber-950 dark:border-amber-700/50 dark:bg-amber-950/35 dark:text-amber-100">
-          아직 시작 전이에요. 플랜만 정한 뒤 <span className="font-bold">운동 시작하기</span>로 들어가면 돼요.
+          {copy.idleNudgeBefore}
+          <span className="font-bold">{copy.idleNudgeBold}</span>
+          {copy.idleNudgeAfter}
         </p>
       ) : null}
 
       {model.hydrated && uiState === "active" ? (
         <p className="mt-3 rounded-xl border border-indigo-300/70 bg-indigo-50/90 px-3 py-2 text-[12px] font-semibold leading-relaxed text-indigo-950 dark:border-indigo-700/50 dark:bg-indigo-950/35 dark:text-indigo-100">
-          타이머랑 입력은 운동 화면에 있어요. 세트 저장하고 휴식 {model.workoutRestTargetSeconds}초 쉬었다가 다음 세트로 가면 돼요.
+          {copy.activeNudgeTemplate.replace("{seconds}", String(model.workoutRestTargetSeconds))}
         </p>
       ) : null}
 
       {model.hydrated && uiState === "missed" ? (
         <p className="mt-3 rounded-xl border border-rose-300/80 bg-rose-50/95 px-3 py-2 text-[12px] font-bold leading-relaxed text-rose-950 dark:border-rose-700/50 dark:bg-rose-950/40 dark:text-rose-50">
-          아직 세트가 없어요. 위 리본에서 빠르게 시작하거나, 아래 플랜으로 바로 들어가도 돼요.
+          {copy.missedNudge}
         </p>
       ) : null}
 
       {model.hydrated && uiState === "completed" ? (
         <p className="mt-3 rounded-xl border border-emerald-300/60 bg-emerald-50/85 px-3 py-2 text-[12px] font-semibold leading-relaxed text-emerald-950 dark:border-emerald-800/45 dark:bg-emerald-950/35 dark:text-emerald-100">
-          주간 목표랑 스트릭 숫자도 갱신됐을 거예요. 성과 탭에서 한번 볼까요.
+          {copy.completedNudge}
         </p>
       ) : null}
 
@@ -115,18 +120,16 @@ export function TodayStatusCard({ model, uiState }: Props) {
 
       <p className="mt-3 text-[13px] leading-relaxed text-apple-subtle dark:text-zinc-400">
         {!model.hydrated ? (
-          "기록 싹 불러오는 중…"
+          copy.weeklyLoading
         ) : model.weeklySessionTarget != null ? (
           <>
-            이번 주 목표 진행률{" "}
-            <span className="font-semibold text-apple-ink tabular-nums dark:text-zinc-200">{pct ?? 0}%</span>
-            <span className="tabular-nums">
-              {" "}
-              ({model.weeklySessionCurrent}/{model.weeklySessionTarget}세션)
-            </span>
+            {copy.weeklyProgressTemplate
+              .replace("{pct}", String(pct ?? 0))
+              .replace("{current}", String(model.weeklySessionCurrent))
+              .replace("{target}", String(model.weeklySessionTarget))}
           </>
         ) : (
-          <>주간 목표는 아래 「이번 주 목표」에서 슬쩍 정해 두면 돼요.</>
+          <>{copy.weeklyNoGoalHint}</>
         )}
       </p>
 
@@ -136,7 +139,7 @@ export function TodayStatusCard({ model, uiState }: Props) {
         aria-valuenow={pct ?? 0}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="이번 주 목표 진행률"
+        aria-label={copy.progressAriaLabel}
       >
         <div
           className="h-full rounded-full bg-gradient-to-r from-emerald-700 to-emerald-500 transition-[width] duration-500 dark:from-emerald-500 dark:to-teal-400"
@@ -144,7 +147,7 @@ export function TodayStatusCard({ model, uiState }: Props) {
         />
       </div>
 
-      <StreakMilestoneBadges streakDays={model.streakDays} hydrated={model.hydrated} />
+      <StreakMilestoneBadges streakDays={model.streakDays} hydrated={model.hydrated} copy={streakBadgesCopy} />
     </section>
   );
 }

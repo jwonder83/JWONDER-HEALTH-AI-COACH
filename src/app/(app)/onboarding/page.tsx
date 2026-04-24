@@ -1,4 +1,5 @@
 import { OnboardingClient } from "./onboarding-client";
+import { getSiteSettings } from "@/lib/site-settings/load-server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -8,5 +9,6 @@ export default async function OnboardingPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  return <OnboardingClient />;
+  const site = await getSiteSettings();
+  return <OnboardingClient copy={site.copy.onboarding} />;
 }

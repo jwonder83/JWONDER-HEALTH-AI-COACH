@@ -5,22 +5,19 @@ import {
   type NoWorkoutInterventionHourBounds,
   type NoWorkoutUrgencyPhase,
 } from "@/lib/dashboard/no-workout-intervention-urgency";
+import type { SiteNoWorkoutInterventionCopy } from "@/types/site-home-hub-copy";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Props = {
-  /** 오늘 루틴 예상 시간 라벨 (예: 약 40–55분) */
   estimatedDurationLabel: string;
   routineTitle: string;
-  /** 플랜 확정 후에만 운동 화면으로 바로 보냄 */
   planConfirmed: boolean;
-  /** 결정형 코치 한 줄(히어로와 동일 소스) */
   coachLine: string;
-  /** 데이터 기반 근거 */
   coachLineReason: string;
-  /** 연속 일수 — 저녁 개입 문구 분기 */
   streakDays: number;
   interventionHours: NoWorkoutInterventionHourBounds;
+  copy: SiteNoWorkoutInterventionCopy;
 };
 
 function scrollToTodayPlan() {
@@ -31,11 +28,11 @@ function scrollToTodayWorkoutHero() {
   document.getElementById("today-workout")?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
-function phaseLabel(phase: NoWorkoutUrgencyPhase): string {
-  if (phase === "morning") return "오전";
-  if (phase === "afternoon") return "오후";
-  if (phase === "evening") return "저녁";
-  return "밤";
+function phaseLabel(phase: NoWorkoutUrgencyPhase, copy: SiteNoWorkoutInterventionCopy): string {
+  if (phase === "morning") return copy.phaseMorning;
+  if (phase === "afternoon") return copy.phaseAfternoon;
+  if (phase === "evening") return copy.phaseEvening;
+  return copy.phaseNight;
 }
 
 /**
@@ -50,6 +47,7 @@ export function NoWorkoutCoachIntervention({
   coachLineReason,
   streakDays,
   interventionHours,
+  copy,
 }: Props) {
   const [now, setNow] = useState(() => new Date());
 
@@ -98,6 +96,8 @@ export function NoWorkoutCoachIntervention({
         ? "inline-flex min-h-[50px] w-full flex-1 items-center justify-center rounded-xl border-2 border-orange-800/50 bg-white/95 px-5 text-[15px] font-bold text-orange-950 shadow-md transition hover:bg-white active:scale-[0.99] dark:border-orange-400/45 dark:bg-zinc-900/85 dark:text-orange-50 sm:min-h-[54px] sm:max-w-md"
         : "inline-flex min-h-[50px] w-full flex-1 items-center justify-center rounded-xl border-2 border-amber-800/45 bg-white/95 px-5 text-[15px] font-bold text-amber-950 shadow-md transition hover:bg-white active:scale-[0.99] dark:border-amber-400/45 dark:bg-zinc-900/85 dark:text-amber-100 sm:min-h-[54px] sm:max-w-md";
 
+  const planSuffix = planConfirmed ? copy.routineLinePlanLockedSuffix : copy.routineLinePlanOpenSuffix;
+
   return (
     <section
       className={`relative overflow-hidden ${shell}`}
@@ -122,7 +122,7 @@ export function NoWorkoutCoachIntervention({
                   : "text-amber-900/85 dark:text-amber-200/90"
             }`}
           >
-            오늘 한 줄
+            {copy.eyebrowTodayLine}
           </p>
           <span
             className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
@@ -133,7 +133,7 @@ export function NoWorkoutCoachIntervention({
                   : "border-amber-800/25 bg-amber-500/12 text-amber-950 dark:border-amber-400/35 dark:bg-amber-500/15 dark:text-amber-100"
             }`}
           >
-            {phaseLabel(phase)}
+            {phaseLabel(phase, copy)}
           </span>
         </div>
 
@@ -148,7 +148,7 @@ export function NoWorkoutCoachIntervention({
 
         <p className={`mt-1.5 text-[13px] font-semibold leading-snug sm:text-[14px] ${subInk}`}>
           「{routineTitle}」 · 대략 {estimatedDurationLabel}
-          {planConfirmed ? " · 플랜 고정됨" : " · 아래에서 플랜만 정하면 됨"}
+          {planSuffix}
         </p>
 
         <p className={`mt-3 flex flex-wrap items-baseline gap-1.5 text-[12px] leading-relaxed opacity-95 ${subInk}`}>
@@ -161,7 +161,7 @@ export function NoWorkoutCoachIntervention({
                   : "border-amber-900/25 bg-white/70 text-amber-950 dark:border-amber-400/40 dark:bg-zinc-900/80 dark:text-amber-100"
             }`}
           >
-            이유
+            {copy.reasonBadge}
           </span>
           <span>{coachLineReason}</span>
         </p>
@@ -169,27 +169,27 @@ export function NoWorkoutCoachIntervention({
         <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-3">
           {planConfirmed ? (
             <>
-              <Link href="/workout" className={primaryBtn} aria-label="지금 시작하기 — 운동 기록 화면으로 이동">
-                지금 시작하기
+              <Link href="/workout" className={primaryBtn} aria-label={copy.ctaStartNow}>
+                {copy.ctaStartNow}
               </Link>
-              <Link href="/workout" className={secondaryBtn} aria-label="빠른 루틴 실행 — 운동 기록 화면으로 이동">
-                빠른 루틴 실행
+              <Link href="/workout" className={secondaryBtn} aria-label={copy.ctaQuickRoutine}>
+                {copy.ctaQuickRoutine}
               </Link>
             </>
           ) : (
             <>
               <button type="button" onClick={scrollToTodayPlan} className={primaryBtn}>
-                지금 시작하기
+                {copy.ctaStartNow}
               </button>
               <button type="button" onClick={scrollToTodayWorkoutHero} className={secondaryBtn}>
-                빠른 루틴 실행
+                {copy.ctaQuickRoutine}
               </button>
             </>
           )}
         </div>
 
         {phase === "night" && streakDays > 0 ? (
-          <p className={`mt-3 text-center text-[12px] font-semibold ${subInk}`}>한 종목·한 세트만 넣어도 연속은 이어져요.</p>
+          <p className={`mt-3 text-center text-[12px] font-semibold ${subInk}`}>{copy.nightStreakHint}</p>
         ) : null}
 
         <div className="mt-3 flex justify-center sm:justify-start">
@@ -197,7 +197,7 @@ export function NoWorkoutCoachIntervention({
             href="/program"
             className={`text-[12px] font-bold underline-offset-2 transition hover:underline ${subInk} opacity-90`}
           >
-            프로그램 보기
+            {copy.programLink}
           </Link>
         </div>
       </div>

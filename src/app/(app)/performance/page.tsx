@@ -1,4 +1,5 @@
 import { PerformanceClient } from "./performance-client";
+import { getSiteSettings } from "@/lib/site-settings/load-server";
 import { mapWorkoutRow } from "@/lib/workouts/map-db-row";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -11,14 +12,15 @@ export default async function PerformancePage() {
   if (!user) {
     redirect("/login");
   }
+  const site = await getSiteSettings();
   const { data, error } = await supabase
     .from("workouts")
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
   if (error) {
-    return <PerformanceClient initialRows={[]} />;
+    return <PerformanceClient initialRows={[]} copy={site.copy.performancePage} />;
   }
   const rows = (data ?? []).map((r) => mapWorkoutRow(r as Record<string, unknown>));
-  return <PerformanceClient initialRows={rows} />;
+  return <PerformanceClient initialRows={rows} copy={site.copy.performancePage} />;
 }
