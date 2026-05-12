@@ -47,6 +47,8 @@ export function RewardStatusCard({ userId, workouts, hydrated, lastXpFloat }: Pr
 
   const streak = useMemo(
     () => (hydrated ? computeLoggingStreakMerged(workouts, new Date()) : 0),
+    // streakPreferenceTick은 localStorage 기반 streak 설정 변경 시 재계산을 강제하는 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [workouts, hydrated, streakPreferenceTick],
   );
   const level = useMemo(() => computeLevelProgress(totalXp), [totalXp]);

@@ -25,6 +25,8 @@ export function WeeklyStakeCard({ stake, hydrated, todayWorkoutComplete }: Props
   useEffect(() => {
     if (!stake || todayWorkoutComplete) return;
     setAnimKey((k) => k + 1);
+    // stake 객체 자체보다 진행률 변화에만 반응시키기 위해 선택적 필드를 사용.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todayWorkoutComplete, stake?.progressPercent, stake?.currentRows, stake?.weeklyTarget]);
 
   if (!hydrated) return null;

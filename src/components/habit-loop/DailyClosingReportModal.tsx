@@ -55,6 +55,8 @@ export function DailyClosingReportModal({ open, kind, workouts, onDismiss }: Pro
     const g = loadLocalGoals();
     const hasWeekly = !!(g.weeklySessionTarget && g.weeklySessionTarget > 0);
     return buildClosingReportPlanFeedbackUi(kind, todayList.length, hasWeekly);
+    // open은 모달이 열릴 때마다 localStorage(goals)를 다시 읽기 위한 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind, todayList.length, open]);
 
   const planFeedbackShell =

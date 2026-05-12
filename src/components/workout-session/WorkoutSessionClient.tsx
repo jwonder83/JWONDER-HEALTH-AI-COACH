@@ -248,8 +248,12 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
   const weeklySessionTarget = useMemo(() => {
     const g = loadLocalGoals();
     return g.weeklySessionTarget && g.weeklySessionTarget > 0 ? g.weeklySessionTarget : null;
+    // goalsVersion/hydrated는 localStorage 변경/하이드레이션 완료 시 재계산을 강제하는 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goalsVersion, hydrated]);
 
+  // streakPreferenceTick은 localStorage 기반 streak 설정 변경 시 재계산을 강제.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const streakMerged = useMemo(() => computeLoggingStreakMerged(workouts, new Date()), [workouts, streakPreferenceTick]);
 
   const weekProgressPercent = useMemo(() => {
@@ -269,6 +273,8 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
         userWorkoutUiState,
         todayWorkoutComplete,
       }),
+    // streakPreferenceTick은 streak 설정 변경 시 재계산을 강제하는 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [workouts, hydrated, weeklySessionTarget, weekRollup.rowCount, streakMerged, userWorkoutUiState, todayWorkoutComplete, streakPreferenceTick],
   );
 
@@ -286,6 +292,8 @@ export function WorkoutSessionClient({ userId, restTargetSeconds, missedDayHourL
         workoutEntryHref: "#workout-session-loop",
         habitLoopHomeHref: "/",
       }),
+    // workouts/loopTick은 외부(체크인 이벤트 등) 변경 시 loadDailyCheckin 재호출을 강제하기 위한 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [hydrated, userId, todayWorkoutComplete, userWorkoutUiState, workouts, loopTick],
   );
 

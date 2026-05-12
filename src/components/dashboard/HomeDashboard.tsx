@@ -166,8 +166,12 @@ export function HomeDashboard({ userId, site }: Props) {
   const weeklySessionTarget = useMemo(() => {
     const g = loadLocalGoals();
     return g.weeklySessionTarget && g.weeklySessionTarget > 0 ? g.weeklySessionTarget : null;
+    // goalsVersion/hydrated는 localStorage 변경/하이드레이션 완료 시 재계산을 강제하는 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goalsVersion, hydrated]);
 
+  // streakPreferenceTick은 localStorage 기반 streak 설정 변경 시 재계산을 강제.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const streakMerged = useMemo(() => computeLoggingStreakMerged(workouts, new Date()), [workouts, streakPreferenceTick]);
 
   const todayWorkoutComplete = useMemo(() => hasWorkoutToday(workouts, new Date()), [workouts]);
@@ -185,6 +189,8 @@ export function HomeDashboard({ userId, site }: Props) {
         now: new Date(),
         workoutEntryHref: "/#section-input",
       }),
+    // habitLoopTick은 외부 이벤트(체크인 등) 발생 시 재계산을 강제하는 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       hydrated,
       userId,
@@ -210,6 +216,8 @@ export function HomeDashboard({ userId, site }: Props) {
       return md.sessionCoachRestDay;
     }
     return md.sessionCoachActiveDayTemplate.replace("{percent}", String(b.recommendedIntensityPercent));
+    // habitLoopTick은 체크인 변경 시 브리핑 재계산을 강제하는 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, workouts, site.experience, site.copy.mainDashboard, userId, habitLoopTick]);
 
   const weekProgressPercent = useMemo(() => {
@@ -229,6 +237,8 @@ export function HomeDashboard({ userId, site }: Props) {
         userWorkoutUiState,
         todayWorkoutComplete,
       }),
+    // streakPreferenceTick은 streak 설정 변경 시 재계산을 강제하는 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [workouts, hydrated, weeklySessionTarget, weekRollup.rowCount, streakMerged, userWorkoutUiState, todayWorkoutComplete, streakPreferenceTick],
   );
 

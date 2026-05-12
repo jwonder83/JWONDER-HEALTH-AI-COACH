@@ -101,6 +101,8 @@ export function useHomeActionViewModel({ userId, workouts, hydrated, experience 
 
   const model = useMemo(
     () => buildHomeActionViewModel(workouts, profile, goals, hydrated, { experience, dailyCheckin }),
+    // streakPreferenceTick/planFeedbackTick은 외부(localStorage) 상태 변경 시 재계산을 강제하기 위한 신호입니다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [workouts, profile, goals, hydrated, experience, dailyCheckin, streakPreferenceTick, planFeedbackTick],
   );
 

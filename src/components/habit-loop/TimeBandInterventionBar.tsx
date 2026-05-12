@@ -45,6 +45,8 @@ export function TimeBandInterventionBar({ hydrated, todayWorkoutComplete, primar
 
   const intervention = useMemo(
     () => getTimeBandIntervention({ now: new Date(), hydrated, todayWorkoutComplete }),
+    // tick은 1분마다 시간대 재계산을 강제하기 위한 신호.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [hydrated, todayWorkoutComplete, tick],
   );
 
