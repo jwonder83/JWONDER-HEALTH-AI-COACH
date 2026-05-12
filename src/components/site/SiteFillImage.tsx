@@ -1,6 +1,9 @@
 "use client";
 
-import { siteAssetDisplayImageUrl } from "@/lib/supabase/storage-image-url";
+import {
+  isSupabaseStoragePublicObjectUrl,
+  siteAssetDisplayImageUrl,
+} from "@/lib/supabase/storage-image-url";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Props = {
@@ -30,15 +33,38 @@ export function SiteFillImage({
   fadeIn = true,
 }: Props) {
   const [loaded, setLoaded] = useState(false);
-  const displaySrc = useMemo(() => siteAssetDisplayImageUrl(src, maxDisplayWidth), [src, maxDisplayWidth]);
+  /** Supabase render URL이 4xx(변환 미지원·플랜 등)일 때 원본 object/public URL로 한 번 재시도 */
+  const [skipSupabaseTransform, setSkipSupabaseTransform] = useState(false);
+
+  const displaySrc = useMemo(() => {
+    const trimmed = src.trim();
+    if (!trimmed) return "";
+    if (skipSupabaseTransform) return trimmed;
+    return siteAssetDisplayImageUrl(trimmed, maxDisplayWidth);
+  }, [src, maxDisplayWidth, skipSupabaseTransform]);
 
   useEffect(() => {
     setLoaded(false);
-  }, [displaySrc]);
+    setSkipSupabaseTransform(false);
+  }, [src, maxDisplayWidth]);
 
   const onLoad = useCallback(() => {
     setLoaded(true);
   }, []);
+
+  const onError = useCallback(() => {
+    const trimmed = src.trim();
+    if (
+      !skipSupabaseTransform &&
+      trimmed &&
+      isSupabaseStoragePublicObjectUrl(trimmed) &&
+      siteAssetDisplayImageUrl(trimmed, maxDisplayWidth) !== trimmed
+    ) {
+      setSkipSupabaseTransform(true);
+      return;
+    }
+    setLoaded(true);
+  }, [src, maxDisplayWidth, skipSupabaseTransform]);
 
   const setImgRef = useCallback((node: HTMLImageElement | null) => {
     if (node?.complete && node.naturalWidth > 0) {
@@ -53,18 +79,22 @@ export function SiteFillImage({
   return (
     <>
       <div className={["pointer-events-none absolute inset-0", placeholderClassName].filter(Boolean).join(" ")} aria-hidden />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        ref={setImgRef}
-        src={displaySrc}
-        alt={alt}
-        sizes={sizes}
-        className={[imgBase, opacityCls, className].filter(Boolean).join(" ")}
-        loading={priority ? "eager" : "lazy"}
-        decoding="async"
-        fetchPriority={priority ? "high" : undefined}
-        onLoad={onLoad}
-      />
+      {displaySrc ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          key={displaySrc}
+          ref={setImgRef}
+          src={displaySrc}
+          alt={alt}
+          sizes={sizes}
+          className={[imgBase, opacityCls, className].filter(Boolean).join(" ")}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={priority ? "high" : undefined}
+          onLoad={onLoad}
+          onError={onError}
+        />
+      ) : null}
     </>
   );
 }
