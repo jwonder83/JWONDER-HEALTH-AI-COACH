@@ -8,10 +8,28 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+function resolveMetadataBase(): URL {
+  // 우선순위: 명시적 SITE_URL → Vercel 프로덕션 도메인 → 현재 배포 도메인 → 로컬 개발
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (explicit) {
+    try {
+      return new URL(explicit);
+    } catch {
+      // 잘못된 형식이면 무시하고 아래 fallback 사용
+    }
+  }
+  const vercelProd = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercelProd) return new URL(`https://${vercelProd}`);
+
+  const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL || process.env.VERCEL_URL;
+  if (vercelUrl) return new URL(`https://${vercelUrl}`);
+
+  return new URL("http://localhost:3000");
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
-  const rawBase = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  const metadataBase = rawBase ? new URL(rawBase) : new URL("http://localhost:3000");
+  const metadataBase = resolveMetadataBase();
   const title = site.copy.appTitle;
   const description = site.copy.appDescription;
   return {
